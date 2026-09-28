@@ -73,8 +73,8 @@ export function Hero() {
 
           <div className="lg:col-span-5">
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              <NetworkGraphic className="mx-auto hidden w-full max-w-[22rem] sm:block lg:max-w-[26rem]" />
-              <Countdown className="sm:-mt-4" />
+              <NetworkGraphic className="mx-auto block w-full max-w-[19rem] sm:max-w-[22rem] lg:max-w-[26rem]" />
+              <Countdown className="-mt-2 sm:-mt-4" />
             </div>
           </div>
         </div>

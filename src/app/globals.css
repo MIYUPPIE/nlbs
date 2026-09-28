@@ -26,6 +26,19 @@
 
   --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
   --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+  /* Hero network: one revolution per minute, starting once the spotlight settles. */
+  --animate-orbit: orbit 60s linear 1.2s infinite;
+  --animate-orbit-counter: orbit 60s linear 1.2s infinite reverse;
+  --animate-drift: orbit 120s linear 1.2s infinite reverse;
+
+  @keyframes orbit {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
   @keyframes spotlight {
     0% {
