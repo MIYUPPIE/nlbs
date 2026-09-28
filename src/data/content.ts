@@ -1,0 +1,163 @@
+import type { IconName } from "@/components/ui/Icon";
+
+export type Pillar = {
+  id: "capital" | "talent" | "technology";
+  label: string;
+  title: string;
+  intro: string;
+  body: string;
+  icon: IconName;
+  href: "/investment" | "/talent" | "/technology";
+};
+
+export const pillars: Pillar[] = [
+  {
+    id: "capital",
+    label: "Capital",
+    title: "Unlocking Investment",
+    intro: "Mobilising investment for high-growth businesses and productive sectors.",
+    body: "Connect high-growth businesses and startups with DFIs, institutional investors, venture capital, sovereign and diaspora capital.",
+    icon: "landmark",
+    href: "/investment",
+  },
+  {
+    id: "talent",
+    label: "Talent",
+    title: "Building Human Capital",
+    intro: "Building pathways for skills, employment and participation in the future economy.",
+    body: "Create sustainable pathways for skills development, employment, youth participation and women's inclusion in the future of work.",
+    icon: "users",
+    href: "/talent",
+  },
+  {
+    id: "technology",
+    label: "Technology",
+    title: "Accelerating Adoption",
+    intro:
+      "Accelerating practical technology adoption across businesses, industries and public institutions.",
+    body: "Showcase how AI, FinTech, AgriTech and enterprise technology can improve productivity and strengthen institutions.",
+    icon: "cpu",
+    href: "/technology",
+  },
+];
+
+export const introduction = {
+  heading: "From Dialogue to Deals",
+  paragraphs: [
+    "Nigeria stands at a defining moment. With ongoing macro-economic reforms, a youthful population and accelerating digital adoption across key sectors, the opportunity to strengthen the country's global competitiveness is significant.",
+    "But structural challenges remain.",
+    "Capital access, skills development, infrastructure, technology adoption and policy clarity require coordinated action across government, business, investors, development institutions and the wider ecosystem.",
+  ],
+  leversLead: "Nigeria 2.0 moves the conversation forward by focusing on three critical levers:",
+};
+
+export const investment = {
+  heading: "Capital That Moves Ideas Forward",
+  lead: "The summit is designed to create structured connections between the people who build businesses and the people who fund them.",
+  groups: {
+    enterprise: { label: "Enterprise", items: ["Local businesses", "Startups"] },
+    enablers: { label: "Enablers", items: ["Government", "Strategic partners"] },
+    capital: {
+      label: "Capital",
+      items: [
+        "Development finance institutions",
+        "Venture capital",
+        "Institutional investors",
+        "Diaspora investors",
+      ],
+    },
+  },
+};
+
+export const talent = {
+  heading: "Invest in People",
+  fundName: "Nigeria 2.0 Talent Fund",
+  lead: "A dedicated initiative to prepare young Nigerians to participate in, and shape, the future economy.",
+  focus: [
+    { label: "Digital skills", icon: "monitor" },
+    { label: "Technology", icon: "cpu" },
+    { label: "Entrepreneurship", icon: "rocket" },
+    { label: "Employability", icon: "briefcase" },
+    { label: "Future of work", icon: "compass" },
+    { label: "Youth participation", icon: "users" },
+    { label: "Women's inclusion", icon: "sparkles" },
+  ] satisfies { label: string; icon: IconName }[],
+};
+
+export type TechArea = {
+  title: string;
+  description: string;
+  icon: IconName;
+};
+
+export const technologyAreas: TechArea[] = [
+  {
+    title: "Artificial Intelligence",
+    description: "Practical AI adoption across enterprises and institutions.",
+    icon: "brain",
+  },
+  {
+    title: "FinTech",
+    description: "Expanding financial infrastructure and business productivity.",
+    icon: "wallet",
+  },
+  {
+    title: "AgriTech",
+    description: "Improving agricultural productivity, access and value chains.",
+    icon: "sprout",
+  },
+  {
+    title: "Enterprise Technology",
+    description: "Digital transformation for businesses and institutions.",
+    icon: "building",
+  },
+  {
+    title: "Public Technology",
+    description: "Technology-enabled public service delivery and governance.",
+    icon: "landmark",
+  },
+];
+
+export const exhibitionCategories: { label: string; icon: IconName }[] = [
+  { label: "AI", icon: "brain" },
+  { label: "FinTech", icon: "wallet" },
+  { label: "AgriTech", icon: "sprout" },
+  { label: "Robotics", icon: "bot" },
+  { label: "Digital Infrastructure", icon: "server" },
+  { label: "Enterprise Software", icon: "layers" },
+  { label: "Climate Technology", icon: "leaf" },
+  { label: "Creative Technology", icon: "palette" },
+  { label: "Education Technology", icon: "graduation" },
+];
+
+export const dealFlow = [
+  { step: "Business", detail: "Organisations register their interest and objectives." },
+  { step: "Qualification", detail: "Needs, readiness and fit are reviewed." },
+  { step: "Matchmaking", detail: "Participants are paired against shared priorities." },
+  { step: "Meeting", detail: "Structured B2B and B2G sessions take place at the summit." },
+  { step: "Partnership", detail: "Aligned parties continue the conversation." },
+  { step: "Potential Deal", detail: "Where there is fit, conversations can progress toward agreements." },
+];
+
+export const pitchArena = {
+  heading: "The Startup Pitch Arena",
+  subheading: "Ideas seeking capital. Solutions seeking scale.",
+  lead: "Selected startups will present their businesses to investors, business leaders and ecosystem partners.",
+  format: [
+    {
+      title: "Selection",
+      detail:
+        "Startups are selected ahead of the summit. Criteria will be published with the application details.",
+    },
+    {
+      title: "Pitch",
+      detail:
+        "Selected founders present on the summit stage to an audience of investors and ecosystem leaders.",
+    },
+    {
+      title: "Engagement",
+      detail: "Investors and partners connect with founders during the summit's structured networking.",
+    },
+  ],
+  datesStatus: "Application details coming soon",
+};

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Gate lane: deterministic, local, fast. Never skip with --no-verify.
+set -e
+npx prettier --check . >/dev/null || { echo "Prettier: run 'npm run format'"; exit 1; }
+npm run --silent typecheck
+npm run --silent lint
+npm run --silent test

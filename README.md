@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nigeria 2.0: Nigerian Leadership Business Summit 2026
 
-## Getting Started
+Official website for **Nigeria 2.0**, Friday 27 November 2026, Eko Convention Centre, Lagos. Convened by HBC Business Help.
 
-First, run the development server:
+Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4 · Aceternity UI patterns · Motion · Lucide · Zod.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install          # also points git at .githooks (pre-commit gate)
+npm run dev          # http://localhost:3000
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and set values (see **Forms** below).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content rule
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Only facts confirmed in the build brief are published. They live in `src/data/`:
 
-## Learn More
+| File                                         | What to edit                                                                                             |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `event.ts`                                   | Event facts, statistics (every figure is `expected` or `target`), contact details (`null` = placeholder) |
+| `programme.ts`                               | Six programme formats. `time: null` renders "Time to be announced"                                       |
+| `speakers.ts`                                | Placeholders. Set `confirmed: true` + real details + `/public/speakers/*.jpg` to publish                 |
+| `partners.ts`                                | Add `{ name, logo }` to a category to replace its placeholder slots                                      |
+| `content.ts`, `audience.ts`, `navigation.ts` | Section copy, audience groups, nav and routes                                                            |
 
-To learn more about Next.js, take a look at the following resources:
+`tests/content-integrity.test.ts` fails the build if unverified names or claims from draft client documents (named keynotes, media partners, pricing, times, contact details) appear in `src/`. When the convener confirms one, remove it from that test's list in the same commit that publishes it.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Forms
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`/register` and `/contact` post to `/api/register` and `/api/enquiry`. Both validate with the same Zod schemas as the client (`src/lib/registration.ts`, `src/lib/enquiry.ts`) and forward to a webhook (CRM, Zapier, Make, Sheets, your API):
 
-## Deploy on Vercel
+| Variable                                           | Purpose                                                                       |
+| -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `REGISTRATION_WEBHOOK_URL` / `ENQUIRY_WEBHOOK_URL` | POST target, JSON body with `kind`, `reference`, `submittedAt` and the fields |
+| `*_WEBHOOK_SECRET`                                 | Optional, sent as `Authorization: Bearer <secret>`                            |
+| `*_ALLOW_UNCONNECTED=true`                         | Accept without a webhook (demo/staging only)                                  |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Status contract: `200` ok · `400` bad JSON · `413` too large · `422` invalid (with `fieldErrors`) · `502` webhook failed · `503` not connected. In production with no webhook, forms show "not open yet" rather than a false confirmation. Logs carry the reference and delegate type/topic only, never personal data.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No payment flow exists. Ticket pricing has not been supplied.
+
+## Tests
+
+| Lane                   | Command                             | What it covers                                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gate (pre-commit, <2s) | `npm run check`                     | Types, lint, 108 unit tests: countdown/timezone math, schemas, API status contract, content integrity, WCAG contrast of design tokens, routes/sitemap/robots                                                                                                                                                    |
+| Eval (before ship)     | `npm run build && npm run test:e2e` | 128 Playwright checks: no horizontal overflow at 1440/1280/1024/768/640/390/375 on all 12 routes, axe WCAG 2.1 AA (zero serious/critical), registration + enquiry flows, mobile drawer, programme tabs keyboard nav, frozen-clock countdown, reduced motion, no-JS rendering, pre-hydration behaviour, SEO tags |
+
+Visual check: `node scripts/screenshot.mjs /path 390 out.png --segments --base=http://localhost:3000`.
+
+## Design system
+
+Tokens are in `src/app/globals.css` (`@theme`). Gold (`#D4AF37`) is for dark surfaces, CTAs, borders and icons. On ivory/white, gold text uses `gold-ink` (`#7A5E10`, 6.1:1) because raw gold is 1.96:1 there. `tests/contrast.test.ts` enforces this.
+
+Aceternity components (adapted, in `src/components/aceternity/`): Spotlight, Background Beams (18 beams, deterministic timings, desktop only, static under reduced motion), Moving Border (partnership + final CTA), Bento Grid (technology, exhibition), Card Hover Effect (audience). Scroll reveal uses one IntersectionObserver; content is visible without JS, under reduced motion and in print.
+
+## Architecture
+
+Server components by default. Client islands: header/drawer, countdown, count-up numbers, programme tabs, audience hover, beams, moving border, forms, reveal observer. The mobile drawer uses HTML Invoker Commands so it opens before hydration; form submit buttons stay disabled until hydration so a native submit can never put personal data in a URL.

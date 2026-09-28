@@ -1,0 +1,53 @@
+export type NavLink = { label: string; href: string };
+
+/** Desktop header links, in the order given by the brief. */
+export const primaryNav: NavLink[] = [
+  { label: "About", href: "/about" },
+  { label: "Programme", href: "/programme" },
+  { label: "Speakers", href: "/speakers" },
+  { label: "Investment", href: "/investment" },
+  { label: "Talent", href: "/talent" },
+  { label: "Technology", href: "/technology" },
+  { label: "Partners", href: "/partners" },
+];
+
+/** Mobile drawer adds the secondary pages. */
+export const mobileNav: NavLink[] = [
+  ...primaryNav,
+  { label: "Startup Pitch Arena", href: "/startup-pitch" },
+  { label: "Innovation Exhibition", href: "/exhibition" },
+  { label: "Contact", href: "/contact" },
+];
+
+export const footerNav: NavLink[] = [
+  { label: "About", href: "/about" },
+  { label: "Programme", href: "/programme" },
+  { label: "Speakers", href: "/speakers" },
+  { label: "Investment", href: "/investment" },
+  { label: "Talent", href: "/talent" },
+  { label: "Technology", href: "/technology" },
+  { label: "Partners", href: "/partners" },
+  { label: "Register", href: "/register" },
+  { label: "Contact", href: "/contact" },
+];
+
+export const footerSecondaryNav: NavLink[] = [
+  { label: "Startup Pitch Arena", href: "/startup-pitch" },
+  { label: "Innovation Exhibition", href: "/exhibition" },
+];
+
+/** Every public route. Drives the sitemap and route tests. */
+export const allRoutes = [
+  "/",
+  "/about",
+  "/programme",
+  "/speakers",
+  "/investment",
+  "/talent",
+  "/technology",
+  "/startup-pitch",
+  "/exhibition",
+  "/partners",
+  "/register",
+  "/contact",
+] as const;

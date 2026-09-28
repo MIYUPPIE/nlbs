@@ -1,0 +1,229 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
+import { event } from "@/data/event";
+import { delegateTypes, registrationSchema, sectors } from "@/lib/registration";
+import { buttonClasses } from "@/components/ui/GoldButton";
+import { Honeypot, SelectField, TextField } from "@/components/forms/Field";
+import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
+import { useHydrated } from "@/components/hooks/useHydrated";
+
+const emptyValues = {
+  fullName: "",
+  email: "",
+  phone: "",
+  organisation: "",
+  jobTitle: "",
+  sector: "",
+  country: "Nigeria",
+  delegateType: "",
+  website: "",
+};
+
+export function RegistrationForm({ initialDelegateType }: { initialDelegateType?: string }) {
+  const initial =
+    initialDelegateType && (delegateTypes as readonly string[]).includes(initialDelegateType)
+      ? { ...emptyValues, delegateType: initialDelegateType }
+      : emptyValues;
+
+  const { formRef, ...form } = useSubmissionForm(registrationSchema, initial, "/api/register");
+  const successRef = useRef<HTMLHeadingElement>(null);
+  // Submit stays disabled until hydrated so a pre-hydration submit cannot fire natively.
+  const hydrated = useHydrated();
+
+  useEffect(() => {
+    if (form.status === "success") successRef.current?.focus();
+  }, [form.status]);
+
+  if (form.status === "success") {
+    return (
+      <div role="status" className="rounded-3xl border border-gold/50 bg-white p-8 text-center sm:p-12">
+        <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-navy-950 text-gold">
+          <CircleCheck aria-hidden="true" className="size-8" />
+        </span>
+        <h2 ref={successRef} tabIndex={-1} className="mt-6 font-display text-4xl text-navy-950 outline-none">
+          Registration received
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-muted">
+          Thank you, {form.values.fullName.split(" ")[0]}. Your registration for {event.shortName} has been
+          received. The summit team will be in touch at{" "}
+          <strong className="text-navy-950">{form.values.email}</strong> with next steps.
+        </p>
+        <dl className="mx-auto mt-8 grid max-w-sm gap-3 rounded-2xl bg-ivory p-5 text-left text-sm">
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Reference</dt>
+            <dd className="font-mono font-semibold text-navy-950">{form.reference}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Date</dt>
+            <dd className="text-right text-navy-950">{event.date.display}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Venue</dt>
+            <dd className="text-right text-navy-950">{event.venue.display}</dd>
+          </div>
+        </dl>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/programme" className={buttonClasses("gold")}>
+            Explore the programme
+          </Link>
+          <button type="button" onClick={form.reset} className={buttonClasses("outline-dark")}>
+            Register another delegate
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const field = {
+    onChange: form.setField,
+    onBlur: form.blurField,
+  };
+  const submitting = form.status === "submitting";
+
+  return (
+    <form
+      ref={formRef}
+      method="post"
+      noValidate
+      onSubmit={form.onSubmit}
+      aria-describedby="registration-note"
+      className="relative rounded-3xl border border-line bg-white p-6 sm:p-10"
+    >
+      {form.formError && (
+        <div
+          role="alert"
+          className="mb-8 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        >
+          <CircleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+          <p>{form.formError}</p>
+        </div>
+      )}
+
+      <fieldset>
+        <legend className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">
+          Your details
+        </legend>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <TextField
+            name="fullName"
+            label="Full Name"
+            autoComplete="name"
+            required
+            value={form.values.fullName}
+            error={form.errors.fullName}
+            className="sm:col-span-2"
+            {...field}
+          />
+          <TextField
+            name="email"
+            label="Email Address"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            required
+            value={form.values.email}
+            error={form.errors.email}
+            {...field}
+          />
+          <TextField
+            name="phone"
+            label="Phone Number"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            required
+            hint="Include your country code if outside Nigeria, e.g. +44."
+            value={form.values.phone}
+            error={form.errors.phone}
+            {...field}
+          />
+        </div>
+      </fieldset>
+
+      <fieldset className="mt-10 border-t border-line pt-8">
+        <legend className="sr-only">Your organisation</legend>
+        <p aria-hidden="true" className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">
+          Your organisation
+        </p>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <TextField
+            name="organisation"
+            label="Organisation"
+            autoComplete="organization"
+            required
+            value={form.values.organisation}
+            error={form.errors.organisation}
+            {...field}
+          />
+          <TextField
+            name="jobTitle"
+            label="Job Title"
+            autoComplete="organization-title"
+            required
+            value={form.values.jobTitle}
+            error={form.errors.jobTitle}
+            {...field}
+          />
+          <SelectField
+            name="sector"
+            label="Sector"
+            required
+            options={sectors}
+            placeholder="Select your sector"
+            value={form.values.sector}
+            error={form.errors.sector}
+            {...field}
+          />
+          <TextField
+            name="country"
+            label="Country"
+            autoComplete="country-name"
+            required
+            value={form.values.country}
+            error={form.errors.country}
+            {...field}
+          />
+          <SelectField
+            name="delegateType"
+            label="Delegate Type"
+            required
+            options={delegateTypes}
+            placeholder="Select a delegate type"
+            value={form.values.delegateType}
+            error={form.errors.delegateType}
+            className="sm:col-span-2"
+            {...field}
+          />
+        </div>
+      </fieldset>
+
+      <Honeypot value={form.values.website} onChange={(v) => form.setField("website", v)} />
+
+      <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <p id="registration-note" className="max-w-sm text-xs leading-relaxed text-muted">
+          Fields marked * are required. Your details are used only to manage your participation in the summit.
+        </p>
+        <button
+          type="submit"
+          disabled={submitting || !hydrated}
+          className={buttonClasses("gold", "lg", "w-full disabled:cursor-wait disabled:opacity-80 sm:w-auto")}
+        >
+          {submitting ? (
+            <>
+              <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+              Submitting…
+            </>
+          ) : (
+            "Complete Registration"
+          )}
+        </button>
+      </div>
+      <p aria-live="polite" className="sr-only">
+        {submitting ? "Submitting your registration" : ""}
+      </p>
+    </form>
+  );
+}
