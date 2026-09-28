@@ -130,14 +130,58 @@ export const exhibitionCategories: { label: string; icon: IconName }[] = [
   { label: "Education Technology", icon: "graduation" },
 ];
 
-export const dealFlow = [
-  { step: "Business", detail: "Organisations register their interest and objectives." },
-  { step: "Qualification", detail: "Needs, readiness and fit are reviewed." },
-  { step: "Matchmaking", detail: "Participants are paired against shared priorities." },
-  { step: "Meeting", detail: "Structured B2B and B2G sessions take place at the summit." },
-  { step: "Partnership", detail: "Aligned parties continue the conversation." },
-  { step: "Potential Deal", detail: "Where there is fit, conversations can progress toward agreements." },
+export type DealPhase = "Before the summit" | "At the summit" | "After the summit";
+
+/** The structured networking journey. Describes the process, not outcomes. */
+export const dealFlow: { step: string; detail: string; phase: DealPhase; icon: IconName }[] = [
+  {
+    step: "Business",
+    detail: "Organisations register their interest and objectives.",
+    phase: "Before the summit",
+    icon: "briefcase",
+  },
+  {
+    step: "Qualification",
+    detail: "Needs, readiness and fit are reviewed.",
+    phase: "Before the summit",
+    icon: "compass",
+  },
+  {
+    step: "Matchmaking",
+    detail: "Participants are paired against shared priorities.",
+    phase: "Before the summit",
+    icon: "users",
+  },
+  {
+    step: "Meeting",
+    detail: "Structured B2B and B2G sessions take place at the summit.",
+    phase: "At the summit",
+    icon: "handshake",
+  },
+  {
+    step: "Partnership",
+    detail: "Aligned parties continue the conversation.",
+    phase: "After the summit",
+    icon: "layers",
+  },
+  {
+    step: "Potential Deal",
+    detail: "Where there is fit, conversations can progress toward agreements.",
+    phase: "After the summit",
+    icon: "trending",
+  },
 ];
+
+/** Consecutive steps grouped by phase, with their index range. */
+export const dealPhases = dealFlow.reduce<{ phase: DealPhase; start: number; count: number }[]>(
+  (acc, s, i) => {
+    const last = acc[acc.length - 1];
+    if (last && last.phase === s.phase) last.count += 1;
+    else acc.push({ phase: s.phase, start: i, count: 1 });
+    return acc;
+  },
+  [],
+);
 
 export const pitchArena = {
   heading: "The Startup Pitch Arena",
