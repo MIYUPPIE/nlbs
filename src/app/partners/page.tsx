@@ -1,15 +1,16 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CTASection } from "@/components/sections/CTASection";
-import { DownloadsSection } from "@/components/sections/DownloadsSection";
-import { FoundingPartnersSection } from "@/components/sections/FoundingPartnersSection";
+import { PartnershipDetailsSection } from "@/components/sections/PartnershipDetailsSection";
+import { PartnershipTracksSection } from "@/components/sections/PartnershipTracksSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { enquiryHref } from "@/lib/enquiry";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
   title: "Partners",
   description:
-    "Strategic, government, development, investment, technology and media partners of the Nigeria 2.0 Leadership Business Summit 2026.",
+    "Partner with Nigeria 2.0 as a Founding Stakeholder or an Official Sponsor of the Nigerian Leadership Business Summit 2026. Limited slots on both tracks.",
   path: "/partners",
 });
 
@@ -19,15 +20,20 @@ export default function PartnersPage() {
       <PageHero
         eyebrow="Partners"
         title="Build Nigeria 2.0 with us."
-        lead="Partners help unlock capital, talent and technology for a resilient economy. Confirmed partners will be announced here."
+        lead="Two ways to partner: shape the policy and deal agenda as a Founding Stakeholder, or reach 800+ decision makers as an Official Sponsor. Confirmed partners will be announced here."
       >
-        <GoldButton href="/contact?topic=partnership" size="lg" className="mt-10">
-          Become a partner
-        </GoldButton>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <GoldButton href="#tracks" size="lg">
+            Compare the two tracks
+          </GoldButton>
+          <GoldButton href={enquiryHref("sponsor")} variant="outline-light" size="lg" arrow={false}>
+            Request fees
+          </GoldButton>
+        </div>
       </PageHero>
-      <FoundingPartnersSection />
+      <PartnershipTracksSection />
+      <PartnershipDetailsSection />
       <PartnersSection />
-      <DownloadsSection ids={["concept-note", "audience-profile"]} title="Partner resources" />
       <CTASection />
     </>
   );

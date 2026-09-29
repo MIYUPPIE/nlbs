@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("registration", () => {
   test("shows inline validation and focuses the first invalid field", async ({ page }) => {
     await page.goto("/register");
-    await page.getByRole("button", { name: "Complete Registration" }).click();
+    await page.getByRole("button", { name: "Request Invitation" }).click();
     await expect(page.locator("form").getByRole("alert")).toContainText(
       "Please correct the highlighted fields.",
     );
@@ -23,9 +23,9 @@ test.describe("registration", () => {
     await page.getByLabel(/Job Title/).fill("Managing Director");
     await page.getByLabel(/Sector/).selectOption("Technology & Telecommunications");
     await page.getByLabel(/Delegate Type/).selectOption("Investor");
-    await page.getByRole("button", { name: "Complete Registration" }).click();
+    await page.getByRole("button", { name: "Request Invitation" }).click();
 
-    const heading = page.getByRole("heading", { name: "Registration received" });
+    const heading = page.getByRole("heading", { name: "Request received" });
     await expect(heading).toBeVisible();
     await expect(heading).toBeFocused();
     await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
@@ -57,9 +57,9 @@ test.describe("registration", () => {
     await page.getByLabel(/Job Title/).fill("MD");
     await page.getByLabel(/Sector/).selectOption("Other");
     await page.getByLabel(/Delegate Type/).selectOption("Other");
-    await page.getByRole("button", { name: "Complete Registration" }).click();
+    await page.getByRole("button", { name: "Request Invitation" }).click();
     await expect(page.locator("form").getByRole("alert")).toContainText("not open yet");
-    await expect(page.getByRole("heading", { name: "Registration received" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Request received" })).toHaveCount(0);
   });
 });
 

@@ -1,18 +1,21 @@
 import "server-only";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseFaq, type FaqCategory, type FaqItem } from "@/lib/faq";
+import { parseFaq, type FaqCategory, type FaqItem, type FaqOverride } from "@/lib/faq";
 
 /**
  * Client-supplied FAQ. Source of truth: content/faq.md (paste updates there).
- * content/faq-overrides.json patches answers that are missing or malformed in
- * the source. Parsed at build time; the /faq page is fully static.
+ * content/faq-overrides.json patches questions and answers that are missing,
+ * malformed or superseded in the source. Parsed at build time; the /faq page is fully static.
  */
 const root = join(process.cwd(), "content");
 
 function load(): FaqCategory[] {
   const md = readFileSync(join(root, "faq.md"), "utf8");
-  const raw = JSON.parse(readFileSync(join(root, "faq-overrides.json"), "utf8")) as Record<string, string>;
+  const raw = JSON.parse(readFileSync(join(root, "faq-overrides.json"), "utf8")) as Record<
+    string,
+    FaqOverride
+  >;
   const overrides = Object.fromEntries(
     Object.entries(raw)
       .filter(([k]) => /^\d+$/.test(k))

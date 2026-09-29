@@ -19,6 +19,9 @@ const emptyValues = {
   sector: "",
   country: "Nigeria",
   delegateType: "",
+  whatsapp: "",
+  nominatedBy: "",
+  accessNeeds: "",
   website: "",
 };
 
@@ -44,12 +47,12 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
           <CircleCheck aria-hidden="true" className="size-8" />
         </span>
         <h2 ref={successRef} tabIndex={-1} className="mt-6 font-display text-4xl text-navy-950 outline-none">
-          Registration received
+          Request received
         </h2>
         <p className="mx-auto mt-4 max-w-md text-muted">
-          Thank you, {form.values.fullName.split(" ")[0]}. Your registration for {event.shortName} has been
-          received. The summit team will be in touch at{" "}
-          <strong className="text-navy-950">{form.values.email}</strong> with next steps.
+          Thank you, {form.values.fullName.split(" ")[0]}. Your invitation request for {event.shortName} has
+          been received. Once it is vetted, the summit team will confirm your seat at{" "}
+          <strong className="text-navy-950">{form.values.email}</strong> and by WhatsApp.
         </p>
         <dl className="mx-auto mt-8 grid max-w-sm gap-3 rounded-2xl bg-ivory p-5 text-left text-sm">
           <div className="flex justify-between gap-4">
@@ -70,7 +73,7 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
             Explore the programme
           </Link>
           <button type="button" onClick={form.reset} className={buttonClasses("outline-dark")}>
-            Register another delegate
+            Request for another delegate
           </button>
         </div>
       </div>
@@ -140,6 +143,18 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
             error={form.errors.phone}
             {...field}
           />
+          <TextField
+            name="whatsapp"
+            label="WhatsApp Number"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            hint="Leave blank if it is your phone number. Your QR code is sent by WhatsApp."
+            value={form.values.whatsapp}
+            error={form.errors.whatsapp}
+            className="sm:col-span-2"
+            {...field}
+          />
         </div>
       </fieldset>
 
@@ -200,6 +215,30 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
         </div>
       </fieldset>
 
+      <fieldset className="mt-10 border-t border-line pt-8">
+        <legend className="sr-only">Invitation details</legend>
+        <p aria-hidden="true" className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">
+          Invitation details
+        </p>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <TextField
+            name="nominatedBy"
+            label="Who nominated you?"
+            hint="A partner, chamber of commerce, bank or organisation. Leave blank if none."
+            value={form.values.nominatedBy}
+            error={form.errors.nominatedBy}
+            {...field}
+          />
+          <TextField
+            name="accessNeeds"
+            label="Dietary or access needs"
+            value={form.values.accessNeeds}
+            error={form.errors.accessNeeds}
+            {...field}
+          />
+        </div>
+      </fieldset>
+
       <Honeypot value={form.values.website} onChange={(v) => form.setField("website", v)} />
 
       <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
@@ -217,12 +256,12 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
               Submitting…
             </>
           ) : (
-            "Complete Registration"
+            "Request Invitation"
           )}
         </button>
       </div>
       <p aria-live="polite" className="sr-only">
-        {submitting ? "Submitting your registration" : ""}
+        {submitting ? "Submitting your request" : ""}
       </p>
     </form>
   );

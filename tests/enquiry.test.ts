@@ -26,6 +26,9 @@ describe("enquirySchema", () => {
 describe("topicFromQuery", () => {
   it.each([
     ["partnership", "Partnership"],
+    ["stakeholder", "Partnership"],
+    ["sponsorship", "Sponsorship"],
+    ["sponsor", "Sponsorship"],
     ["exhibition", "Exhibition"],
     ["pitch", "Startup Pitch Arena"],
     ["investment", "Investment"],

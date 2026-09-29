@@ -33,6 +33,30 @@ describe("registrationSchema", () => {
     }
   });
 
+  it("accepts the optional plan fields blank or missing, and trims them", () => {
+    const r = registrationSchema.parse(validRegistration);
+    expect([r.whatsapp, r.nominatedBy, r.accessNeeds]).toEqual(["", "", ""]);
+    const full = registrationSchema.parse({
+      ...validRegistration,
+      whatsapp: " +234 802 000 0000 ",
+      nominatedBy: " Lagos Chamber ",
+      accessNeeds: "Vegetarian",
+    });
+    expect([full.whatsapp, full.nominatedBy, full.accessNeeds]).toEqual([
+      "+234 802 000 0000",
+      "Lagos Chamber",
+      "Vegetarian",
+    ]);
+  });
+
+  it.each(["123", "whatsapp", "+234-ABC"])("rejects WhatsApp number %s", (whatsapp) => {
+    expect(errorsFor({ ...validRegistration, whatsapp }).whatsapp).toMatch(/valid WhatsApp number/);
+  });
+
+  it("caps access needs at 300 characters", () => {
+    expect(errorsFor({ ...validRegistration, accessNeeds: "x".repeat(301) }).accessNeeds).toBeTruthy();
+  });
+
   it.each(["not-an-email", "a@b", "@example.com", "ada@"])("rejects email %s", (email) => {
     expect(errorsFor({ ...validRegistration, email }).email).toBe("Enter a valid email address.");
   });

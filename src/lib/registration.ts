@@ -42,6 +42,9 @@ const requiredText = (label: string, max = 120) =>
 
 const phonePattern = /^\+?[0-9\s\-().]{7,20}$/;
 
+const optionalText = (label: string, max: number) =>
+  z.string().trim().max(max, `${label} must be ${max} characters or fewer.`).optional().default("");
+
 export const registrationSchema = z.object({
   fullName: requiredText("Full name", 100),
   email: z
@@ -61,6 +64,18 @@ export const registrationSchema = z.object({
   sector: z.enum(sectors, { error: "Select your sector." }),
   country: requiredText("Country", 80),
   delegateType: z.enum(delegateTypes, { error: "Select a delegate type." }),
+  /** Optional extras from the registration plan. Blank WhatsApp means "same as phone". */
+  whatsapp: z
+    .string()
+    .trim()
+    .optional()
+    .default("")
+    .refine(
+      (v) => v === "" || (phonePattern.test(v) && (v.match(/\d/g) ?? []).length >= 7),
+      "Enter a valid WhatsApp number, or leave it blank if it is your phone number.",
+    ),
+  nominatedBy: optionalText("Nominated by", 120),
+  accessNeeds: optionalText("Dietary or access needs", 300),
   /** Honeypot. Real users never see or fill this field. */
   website: z.string().max(0).optional().or(z.literal("")),
 });

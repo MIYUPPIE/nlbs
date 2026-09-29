@@ -48,6 +48,19 @@ describe("parseFaq", () => {
     expect(cats[0].items[1].answer).toBe("Yes, every November.");
   });
 
+  it("an object override can replace the question as well as the answer", () => {
+    const cats = parseFaq(sample, {
+      overrides: { 2: { question: "Is it held every year", answer: "Yes." } },
+    });
+    expect(cats[0].items[1]).toEqual({ number: 2, question: "Is it held every year?", answer: "Yes." });
+    const qOnly = parseFaq(sample, { overrides: { 1: { question: "What is the summit?" } } });
+    expect(qOnly[0].items[0]).toEqual({
+      number: 1,
+      question: "What is the summit?",
+      answer: "A summit (2026-2036) for leaders.",
+    });
+  });
+
   it("rejects a missing answer", () => {
     expect(() => parseFaq(sample.replace("    Yes.\n    Every year.\n", ""))).toThrow(
       /Question 2 has no answer/,

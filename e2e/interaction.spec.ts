@@ -45,7 +45,7 @@ test.describe("before hydration (regression: taps ignored on slow networks)", ()
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
     for (const [path, button] of [
-      ["/register", "Complete Registration"],
+      ["/register", "Request Invitation"],
       ["/contact", "Send enquiry"],
     ] as const) {
       await page.goto(path);

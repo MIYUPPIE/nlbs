@@ -5,6 +5,7 @@ import { z } from "zod";
 export const enquiryTopics = [
   "General enquiry",
   "Partnership",
+  "Sponsorship",
   "Exhibition",
   "Startup Pitch Arena",
   "Investment",
@@ -51,6 +52,9 @@ export function topicFromQuery(value: string | string[] | undefined): EnquiryTop
   const slug = v.toLowerCase();
   const map: Record<string, EnquiryTopic> = {
     partnership: "Partnership",
+    stakeholder: "Partnership",
+    sponsorship: "Sponsorship",
+    sponsor: "Sponsorship",
     exhibition: "Exhibition",
     pitch: "Startup Pitch Arena",
     investment: "Investment",
@@ -59,4 +63,9 @@ export function topicFromQuery(value: string | string[] | undefined): EnquiryTop
     media: "Media",
   };
   return map[slug] ?? null;
+}
+
+/** Contact link for a partnership track: Stakeholders are "Partnership", Sponsors "Sponsorship". */
+export function enquiryHref(track: "stakeholder" | "sponsor"): string {
+  return `/contact?topic=${track === "stakeholder" ? "partnership" : "sponsorship"}`;
 }

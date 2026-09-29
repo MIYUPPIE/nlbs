@@ -1,7 +1,7 @@
 import { event } from "@/data/event";
 import { PageHero } from "@/components/layout/PageHero";
 import { AboutSection } from "@/components/sections/AboutSection";
-import { DownloadsSection } from "@/components/sections/DownloadsSection";
+import { ObjectivesSection } from "@/components/sections/ObjectivesSection";
 import { LeadershipSection } from "@/components/sections/LeadershipSection";
 import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { SummitExperienceSection } from "@/components/sections/SummitExperienceSection";
@@ -59,13 +59,13 @@ export default function AboutPage() {
       </Section>
       <StatisticsSection />
       <PillarsSection />
+      <ObjectivesSection />
       <WhyNowSection />
       <RoadmapSection />
       <SummitExperienceSection />
-      <AudienceSection />
+      <AudienceSection detailed />
       <LeadershipSection />
       <EditionSection />
-      <DownloadsSection />
       <CTASection />
     </>
   );

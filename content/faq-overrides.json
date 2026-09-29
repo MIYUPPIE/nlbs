@@ -1,8 +1,29 @@
 {
-  "_note": "Answers that replace the source text in faq.md, by question number. Each entry exists because the source was missing, malformed, or contradicted the build brief (Q13: the summit is on a Friday; Q67: partners are announced only once confirmed). Keep all other facts identical to the source.",
+  "_note": "Replacements by question number: a string replaces the answer, an object can replace the question and/or answer. Each entry exists because the source was missing, malformed, or contradicted the build brief (Q13: the summit is on a Friday; Q67: partners are announced only once confirmed). Q24, Q46-48, Q50, Q53, Q55, Q63, Q69 and Q72 follow the Stakeholders + Sponsors structure with fees on request (convener decision, 29 Sep 2026; see src/data/partnership.ts). Keep all other facts identical to the source.",
   "13": "Yes. The summit convenes every November until 2036.",
   "19": "Open application on http://nlbs.com.ng/talentnigeria20, followed by CBT screening, an interview and state quota balancing.",
+  "24": "No recruitment fee in Year 1. Founding Stakeholders get first pick of the talent pool as part of their partnership.",
+  "46": {
+    "answer": "Two tracks. Founding Stakeholders (3 Platinum, 5 Gold and 8 Silver slots) help shape the policy and deal agenda. Official Sponsors (1 Diamond, 3 Gold, 5 Silver and 10 Supporting slots) gain brand reach and leads. In-kind Talent and Ecosystem partnerships are also welcome. Fees are shared on request."
+  },
+  "47": {
+    "question": "What does a Platinum Founding Stakeholder package include?",
+    "answer": "A named place on the Post-Summit Policy Brief to the Presidency, curated one-on-one meetings with government and DFI leaders, a sector roundtable to chair, the VIP dinner with Federal Ministers and CEOs, a 15-minute keynote, a seat on the pre-summit working group, and nomination of up to 500 youths into the Talent Fund."
+  },
+  "48": {
+    "question": "Is a Founding Stakeholder package sponsorship?",
+    "answer": "No. Stakeholders pay a partnership fee to help set the agenda, not to buy logo space. Founding Stakeholder status is renewable annually for 10 years."
+  },
+  "50": {
+    "question": "What does a Gold Founding Stakeholder package include?",
+    "answer": "The Stakeholder benefits: a named place on the Policy Brief, curated meetings with government and DFI leaders, a roundtable seat, VIP dinner access, a panel speaking slot and Talent Fund nominations. Exact terms are in the partnership proposal, shared on request."
+  },
+  "53": "Yes: recruitment cost saved through the talent pipeline, media visibility, policy access and ESG/CSR reporting.",
+  "55": "Yes. Every Founding Stakeholder has a guaranteed speaking slot, and only Platinum gets a solo keynote. Diamond Sponsors give a 5-minute address and Gold Sponsors join a panel. Other speaking is subject to availability.",
+  "63": "Yes. Platinum Stakeholders can co-brand a cohort, for example \"[Your company] Nigeria 2.0 Talent Fund Cohort\".",
   "67": "Media partners will be announced on this website once agreements are confirmed.",
+  "69": "Yes. Founding Stakeholders sign a simple 2-page MOU and Impact Agreement. Sponsors receive a contract and invoice after a 15-minute activation planning call, and a 50% deposit secures the slot.",
+  "72": "Sponsors put their brand on the table: logo placement, delegate passes, exhibition and media. Founding Stakeholders build the table: they help set the agenda, meet Ministers and DFIs one-on-one, have a guaranteed speaking slot and are named on the Policy Brief. The Partners page compares both tracks.",
   "75": "By bank transfer to KK Crown Resource Ltd, Access Bank Plc, account number 0078883858. Use the reference NLBS/PLT/ followed by your company name.",
   "93": "Yes. KK Crown Resource Nig Ltd (CAC No. 840889) is the parent company of HBC Business Help, and a trademark for Nigeria 2.0 is pending.",
   "101": "Register as a delegate on this website, send a partnership, exhibition or media enquiry through the contact page, or apply to the Nigeria 2.0 Talent Fund through the portal at http://nlbs.com.ng/talentnigeria20."

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
  * Cards are plain list items (not links) because they describe groups, so
  * the highlight is decorative and adds no keyboard stops.
  */
-export type HoverItem = { title: string; description: string; icon: IconName };
+export type HoverItem = { title: string; description: string; icon: IconName; meta?: string };
 
 export function HoverEffect({ items, className }: { items: HoverItem[]; className?: string }) {
   const [active, setActive] = useState<number | null>(null);
@@ -37,9 +37,12 @@ export function HoverEffect({ items, className }: { items: HoverItem[]; classNam
             )}
           </AnimatePresence>
           <div className="relative z-10 flex h-full flex-col rounded-2xl border border-white/10 bg-navy-950/80 p-7 backdrop-blur-sm">
-            <span className="flex size-11 items-center justify-center rounded-full border border-gold/30 text-gold">
-              <Icon name={item.icon} className="size-5" />
-            </span>
+            <div className="flex items-start justify-between gap-4">
+              <span className="flex size-11 items-center justify-center rounded-full border border-gold/30 text-gold">
+                <Icon name={item.icon} className="size-5" />
+              </span>
+              {item.meta && <p className="text-right text-xs leading-snug text-mist">{item.meta}</p>}
+            </div>
             <h3 className="mt-6 text-sm font-semibold tracking-[0.2em] text-gold uppercase">{item.title}</h3>
             <p className="mt-3 text-base leading-relaxed text-white/85">{item.description}</p>
           </div>

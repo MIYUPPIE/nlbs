@@ -44,12 +44,61 @@ export const pillars: Pillar[] = [
 export const introduction = {
   heading: "From Dialogue to Deals",
   paragraphs: [
-    "Nigeria stands at a defining moment. With ongoing macro-economic reforms, a youthful population and accelerating digital adoption across key sectors, the opportunity to strengthen the country's global competitiveness is significant.",
+    "Nigeria stands at a defining moment. With ongoing macro-economic reforms, a population more than 70% under 35 and accelerating digital adoption across key sectors, the opportunity to strengthen the country's global competitiveness is significant.",
     "But structural challenges remain.",
     "Capital access, skills development, infrastructure, technology adoption and policy clarity require coordinated action across government, business, investors, development institutions and the wider ecosystem.",
   ],
   leversLead: "Nigeria 2.0 moves the conversation forward by focusing on three critical levers:",
 };
+
+/** Concept note, 1.2 Core Strategic Objectives. */
+export const objectives: { title: string; detail: string; icon: IconName }[] = [
+  {
+    title: "Attract Investment",
+    detail:
+      "Connect high-growth local businesses and startups with DFIs, global VCs and sovereign and diaspora capital.",
+    icon: "trending",
+  },
+  {
+    title: "Build Talent",
+    detail:
+      "Create sustainable pathways for skills development, job creation and youth and women's inclusion in the future of work.",
+    icon: "users",
+  },
+  {
+    title: "Drive Technology Adoption",
+    detail:
+      "Show how AI, enterprise FinTech and AgriTech can improve sector productivity and public governance.",
+    icon: "cpu",
+  },
+  {
+    title: "Foster Partnership",
+    detail:
+      "Build a premium platform for public, private and diaspora collaboration on national development.",
+    icon: "handshake",
+  },
+];
+
+/**
+ * Concept note, 1.4 Expected Outcomes. All are targets; `statId` links an
+ * outcome to its figure in event.ts so the numbers cannot drift apart.
+ */
+export const expectedOutcomes: { title: string; statId?: string }[] = [
+  { title: "Signed MOUs and investment commitments", statId: "investment" },
+  { title: "Launch of the Nigeria 2.0 Talent Fund for young Nigerians", statId: "talent" },
+  { title: "Structured B2B and B2G deal meetings", statId: "meetings" },
+  { title: "A Policy Action Brief submitted to Federal and State Executives" },
+];
+
+/** "What to expect" from the event flyer. */
+export const whatToExpect: { title: string; detail: string }[] = [
+  { title: "Presidential Roundtable", detail: "Direct dialogue with policy makers" },
+  { title: "Capital Rooms", detail: "B2B and B2G meetings with investors and DFIs" },
+  { title: "Talent Showcase", detail: "Launch of the Nigeria 2.0 Talent Fund" },
+  { title: "Tech Exhibition", detail: "50 startups pitching solutions" },
+  { title: "High-Level Panels", detail: "Practical deals, not just talk" },
+  { title: "Networking Dinner", detail: "With speakers and stakeholders" },
+];
 
 export const investment = {
   heading: "Capital That Moves Ideas Forward",
@@ -186,7 +235,7 @@ export const dealPhases = dealFlow.reduce<{ phase: DealPhase; start: number; cou
 export const pitchArena = {
   heading: "The Startup Pitch Arena",
   subheading: "Ideas seeking capital. Solutions seeking scale.",
-  lead: "Selected startups will present their businesses to investors, business leaders and ecosystem partners.",
+  lead: "Selected startups will present their businesses to investors, business leaders and ecosystem partners. The summit aims to showcase innovation from 50 startups.",
   format: [
     {
       title: "Selection",

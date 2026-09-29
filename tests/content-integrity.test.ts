@@ -2,7 +2,7 @@
  * Guards the brief's content rule: no fabricated facts, targets stay targets.
  * These fail the build if someone adds an unverified claim.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { contact, event, formatStat, stats } from "@/data/event";
@@ -93,6 +93,8 @@ describe("no fabricated content", () => {
   // reach src/. Client-approved FAQ text lives in content/, outside this scan.
   // Approved from latest/1.md, 2.md and the flyer: Seyi Tinubu (Youth
   // Patron), $1 Trillion agenda, 9:00 AM start, info@ email and phone.
+  // Approved from the prospectus and briefs: the Stakeholder and Sponsor
+  // tiers and benefits, without fees (tests/partnership.test.ts).
   it.each([
     "Dangote",
     "Elumelu",
@@ -115,11 +117,14 @@ describe("no fabricated content", () => {
     expect(sourceText.includes(term)).toBe(false);
   });
 
-  it("never publishes confidential documents", () => {
-    const files = readdirSync(join(__dirname, "..", "public", "downloads"));
-    expect(files.some((f) => /prospectus|stakeholder|sponsor|internal|application_form|youth/i.test(f))).toBe(
-      false,
-    );
+  it("publishes no client documents as files", () => {
+    // The convener's documents are source material for pages, not downloads.
+    const PUBLIC = join(__dirname, "..", "public");
+    const files = (dir: string): string[] =>
+      readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? files(join(dir, f)) : [f]));
+    expect(existsSync(join(PUBLIC, "downloads"))).toBe(false);
+    expect(files(PUBLIC).filter((f) => /\.(pdf|docx?|pptx?|jpe?g)$/i.test(f))).toEqual([]);
+    expect(sourceText).not.toMatch(/\bdownload\b/);
   });
 
   it("has no ticket pricing or payment flow", () => {

@@ -116,7 +116,7 @@ export const summitExperience = [
   },
   {
     title: "Platinum Keynotes",
-    body: "15-minute power keynotes from Platinum Founding Partners on building a $1 Trillion Nigeria.",
+    body: "15-minute power keynotes from Platinum Founding Stakeholders on building a $1 Trillion Nigeria.",
     icon: "mic",
   },
   {
@@ -140,17 +140,6 @@ export const summitExperience = [
     icon: "compass",
   },
 ] satisfies { title: string; body: string; icon: IconName }[];
-
-export const foundingPartners = {
-  heading: "Join the Founding 800",
-  lead: "Only 3 Platinum Founding Partner slots and 10 Gold Partner slots are reserved nationally for the maiden edition.",
-  tiers: [
-    { name: "Platinum Founding Partner", slots: 3 },
-    { name: "Gold Partner", slots: 10 },
-  ],
-  statement:
-    "This is not sponsorship. This is co-ownership of the Nigeria 2.0 narrative for the next 10 years.",
-};
 
 export const leadership = [
   { role: "Convener", name: "Dr. Wale Busari", credentials: "FCA, FIMC, CMC" },

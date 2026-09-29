@@ -62,9 +62,12 @@ export function cleanAnswer(raw: string): string {
     .trim();
 }
 
+/** A replacement answer, or a replacement question and/or answer. */
+export type FaqOverride = string | { question?: string; answer?: string };
+
 export type ParseOptions = {
-  /** Replacement answers by question number (for missing or malformed source text). */
-  overrides?: Record<number, string>;
+  /** Replacements by question number (for missing, malformed or superseded source text). */
+  overrides?: Record<number, FaqOverride>;
 };
 
 export function parseFaq(markdown: string, options: ParseOptions = {}): FaqCategory[] {
@@ -75,8 +78,10 @@ export function parseFaq(markdown: string, options: ParseOptions = {}): FaqCateg
 
   const finishItem = () => {
     if (!item || !current) return;
-    const override = overrides[item.number];
-    item.answer = override !== undefined ? override.trim() : cleanAnswer(item.answer);
+    const o = overrides[item.number];
+    const answer = typeof o === "string" ? o : o?.answer;
+    if (typeof o === "object" && o.question) item.question = cleanQuestion(o.question);
+    item.answer = answer !== undefined ? answer.trim() : cleanAnswer(item.answer);
     current.items.push(item);
     item = null;
   };

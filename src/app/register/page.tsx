@@ -1,25 +1,24 @@
-import { CalendarDays, CircleCheck, MapPin } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CalendarDays, CircleCheck, Clock, MapPin } from "lucide-react";
+import { whatToExpect } from "@/data/content";
 import { event } from "@/data/event";
+import { arrival, entryRoutes, preEventTimeline, registrationModel } from "@/data/registration-plan";
 import { PageHero } from "@/components/layout/PageHero";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
+import { Icon } from "@/components/ui/Icon";
+import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { pageMetadata } from "@/lib/metadata";
 import { eventJsonLd } from "@/lib/site";
 
 export const metadata = pageMetadata({
-  title: "Register",
+  title: "Request an Invitation",
   description:
-    "Register for the Nigeria 2.0 Leadership Business Summit 2026, Friday 27 November 2026, Eko Convention Centre, Lagos.",
+    "Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. Friday 27 November 2026, Eko Convention Centre, Lagos.",
   path: "/register",
 });
-
-const expectations = [
-  "Presidential keynotes and leadership panels",
-  "Startup Pitch Arena and Innovation Exhibition",
-  "Structured B2B and B2G deal meetings",
-  "Networking with leaders across the economy",
-];
 
 export default async function RegisterPage(props: PageProps<"/register">) {
   const { type } = await props.searchParams;
@@ -29,11 +28,47 @@ export default async function RegisterPage(props: PageProps<"/register">) {
     <>
       <JsonLd data={eventJsonLd()} />
       <PageHero
-        eyebrow="Registration"
-        title="Register for the Summit"
-        lead="Complete the form to register your interest in attending Nigeria 2.0. The summit team will confirm next steps by email."
+        eyebrow="Invitation-only · 800 seats"
+        title="Request your invitation"
+        lead={registrationModel.lead}
       />
-      <section aria-label="Registration form" className="surface-light bg-ivory py-16 sm:py-20 lg:py-24">
+      <Section tone="white" labelledBy="routes-title">
+        <Container>
+          <SectionHeading
+            id="routes-title"
+            eyebrow="How delegates get in"
+            title={registrationModel.heading}
+          />
+          <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-5">
+            {entryRoutes.map((r) => (
+              <li key={r.category} className="flex flex-col bg-white p-6" data-reveal>
+                <span className="flex size-10 items-center justify-center rounded-xl bg-navy-950 text-gold">
+                  <Icon name={r.icon} className="size-5" />
+                </span>
+                <h3 className="mt-5 font-semibold text-navy-950">{r.category}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{r.how}</p>
+                <p className="mt-5 text-xs font-semibold tracking-[0.14em] text-gold-ink uppercase">
+                  {r.approval}
+                </p>
+                {r.action && (
+                  <Link
+                    href={r.action.href}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-700 underline-offset-4 hover:underline"
+                  >
+                    {r.action.label}
+                    <ArrowRight aria-hidden="true" className="size-3.5" />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </Section>
+      <section
+        id="request"
+        aria-label="Invitation request form"
+        className="surface-light bg-ivory py-16 sm:py-20 lg:py-24"
+      >
         <Container>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">
@@ -54,28 +89,97 @@ export default async function RegisterPage(props: PageProps<"/register">) {
                     <time dateTime={event.date.iso}>{event.date.display}</time>
                   </li>
                   <li className="flex items-center gap-3">
+                    <Clock aria-hidden="true" className="size-4 text-gold" />
+                    Registration {arrival.registrationOpens}. Start {event.date.startDisplay}
+                  </li>
+                  <li className="flex items-center gap-3">
                     <MapPin aria-hidden="true" className="size-4 text-gold" />
                     {event.venue.display}
                   </li>
                 </ul>
                 <h3 className="mt-8 text-sm font-semibold text-white">What to expect</h3>
                 <ul className="mt-4 space-y-3 text-sm text-mist">
-                  {expectations.map((e) => (
-                    <li key={e} className="flex items-start gap-3">
+                  {whatToExpect.map((e) => (
+                    <li key={e.title} className="flex items-start gap-3">
                       <CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-gold" />
-                      {e}
+                      <span>
+                        <span className="font-semibold text-white">{e.title}:</span> {e.detail}
+                      </span>
                     </li>
                   ))}
                 </ul>
                 <p className="mt-8 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-relaxed text-mist">
-                  Registration does not involve payment on this site. Participation details will be confirmed
-                  by the summit team.
+                  Requests are free and involve no payment on this site. Seats are confirmed only after
+                  vetting.
                 </p>
               </div>
             </aside>
           </div>
         </Container>
       </section>
+      <Section tone="deep" labelledBy="journey-title">
+        <Container>
+          <SectionHeading
+            id="journey-title"
+            tone="dark"
+            eyebrow="Before and on the day"
+            title="No queues. No surprises at the door."
+          />
+          <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
+              <h3 className="text-xs font-semibold tracking-[0.22em] text-gold uppercase">
+                What you will receive
+              </h3>
+              <ol className="mt-6 divide-y divide-white/10 border-y border-white/10">
+                {preEventTimeline.map((t) => (
+                  <li key={t.when} className="grid gap-1 py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+                    <p className="text-sm font-semibold text-gold">{t.when}</p>
+                    <div>
+                      <p className="text-white">{t.what}</p>
+                      <p className="mt-1 text-xs text-mist">{t.channel}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="lg:col-span-5">
+              <h3 className="text-xs font-semibold tracking-[0.22em] text-gold uppercase">On arrival</h3>
+              <dl className="mt-6 space-y-5 text-sm">
+                <div>
+                  <dt className="font-semibold text-white">Timing</dt>
+                  <dd className="mt-1 text-mist">
+                    Registration opens {arrival.registrationOpens}. The summit starts{" "}
+                    {event.date.startDisplay} prompt.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-white">Check-in</dt>
+                  <dd className="mt-1 text-mist">{arrival.steps.join(" ")}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-white">Bring</dt>
+                  <dd className="mt-1 text-mist">{arrival.bring.join(" and ")}.</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-white">Dress code</dt>
+                  <dd className="mt-1 text-mist">{arrival.dressCode}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-white">Parking</dt>
+                  <dd className="mt-1 text-mist">{arrival.parking}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-white">Exhibitors</dt>
+                  <dd className="mt-1 text-mist">{arrival.exhibitors}</dd>
+                </div>
+              </dl>
+              <p className="mt-8 rounded-xl border border-gold/40 bg-gold/10 p-4 text-sm text-white">
+                {arrival.noOnSite}
+              </p>
+            </div>
+          </div>
+        </Container>
+      </Section>
     </>
   );
 }
