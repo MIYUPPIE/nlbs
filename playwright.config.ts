@@ -26,6 +26,9 @@ export default defineConfig({
       REGISTRATION_ALLOW_UNCONNECTED: "true",
       ENQUIRY_ALLOW_UNCONNECTED: "true",
       TALENT_ALLOW_UNCONNECTED: "true",
+      SPONSOR_ALLOW_UNCONNECTED: "true",
+      // Test-only private link token (e2e/sponsor-form.spec.ts).
+      SPONSOR_FORM_TOKEN: "e2e-private-sponsor-link-token-0001",
       // The real window opens 1 Oct 2026; force it open so the form can be exercised.
       TALENT_APPLICATIONS_OVERRIDE: "open",
     },

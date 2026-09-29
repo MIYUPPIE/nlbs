@@ -56,6 +56,16 @@ Status contract: `200` ok · `400` bad JSON · `413` too large · `422` invalid 
 
 No payment flow exists. Ticket pricing has not been supplied.
 
+## Private partner form
+
+`/sponsor/<SPONSOR_FORM_TOKEN>` is the partner booking form (track, tier, organisation and billing, main contact, strategy-call availability, VIP pass holders). Only people with the link can open or submit it:
+
+- `npm run sponsor-link` prints a new token and link. Set `SPONSOR_FORM_TOKEN` on the server and restart.
+- Any other token is a 404, for the page and for `/api/sponsor`. With no token (or one under 24 characters) the form is off for everyone.
+- Not in the nav or sitemap; `noindex`, `no-referrer` and `no-store` headers, so the link does not leak to search engines or linked sites.
+- Rotating the token revokes every link already shared.
+- Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier, and never includes the token.
+
 ## Talent Fund application
 
 `/talentnigeria20` (aliases `/talent/apply`, `/apply`) implements `youth_application_form_questions.pdf` as a three-step form: Who are you, Which track, and the 8 filter questions, with track-specific Q4 (Skills: skill; Jobs: PDF CV up to 2 MB + portfolio link; Capital: business name, CAC status, monthly revenue).

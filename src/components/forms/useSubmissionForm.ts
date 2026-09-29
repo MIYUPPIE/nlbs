@@ -41,14 +41,18 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
     [schema],
   );
 
-  const setField = (name: string, value: string) => {
-    const next = { ...values, [name]: value };
+  /** Updates several fields in one render (e.g. a choice that clears a dependent field). */
+  const setFields = (patch: Record<string, string>) => {
+    const next = { ...values, ...patch };
     setValues(next);
-    if (touched[name]) {
+    const names = Object.keys(patch).filter((n) => touched[n]);
+    if (names.length > 0) {
       const all = fieldErrorsFor(next);
-      setErrors((prev) => ({ ...prev, [name]: all[name] ?? "" }));
+      setErrors((prev) => ({ ...prev, ...Object.fromEntries(names.map((n) => [n, all[n] ?? ""])) }));
     }
   };
+
+  const setField = (name: string, value: string) => setFields({ [name]: value });
 
   const blurField = (name: string) => {
     setTouched((t) => ({ ...t, [name]: true }));
@@ -103,5 +107,17 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
     setReference(null);
   };
 
-  return { values, errors, status, formError, reference, formRef, setField, blurField, onSubmit, reset };
+  return {
+    values,
+    errors,
+    status,
+    formError,
+    reference,
+    formRef,
+    setField,
+    setFields,
+    blurField,
+    onSubmit,
+    reset,
+  };
 }

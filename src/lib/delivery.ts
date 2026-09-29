@@ -10,11 +10,11 @@ import { createReference } from "@/lib/registration";
  *   <PREFIX>_ALLOW_UNCONNECTED  "true" accepts submissions with no webhook
  *                               (demo/staging only)
  *
- * PREFIX is REGISTRATION or ENQUIRY. With no webhook in production the
+ * PREFIX is REGISTRATION, ENQUIRY, TALENT or SPONSOR. With no webhook in production the
  * adapter refuses submissions rather than confirming data that went nowhere.
  */
 
-export type SubmissionKind = "registration" | "enquiry" | "talent";
+export type SubmissionKind = "registration" | "enquiry" | "talent" | "sponsor";
 
 export type DeliveryEnv = Record<string, string | undefined>;
 
