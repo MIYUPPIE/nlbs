@@ -1,10 +1,9 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST as sponsorPOST } from "@/app/api/sponsor/route";
 import sitemap from "@/app/sitemap";
-import { MIN_TOKEN_LENGTH, sponsorAccessAllowed } from "@/lib/sponsor-access";
 import { parsePassHolders, passLimit, sponsorFormSchema, tierOptions } from "@/lib/sponsor-form";
-
-const TOKEN = "t".repeat(MIN_TOKEN_LENGTH);
 
 const valid = {
   companyName: "Example Telecoms Ltd",
@@ -23,7 +22,6 @@ const valid = {
   callAvailability: "Weekdays after 2 PM",
   passHolders: "Ada Obi, ada@example.com\nTunde Bello; tunde@example.com",
   acknowledge: "yes",
-  accessToken: TOKEN,
   website: "",
 };
 
@@ -38,28 +36,25 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("private link access", () => {
-  it("fails closed with no token configured", () => {
-    expect(sponsorAccessAllowed(TOKEN, {})).toBe(false);
-    expect(sponsorAccessAllowed("", { SPONSOR_FORM_TOKEN: "" })).toBe(false);
+describe("unlisted page", () => {
+  const SRC = join(__dirname, "..", "src");
+  const walk = (dir: string): string[] =>
+    readdirSync(dir).flatMap((f) => {
+      const p = join(dir, f);
+      return statSync(p).isDirectory() ? walk(p) : /\.tsx?$/.test(p) ? [p] : [];
+    });
+
+  it("exists at /sponsors", () => {
+    expect(statSync(join(SRC, "app", "sponsors", "page.tsx")).isFile()).toBe(true);
   });
 
-  it("refuses a configured token that is too short to be private", () => {
-    const short = "x".repeat(MIN_TOKEN_LENGTH - 1);
-    expect(sponsorAccessAllowed(short, { SPONSOR_FORM_TOKEN: short })).toBe(false);
-  });
-
-  it("accepts only the exact token", () => {
-    const env = { SPONSOR_FORM_TOKEN: TOKEN };
-    expect(sponsorAccessAllowed(TOKEN, env)).toBe(true);
-    expect(sponsorAccessAllowed(`${TOKEN}x`, env)).toBe(false);
-    expect(sponsorAccessAllowed(TOKEN.toUpperCase(), env)).toBe(false);
-    expect(sponsorAccessAllowed(undefined, env)).toBe(false);
-    expect(sponsorAccessAllowed(42, env)).toBe(false);
+  it("no page, nav or component links to it", () => {
+    const linking = walk(SRC).filter((p) => /["'`]\/sponsors\b/.test(readFileSync(p, "utf8")));
+    expect(linking).toEqual([]);
   });
 
   it("is not listed in the sitemap", () => {
-    expect(sitemap().some((e) => e.url.includes("/sponsor"))).toBe(false);
+    expect(sitemap().some((e) => e.url.includes("/sponsors"))).toBe(false);
   });
 });
 
@@ -146,20 +141,7 @@ describe("/api/sponsor", () => {
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
 
-  it("is a 404 without the link's token, even for invalid data", async () => {
-    vi.stubEnv("SPONSOR_FORM_TOKEN", TOKEN);
-    expect((await sponsorPOST(req({ ...valid, accessToken: "guess" }))).status).toBe(404);
-    expect((await sponsorPOST(req({}))).status).toBe(404);
-    expect((await sponsorPOST(req("{nope"))).status).toBe(404);
-  });
-
-  it("is a 404 for everyone when no token is configured", async () => {
-    vi.stubEnv("SPONSOR_FORM_TOKEN", "");
-    expect((await sponsorPOST(req(valid))).status).toBe(404);
-  });
-
-  it("validates with the token and delivers parsed pass holders without the token", async () => {
-    vi.stubEnv("SPONSOR_FORM_TOKEN", TOKEN);
+  it("validates and delivers parsed pass holders", async () => {
     vi.stubEnv("SPONSOR_WEBHOOK_URL", "https://hooks.example.com/sponsor");
     vi.spyOn(console, "info").mockImplementation(() => {});
     const fetchMock = vi.fn(async () => new Response("{}", { status: 200 }));
@@ -173,13 +155,11 @@ describe("/api/sponsor", () => {
     expect(res.status).toBe(200);
     const sent = JSON.parse(String((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body));
     expect(sent.kind).toBe("sponsor");
-    expect(sent.accessToken).toBeUndefined();
     expect(sent.acknowledge).toBeUndefined();
     expect(sent.passHolders).toEqual([
       { name: "Ada Obi", email: "ada@example.com" },
       { name: "Tunde Bello", email: "tunde@example.com" },
     ]);
     expect(sent.passAllowance).toBe(6);
-    expect(JSON.stringify(sent)).not.toContain(TOKEN);
   });
 });

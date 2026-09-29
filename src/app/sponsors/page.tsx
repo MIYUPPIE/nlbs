@@ -1,34 +1,25 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { connection } from "next/server";
-import { Lock } from "lucide-react";
 import { sponsorNotes, totalSlots, tracks } from "@/data/partnership";
 import { contact, event } from "@/data/event";
 import { PageHero } from "@/components/layout/PageHero";
 import { SponsorForm } from "@/components/forms/SponsorForm";
 import { Container } from "@/components/ui/Container";
-import { sponsorAccessAllowed } from "@/lib/sponsor-access";
 
 /**
- * Private partner booking form. Reachable only through the shared link
- * /sponsor/<SPONSOR_FORM_TOKEN>; any other token is a 404. Not in the nav,
- * sitemap or search results.
+ * Partner booking form, always available at /sponsors but deliberately not
+ * linked from anywhere on the site (tests/sponsor-form.test.ts enforces it),
+ * not in the sitemap and not indexed. Shared by the convener's office.
  */
 export const metadata: Metadata = {
   title: "Partner Package Request",
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
-  referrer: "no-referrer",
 };
 
-export default async function SponsorFormPage(props: PageProps<"/sponsor/[token]">) {
-  await connection();
-  const { token } = await props.params;
-  if (!sponsorAccessAllowed(token)) notFound();
-
+export default function SponsorFormPage() {
   return (
     <>
       <PageHero
-        eyebrow="Private partner form"
+        eyebrow="Partner form"
         title="Request your partnership package"
         lead={`Choose your track and tier for ${event.shortName}, ${event.date.display}. The convener's office will book a 15-minute strategy call, then send your contract and invoice.`}
       />
@@ -36,14 +27,10 @@ export default async function SponsorFormPage(props: PageProps<"/sponsor/[token]
         <Container>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div className="min-w-0 lg:col-span-8">
-              <SponsorForm accessToken={token} />
+              <SponsorForm />
             </div>
             <aside className="lg:col-span-4" aria-labelledby="sponsor-aside-title">
               <div className="space-y-6 rounded-3xl bg-navy-950 p-8 text-white lg:sticky lg:top-28">
-                <p className="flex items-center gap-2 text-xs text-mist">
-                  <Lock aria-hidden="true" className="size-3.5 text-gold" />
-                  Private link. Please do not share it.
-                </p>
                 <h2 id="sponsor-aside-title" className="font-display text-3xl leading-tight">
                   Limited slots
                 </h2>

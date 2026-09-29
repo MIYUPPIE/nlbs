@@ -56,15 +56,11 @@ Status contract: `200` ok · `400` bad JSON · `413` too large · `422` invalid 
 
 No payment flow exists. Ticket pricing has not been supplied.
 
-## Private partner form
+## Partner form (unlisted)
 
-`/sponsor/<SPONSOR_FORM_TOKEN>` is the partner booking form (track, tier, organisation and billing, main contact, strategy-call availability, VIP pass holders). Only people with the link can open or submit it:
+`/sponsors` is the partner booking form (track, tier, organisation and billing, main contact, strategy-call availability, VIP pass holders). It is always available to anyone with the address, but no page links to it, it is not in the sitemap and it sends `noindex`. Share the URL directly. `tests/sponsor-form.test.ts` fails if a link to it is added anywhere in `src/`.
 
-- `npm run sponsor-link` prints a new token and link. Set `SPONSOR_FORM_TOKEN` on the server and restart.
-- Any other token is a 404, for the page and for `/api/sponsor`. With no token (or one under 24 characters) the form is off for everyone.
-- Not in the nav or sitemap; `noindex`, `no-referrer` and `no-store` headers, so the link does not leak to search engines or linked sites.
-- Rotating the token revokes every link already shared.
-- Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier, and never includes the token.
+Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier.
 
 ## Talent Fund application
 

@@ -3,7 +3,7 @@ import { sponsorBenefits, trackById, tracks, type TrackId } from "@/data/partner
 import { sectors } from "@/lib/registration";
 
 /**
- * Private partner booking form (/sponsor/<token>). Shared by the client form
+ * Partner booking form (/sponsors). Shared by the client form
  * and /api/sponsor. Follows the prospectus "What happens next": confirm a
  * package, book the 15-minute strategy call, then contract and invoice.
  */
@@ -109,7 +109,6 @@ export const sponsorFormSchema = z
     acknowledge: z.literal("yes", {
       error: "Please confirm you understand how a slot is secured.",
     }),
-    accessToken: z.string().max(200).optional().default(""),
     website: z.string().max(0).optional().or(z.literal("")),
   })
   .superRefine((d, ctx) => {

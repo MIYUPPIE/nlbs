@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, CircleCheck, Clock, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, CircleCheck, MapPin } from "lucide-react";
 import { whatToExpect } from "@/data/content";
 import { event } from "@/data/event";
 import { arrival, entryRoutes, preEventTimeline, registrationModel } from "@/data/registration-plan";
@@ -89,10 +89,6 @@ export default async function RegisterPage(props: PageProps<"/register">) {
                     <time dateTime={event.date.iso}>{event.date.display}</time>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Clock aria-hidden="true" className="size-4 text-gold" />
-                    Registration {arrival.registrationOpens}. Start {event.date.startDisplay}
-                  </li>
-                  <li className="flex items-center gap-3">
                     <MapPin aria-hidden="true" className="size-4 text-gold" />
                     {event.venue.display}
                   </li>
@@ -145,13 +141,6 @@ export default async function RegisterPage(props: PageProps<"/register">) {
             <div className="lg:col-span-5">
               <h3 className="text-xs font-semibold tracking-[0.22em] text-gold uppercase">On arrival</h3>
               <dl className="mt-6 space-y-5 text-sm">
-                <div>
-                  <dt className="font-semibold text-white">Timing</dt>
-                  <dd className="mt-1 text-mist">
-                    Registration opens {arrival.registrationOpens}. The summit starts{" "}
-                    {event.date.startDisplay} prompt.
-                  </dd>
-                </div>
                 <div>
                   <dt className="font-semibold text-white">Check-in</dt>
                   <dd className="mt-1 text-mist">{arrival.steps.join(" ")}</dd>

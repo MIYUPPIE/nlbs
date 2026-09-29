@@ -74,9 +74,11 @@ export const preEventTimeline: { when: string; what: string; channel: string }[]
   { when: "1 day before", what: "“See you tomorrow” reminder. ID required", channel: "SMS and WhatsApp" },
 ];
 
-/** On the day. Times come from the plan's delegate WhatsApp template. */
+/**
+ * On the day. No registration-open time is published: the plan's documents
+ * disagree (7:30, 8:00, 8:30 AM), and the convener asked for it to be removed.
+ */
 export const arrival = {
-  registrationOpens: "8:00 AM",
   dressCode: "Business formal or national dress",
   steps: [
     "Show your QR code on your phone, or give your name, at a check-in lane.",

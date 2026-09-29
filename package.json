@@ -14,8 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "prepare": "git config core.hooksPath .githooks || true",
-    "sponsor-link": "node scripts/sponsor-link.mjs"
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "clsx": "^2.1.1",

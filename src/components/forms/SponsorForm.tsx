@@ -10,7 +10,7 @@ import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/fo
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
 import { useHydrated } from "@/components/hooks/useHydrated";
 
-export function SponsorForm({ accessToken }: { accessToken: string }) {
+export function SponsorForm() {
   const { formRef, ...form } = useSubmissionForm(
     sponsorFormSchema,
     {
@@ -30,7 +30,6 @@ export function SponsorForm({ accessToken }: { accessToken: string }) {
       callAvailability: "",
       passHolders: "",
       acknowledge: "",
-      accessToken,
       website: "",
     },
     "/api/sponsor",

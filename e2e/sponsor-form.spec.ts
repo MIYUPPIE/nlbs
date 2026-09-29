@@ -1,24 +1,24 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { ROUTES } from "./helpers";
 
-const LINK = "/sponsor/e2e-private-sponsor-link-token-0001";
+const LINK = "/sponsors";
 
-test.describe("private sponsor form", () => {
-  test("a wrong or missing token is a 404", async ({ page }) => {
-    for (const path of ["/sponsor/guess", "/sponsor/e2e-private-sponsor-link-token-0002", "/sponsor"]) {
-      const res = await page.goto(path);
-      expect(res?.status(), path).toBe(404);
-    }
-  });
-
-  test("the private link is hidden from search engines and leaks no referrer", async ({ page }) => {
+test.describe("unlisted sponsor form", () => {
+  test("is always available but hidden from search engines", async ({ page }) => {
     const res = await page.goto(LINK);
     expect(res?.status()).toBe(200);
     expect(res?.headers()["x-robots-tag"]).toContain("noindex");
-    expect(res?.headers()["referrer-policy"]).toBe("no-referrer");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     const sitemap = await page.request.get("/sitemap.xml");
-    expect(await sitemap.text()).not.toContain("/sponsor");
+    expect(await sitemap.text()).not.toContain("/sponsors");
+  });
+
+  test("no page on the site links to it", async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+      await expect(page.locator('a[href*="/sponsors"]'), route).toHaveCount(0);
+    }
   });
 
   test("switching track clears the tier and shows that track's tiers", async ({ page }) => {

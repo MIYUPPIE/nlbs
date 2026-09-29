@@ -1,8 +1,7 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { arrival, entryRoutes, preEventTimeline } from "@/data/registration-plan";
-import { event } from "@/data/event";
 
 const APP = join(__dirname, "..", "src", "app");
 
@@ -35,13 +34,10 @@ describe("registration plan", () => {
     ]);
   });
 
-  it("registration opens before the 9:00 AM start", () => {
-    const toMinutes = (s: string) => {
-      const [, h, m, ap] = /^(\d{1,2}):(\d{2}) (AM|PM)$/.exec(s) ?? [];
-      return ((Number(h) % 12) + (ap === "PM" ? 12 : 0)) * 60 + Number(m);
-    };
-    const [sh, sm] = event.date.startTime.split(":").map(Number);
-    expect(toMinutes(arrival.registrationOpens)).toBeLessThan(sh * 60 + sm);
+  it("publishes no registration-open time (convener removed it)", () => {
+    expect(Object.keys(arrival)).not.toContain("registrationOpens");
+    const page = readFileSync(join(APP, "register", "page.tsx"), "utf8");
+    expect(page).not.toMatch(/registration opens|[78]:[03]0 ?AM/i);
   });
 
   it("states there is no on-site registration", () => {

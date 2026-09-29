@@ -9,11 +9,10 @@ const nextConfig: NextConfig = {
   headers() {
     return [
       {
-        // Private partner form: never indexed, cached or leaked via Referer.
-        source: "/sponsor/:token*",
+        // Unlisted partner form: kept out of search results and caches.
+        source: "/sponsors",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-          { key: "Referrer-Policy", value: "no-referrer" },
           { key: "Cache-Control", value: "private, no-store" },
         ],
       },
