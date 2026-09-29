@@ -52,7 +52,8 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
         <p className="mx-auto mt-4 max-w-md text-muted">
           Thank you, {form.values.fullName.split(" ")[0]}. Your invitation request for {event.shortName} has
           been received. Once it is vetted, the summit team will confirm your seat at{" "}
-          <strong className="text-navy-950">{form.values.email}</strong> and by WhatsApp.
+          <strong className="text-navy-950">{form.values.email}</strong>, where your QR entry code will also
+          be sent.
         </p>
         <dl className="mx-auto mt-8 grid max-w-sm gap-3 rounded-2xl bg-ivory p-5 text-left text-sm">
           <div className="flex justify-between gap-4">
@@ -149,7 +150,7 @@ export function RegistrationForm({ initialDelegateType }: { initialDelegateType?
             type="tel"
             autoComplete="tel"
             inputMode="tel"
-            hint="Leave blank if it is your phone number. Your QR code is sent by WhatsApp."
+            hint="Leave blank if it is your phone number."
             value={form.values.whatsapp}
             error={form.errors.whatsapp}
             className="sm:col-span-2"

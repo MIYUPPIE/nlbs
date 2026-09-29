@@ -2,7 +2,8 @@ import type { IconName } from "@/components/ui/Icon";
 
 /**
  * Delegate-facing parts of the convener's "Participants Registration + Event
- * Entry Plan" (latest/35996679-eabc-4da2-8a58-5780a6100ae9.jpeg).
+ * Entry Plan" (latest/35996679-eabc-4da2-8a58-5780a6100ae9.jpeg). The QR code
+ * goes by email, not WhatsApp as the plan drew it (convener, 29 Sep 2026).
  *
  * Internal parts stay off the site: badge colours and access zones, staffing,
  * equipment, tools, and the data captured for sponsors.
@@ -70,7 +71,7 @@ export const preEventTimeline: { when: string; what: string; channel: string }[]
     channel: "Email and WhatsApp",
   },
   { when: "7 days before", what: "Final details: parking, agenda and who you'll meet", channel: "Email" },
-  { when: "2 days before", what: "Your QR code and the venue map", channel: "WhatsApp" },
+  { when: "2 days before", what: "Your QR code and the venue map", channel: "Email" },
   { when: "1 day before", what: "“See you tomorrow” reminder. ID required", channel: "SMS and WhatsApp" },
 ];
 
@@ -84,7 +85,7 @@ export const arrival = {
     "Show your QR code on your phone, or give your name, at a check-in lane.",
     "Your badge prints in seconds and an usher directs you to the hall.",
   ],
-  bring: ["Your QR code (sent by WhatsApp two days before)", "A valid photo ID"],
+  bring: ["Your QR code (sent by email two days before)", "A valid photo ID"],
   parking: "Use the Eko Hotel gate and show your confirmation message.",
   exhibitors: "Exhibitor and booth set-up staff use a separate lane with their own badges.",
   noOnSite: "There is no on-site registration. Only pre-approved delegates are admitted.",

@@ -40,6 +40,11 @@ describe("registration plan", () => {
     expect(page).not.toMatch(/registration opens|[78]:[03]0 ?AM/i);
   });
 
+  it("sends the QR code by email, not WhatsApp", () => {
+    expect(preEventTimeline.find((t) => t.what.includes("QR code"))?.channel).toBe("Email");
+    expect(arrival.bring.join(" ")).toMatch(/QR code \(sent by email/);
+  });
+
   it("states there is no on-site registration", () => {
     expect(arrival.noOnSite).toMatch(/no on-site registration/i);
   });

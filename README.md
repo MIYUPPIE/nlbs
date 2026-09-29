@@ -60,7 +60,7 @@ No payment flow exists. Ticket pricing has not been supplied.
 
 `/sponsors` is the partner booking form (track, tier, organisation and billing, main contact, strategy-call availability, VIP pass holders). It is always available to anyone with the address, but no page links to it, it is not in the sitemap and it sends `noindex`. Share the URL directly. `tests/sponsor-form.test.ts` fails if a link to it is added anywhere in `src/`.
 
-Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier.
+Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. Point it at the central backend (`central-backend/docs/connecting-sites.md`), where requests appear under _NLBS > Partners_. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier.
 
 ## Talent Fund application
 
