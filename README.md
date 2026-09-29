@@ -54,6 +54,17 @@ Status contract: `200` ok · `400` bad JSON · `413` too large · `422` invalid 
 
 No payment flow exists. Ticket pricing has not been supplied.
 
+## Talent Fund application
+
+`/talentnigeria20` (aliases `/talent/apply`, `/apply`) implements `youth_application_form_questions.pdf` as a three-step form: Who are you, Which track, and the 8 filter questions, with track-specific Q4 (Skills: skill; Jobs: PDF CV up to 2 MB + portfolio link; Capital: business name, CAC status, monthly revenue).
+
+- **Auto-reject** (PDF rules): age 36+ or "No" to Q5 shows "Thank you, you are not eligible." and blocks submission; the API enforces the same.
+- **Window**: open 00:00 1 Oct to 23:59 30 Oct 2026, Lagos time, enforced on the page and API. `TALENT_APPLICATIONS_OVERRIDE=open|closed` to open early or extend.
+- **Video (Q3)** is a link (YouTube, Drive, TikTok, Instagram, Loom). Phone video files exceed what the site can accept without file storage.
+- **Screening** (`screen()` in `src/lib/talent-form.ts`), attached to the webhook payload, never shown to applicants: video 30, Platinum Partner referral 15, age 18-30 and available 15. Problem statement (20) and pitch (20) are left for reviewers, with `bandRange` showing the best and worst band (70+ shortlist, 50-69 waitlist, under 50 reject). Flags: `generic_problem_statement`, `skill_level_track_mismatch`, `received_prior_support`, `partner_referral_unverified`, `needs_hub_access`.
+- WhatsApp numbers are normalised to `+234…`; answers from unchosen tracks are dropped; drafts auto-save on the device (never the CV).
+- Deviations from the PDF: "from April 2026" dropped (contradicts the deadline); Platinum Partner names are typed by the applicant until the partners are confirmed.
+
 ## Tests
 
 | Lane                   | Command                             | What it covers                                                                                                                                                                                                                                                                                                  |

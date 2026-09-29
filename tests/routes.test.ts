@@ -25,6 +25,7 @@ describe("routes", () => {
       "/register",
       "/contact",
       "/faq",
+      "/talentnigeria20",
     ]);
     for (const r of allRoutes) expect(existsSync(pageFile(r)), r).toBe(true);
   });

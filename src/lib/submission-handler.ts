@@ -31,12 +31,23 @@ export async function handleSubmission<S extends z.ZodType<Record<string, unknow
     schema: S;
     traceLabel: (data: z.infer<S>) => string;
     unavailableMessage: string;
+    /** Body size cap in bytes (default 10 KB). */
+    maxBytes?: number;
+    /**
+     * Runs after validation, before delivery: can refuse (eligibility, closed
+     * window) or return the fields to deliver (e.g. with screening attached).
+     */
+    prepare?: (
+      data: z.infer<S>,
+    ) =>
+      | { ok: true; fields: Record<string, unknown> }
+      | { ok: false; status: number; error: string; fieldErrors?: Record<string, string> };
     env?: DeliveryEnv;
     fetchImpl?: typeof fetch;
   },
 ): Promise<NextResponse> {
   const raw = await request.text();
-  if (raw.length > MAX_BODY_BYTES) {
+  if (raw.length > (options.maxBytes ?? MAX_BODY_BYTES)) {
     return json({ ok: false, error: "Submission is too large." }, 413);
   }
 
@@ -70,8 +81,19 @@ export async function handleSubmission<S extends z.ZodType<Record<string, unknow
     );
   }
 
-  const { website: _honeypot, ...fields } = parsed.data as Record<string, unknown>;
+  let fields: Record<string, unknown>;
+  if (options.prepare) {
+    const prepared = options.prepare(parsed.data);
+    if (!prepared.ok) {
+      return json({ ok: false, error: prepared.error, fieldErrors: prepared.fieldErrors }, prepared.status);
+    }
+    fields = prepared.fields;
+  } else {
+    fields = parsed.data as Record<string, unknown>;
+  }
+  const { website: _honeypot, ...rest } = fields;
   void _honeypot;
+  fields = rest;
 
   const result = await deliverSubmission(
     options.kind,

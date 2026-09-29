@@ -2,14 +2,15 @@ import type { IconName } from "@/components/ui/Icon";
 
 /**
  * Applicant-facing Talent Fund details. Sources: youth application form PDF
- * (tracks, requirements, deadline) and FAQ Q16-Q22, Q31. The form's internal
- * scoring and review workflow is deliberately not published. "From April
+ * (tracks, requirements, deadline) and FAQ Q16-Q22, Q31. The form itself
+ * lives at /talentnigeria20 (src/lib/talent-form.ts); its scoring is computed
+ * server-side for reviewers and never shown to applicants. "From April
  * 2026" in the form contradicts the October deadline and is omitted.
  */
 export const talentApplication = {
   heading: "Apply to the Nigeria 2.0 Talent Fund",
   lead: "We are selecting 10,000 young Nigerians for skills, jobs and capital. The application takes about 4 minutes and no payment is required.",
-  portal: "http://nlbs.com.ng/talentnigeria20",
+  portal: "/talentnigeria20",
   portalOpens: "1 October 2026",
   deadline: "30 October 2026",
   deadlineIso: "2026-10-30",

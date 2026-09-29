@@ -25,6 +25,9 @@ export default defineConfig({
       // Lets the e2e suite exercise the success path without a real webhook.
       REGISTRATION_ALLOW_UNCONNECTED: "true",
       ENQUIRY_ALLOW_UNCONNECTED: "true",
+      TALENT_ALLOW_UNCONNECTED: "true",
+      // The real window opens 1 Oct 2026; force it open so the form can be exercised.
+      TALENT_APPLICATIONS_OVERRIDE: "open",
     },
   },
 });

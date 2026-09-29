@@ -16,6 +16,7 @@ export const mobileNav: NavLink[] = [
   ...primaryNav,
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
+  { label: "Talent Fund Application", href: "/talentnigeria20" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
@@ -34,6 +35,7 @@ export const footerNav: NavLink[] = [
 ];
 
 export const footerSecondaryNav: NavLink[] = [
+  { label: "Talent Fund Application", href: "/talentnigeria20" },
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
 ];
@@ -53,4 +55,5 @@ export const allRoutes = [
   "/register",
   "/contact",
   "/faq",
+  "/talentnigeria20",
 ] as const;

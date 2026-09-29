@@ -123,7 +123,12 @@ describe("no fabricated content", () => {
   });
 
   it("has no ticket pricing or payment flow", () => {
-    expect(sourceText).not.toMatch(/[₦N]\s?\d{1,3}(,\d{3})+/);
+    // Naira amounts are only allowed as Talent Fund answer options (monthly revenue bands).
+    const allowNaira = new Set([join(SRC, "lib", "talent-form.ts")]);
+    const priced = walk(SRC).filter(
+      (p) => !allowNaira.has(p) && /[₦N]\s?\d{1,3}(,\d{3})+/.test(readFileSync(p, "utf8")),
+    );
+    expect(priced).toEqual([]);
     expect(sourceText.toLowerCase()).not.toMatch(/checkout|paystack|flutterwave|stripe/);
   });
 });

@@ -14,7 +14,7 @@ import { createReference } from "@/lib/registration";
  * adapter refuses submissions rather than confirming data that went nowhere.
  */
 
-export type SubmissionKind = "registration" | "enquiry";
+export type SubmissionKind = "registration" | "enquiry" | "talent";
 
 export type DeliveryEnv = Record<string, string | undefined>;
 

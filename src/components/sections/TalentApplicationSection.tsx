@@ -82,7 +82,7 @@ export function TalentApplicationSection() {
                   </div>
                 </dl>
                 <GoldButton href={t.portal} size="lg" className="mt-8">
-                  Go to the application portal
+                  Start your application
                 </GoldButton>
                 <ul className="mt-8 space-y-3">
                   {t.eligibility.map((e) => (
