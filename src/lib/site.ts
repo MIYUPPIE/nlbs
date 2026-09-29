@@ -10,8 +10,8 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nlbs.co
 export const siteTitle = "Nigeria 2.0 | Nigerian Leadership Business Summit 2026";
 
 /**
- * Schema.org Event. Uses a date-only startDate/endDate because no start or
- * end time has been confirmed.
+ * Schema.org Event. Start time from the convener's flyer and FAQ (9:00 AM WAT).
+ * No end time is published (evening programme varies), so endDate is date-only.
  */
 export function eventJsonLd() {
   return {
@@ -19,7 +19,7 @@ export function eventJsonLd() {
     "@type": "Event",
     name: event.fullName,
     description: event.description,
-    startDate: event.date.iso,
+    startDate: `${event.date.iso}T${event.date.startTime}:00+01:00`,
     endDate: event.date.iso,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
@@ -28,6 +28,7 @@ export function eventJsonLd() {
       name: event.venue.name,
       address: {
         "@type": "PostalAddress",
+        streetAddress: event.venue.address,
         addressLocality: event.venue.city,
         addressCountry: "NG",
       },

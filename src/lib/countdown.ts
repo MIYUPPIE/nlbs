@@ -34,15 +34,23 @@ export function timeZoneOffsetMs(utcMs: number, timeZone: string): number {
   return asUtc - Math.floor(utcMs / 1000) * 1000;
 }
 
-/** UTC epoch ms for 00:00 on `isoDate` (YYYY-MM-DD) in `timeZone`. */
-export function startOfDayInZone(isoDate: string, timeZone: string): number {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
-  if (!match) throw new Error(`Invalid ISO date: ${isoDate}`);
-  const [, y, m, d] = match.map(Number);
-  const naive = Date.UTC(y, m - 1, d);
+/** UTC epoch ms for a local wall-clock time (HH:MM) on `isoDate` in `timeZone`. */
+export function zonedTimeToUtc(isoDate: string, time: string, timeZone: string): number {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!d) throw new Error(`Invalid ISO date: ${isoDate}`);
+  const t = /^(\d{2}):(\d{2})$/.exec(time);
+  if (!t) throw new Error(`Invalid time: ${time}`);
+  const [, y, m, day] = d.map(Number);
+  const [, hh, mm] = t.map(Number);
+  const naive = Date.UTC(y, m - 1, day, hh, mm);
   // Two passes handle zones whose offset differs across the naive guess.
   const first = naive - timeZoneOffsetMs(naive, timeZone);
   return naive - timeZoneOffsetMs(first, timeZone);
+}
+
+/** UTC epoch ms for 00:00 on `isoDate` (YYYY-MM-DD) in `timeZone`. */
+export function startOfDayInZone(isoDate: string, timeZone: string): number {
+  return zonedTimeToUtc(isoDate, "00:00", timeZone);
 }
 
 export type CountdownStatus = "upcoming" | "live" | "past";
@@ -57,13 +65,13 @@ export type Countdown = {
 
 /**
  * Breaks the time from `nowMs` to `targetMs` into units.
- * "live" covers the full event day; "past" is anything after it.
+ * "live" runs from the target until `endMs` (default: 24h later); "past" after.
  */
-export function getCountdown(nowMs: number, targetMs: number): Countdown {
+export function getCountdown(nowMs: number, targetMs: number, endMs: number = targetMs + DAY_MS): Countdown {
   const diff = targetMs - nowMs;
   if (diff <= 0) {
     return {
-      status: nowMs < targetMs + DAY_MS ? "live" : "past",
+      status: nowMs < endMs ? "live" : "past",
       days: 0,
       hours: 0,
       minutes: 0,

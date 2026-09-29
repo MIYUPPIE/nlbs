@@ -80,12 +80,37 @@ export function Footer() {
               <dl className="mt-5 space-y-4 text-sm">
                 <div>
                   <dt className="text-mist">Date</dt>
-                  <dd className="mt-1 text-white/90">{event.date.display}</dd>
+                  <dd className="mt-1 text-white/90">
+                    {event.date.display}, {event.date.startDisplay}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-mist">Venue</dt>
                   <dd className="mt-1 text-white/90">{event.venue.display}</dd>
                 </div>
+                {(contact.email || contact.phone) && (
+                  <div>
+                    <dt className="text-mist">Contact</dt>
+                    <dd className="mt-1 space-y-1 text-white/90">
+                      {contact.email && (
+                        <a href={`mailto:${contact.email}`} className="block hover:text-gold-bright">
+                          {contact.email}
+                        </a>
+                      )}
+                      {contact.phone && (
+                        <a
+                          href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                          className="block hover:text-gold-bright"
+                        >
+                          {contact.phone}
+                        </a>
+                      )}
+                      {contact.socialHandle && (
+                        <span className="block text-mist">{contact.socialHandle}</span>
+                      )}
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-mist">Convened by</dt>
                   <dd className="mt-2">

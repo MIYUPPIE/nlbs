@@ -89,12 +89,12 @@ test.describe("programme tabs", () => {
 });
 
 test.describe("countdown", () => {
-  test("counts down to 27 Nov 2026 00:00 WAT from a frozen clock", async ({ page }) => {
-    // 28 Sep 2026 12:00 WAT → 59 days, 12 hours.
+  test("counts down to 27 Nov 2026 09:00 WAT from a frozen clock", async ({ page }) => {
+    // 28 Sep 2026 12:00 WAT → 27 Nov 09:00 WAT is 59 days, 21 hours.
     await page.clock.setFixedTime(new Date("2026-09-28T11:00:00Z"));
     await page.goto("/");
     const timer = page.getByRole("timer");
-    await expect(timer).toHaveAttribute("aria-label", "59 days, 12 hours, 0 minutes until the summit");
+    await expect(timer).toHaveAttribute("aria-label", "59 days, 21 hours, 0 minutes until the summit");
   });
 
   test("shows the event-day state on the day", async ({ page }) => {
@@ -195,7 +195,7 @@ test.describe("seo", () => {
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? "{}");
     expect(ld["@type"]).toBe("Event");
-    expect(ld.startDate).toBe("2026-11-27");
+    expect(ld.startDate).toBe("2026-11-27T09:00:00+01:00");
   });
 
   test("sitemap and robots are served", async ({ request }) => {

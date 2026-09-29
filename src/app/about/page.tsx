@@ -1,6 +1,12 @@
 import { event } from "@/data/event";
 import { PageHero } from "@/components/layout/PageHero";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { DownloadsSection } from "@/components/sections/DownloadsSection";
+import { LeadershipSection } from "@/components/sections/LeadershipSection";
+import { RoadmapSection } from "@/components/sections/RoadmapSection";
+import { SummitExperienceSection } from "@/components/sections/SummitExperienceSection";
+import { VisionSection } from "@/components/sections/VisionSection";
+import { WhyNowSection } from "@/components/sections/WhyNowSection";
 import { AudienceSection } from "@/components/sections/AudienceSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { EditionSection } from "@/components/sections/EditionSection";
@@ -20,9 +26,9 @@ export const metadata = pageMetadata({
 const facts = [
   { label: "Theme", value: event.theme },
   { label: "Tagline", value: event.tagline },
-  { label: "Date", value: event.date.display },
-  { label: "Venue", value: event.venue.display },
-  { label: "Convener", value: event.convener },
+  { label: "Date", value: `${event.date.display}, ${event.date.startDisplay}` },
+  { label: "Venue", value: `${event.venue.display}, ${event.venue.address}` },
+  { label: "Convener", value: `${event.convener}. Convened by Dr. Wale Busari FCA, FIMC, CMC` },
   { label: "Previous edition", value: `${event.previousEdition.year}: ${event.previousEdition.theme}` },
 ];
 
@@ -34,6 +40,7 @@ export default function AboutPage() {
         title="Nigeria's leadership and business community, focused on what comes next."
         lead={event.heroSupport}
       />
+      <VisionSection />
       <AboutSection />
       <Section tone="white" labelledBy="facts-title">
         <Container>
@@ -52,8 +59,13 @@ export default function AboutPage() {
       </Section>
       <StatisticsSection />
       <PillarsSection />
+      <WhyNowSection />
+      <RoadmapSection />
+      <SummitExperienceSection />
       <AudienceSection />
+      <LeadershipSection />
       <EditionSection />
+      <DownloadsSection />
       <CTASection />
     </>
   );

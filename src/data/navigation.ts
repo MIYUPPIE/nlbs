@@ -16,6 +16,7 @@ export const mobileNav: NavLink[] = [
   ...primaryNav,
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
+  { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -28,6 +29,7 @@ export const footerNav: NavLink[] = [
   { label: "Technology", href: "/technology" },
   { label: "Partners", href: "/partners" },
   { label: "Register", href: "/register" },
+  { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -50,4 +52,5 @@ export const allRoutes = [
   "/partners",
   "/register",
   "/contact",
+  "/faq",
 ] as const;

@@ -1,6 +1,7 @@
 import { talent } from "@/data/content";
 import { PageHero } from "@/components/layout/PageHero";
 import { CTASection } from "@/components/sections/CTASection";
+import { TalentApplicationSection } from "@/components/sections/TalentApplicationSection";
 import { TalentSection } from "@/components/sections/TalentSection";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
@@ -18,9 +19,9 @@ export const metadata = pageMetadata({
 const ways = [
   {
     title: "Young professionals",
-    body: "Register interest to hear when programme details, eligibility and application dates are published.",
-    href: "/register?type=Student%20%2F%20Young%20Professional",
-    cta: "Register interest",
+    body: "Apply for Skills, Jobs or Capital through the Talent Fund portal before 30 October 2026.",
+    href: "#apply",
+    cta: "How to apply",
   },
   {
     title: "Employers and partners",
@@ -38,14 +39,15 @@ export default function TalentPage() {
         title="Invest in People"
         lead="Nigeria's youthful population is one of its greatest economic assets. The Talent Fund is the summit's commitment to turning that potential into participation."
       />
-      <TalentSection cta={false} />
+      <TalentSection cta={false} eyebrow="Focus areas" title="Skills for the future economy" />
+      <TalentApplicationSection />
       <Section tone="white" labelledBy="talent-ways-title">
         <Container>
           <SectionHeading
             id="talent-ways-title"
             eyebrow="Get involved"
             title="Two ways to take part"
-            lead="Eligibility, selection and programme dates will be published once confirmed."
+            lead="Apply through the Talent Fund portal, or bring your organisation in as an employer or training partner."
           />
           <ul role="list" className="mt-12 grid gap-5 md:grid-cols-2">
             {ways.map((w) => (

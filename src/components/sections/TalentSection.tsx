@@ -7,7 +7,15 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TargetBadge } from "@/components/ui/TargetBadge";
 
-export function TalentSection({ cta = true }: { cta?: boolean }) {
+export function TalentSection({
+  cta = true,
+  eyebrow = talent.fundName,
+  title = talent.heading,
+}: {
+  cta?: boolean;
+  eyebrow?: string;
+  title?: string;
+}) {
   const target = statById("talent");
   return (
     <Section tone="deep" id="talent" labelledBy="talent-title">
@@ -21,8 +29,8 @@ export function TalentSection({ cta = true }: { cta?: boolean }) {
             <SectionHeading
               id="talent-title"
               tone="dark"
-              eyebrow={talent.fundName}
-              title={talent.heading}
+              eyebrow={eyebrow}
+              title={title}
               lead={talent.lead}
             />
             <ul className="mt-12 grid gap-3 sm:grid-cols-2">
@@ -50,7 +58,7 @@ export function TalentSection({ cta = true }: { cta?: boolean }) {
                 </p>
                 <p className="mt-4 text-xl font-semibold text-white">young Nigerians</p>
                 <p className="mt-2 text-mist">
-                  The {talent.fundName} target. Programme details will be published as they are confirmed.
+                  The {talent.fundName} target: 5,000 skilled, 3,000 placed and 2,000 funded.
                 </p>
               </div>
               {cta && (

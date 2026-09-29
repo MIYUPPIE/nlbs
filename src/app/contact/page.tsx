@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowUpRight, AtSign, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, AtSign, Building2, Mail, MapPin, Phone } from "lucide-react";
 import { contact, event } from "@/data/event";
 import { PageHero } from "@/components/layout/PageHero";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
@@ -106,6 +106,8 @@ export default async function ContactPage(props: PageProps<"/contact">) {
                             </li>
                           ))}
                         </ul>
+                      ) : contact.socialHandle ? (
+                        <span className="text-navy-950">{contact.socialHandle}</span>
                       ) : (
                         <Placeholder>Social channels to be published</Placeholder>
                       )}
@@ -116,8 +118,20 @@ export default async function ContactPage(props: PageProps<"/contact">) {
                       <MapPin aria-hidden="true" className="size-5 shrink-0 text-gold-ink" />
                       Venue
                     </dt>
-                    <dd className="mt-1 pl-8 text-navy-950">{event.venue.display}</dd>
+                    <dd className="mt-1 pl-8 text-navy-950">
+                      {event.venue.display}
+                      <span className="block text-muted">{event.venue.address}</span>
+                    </dd>
                   </div>
+                  {contact.secretariat && (
+                    <div>
+                      <dt className="flex items-center gap-3 font-semibold text-navy-950">
+                        <Building2 aria-hidden="true" className="size-5 shrink-0 text-gold-ink" />
+                        Secretariat
+                      </dt>
+                      <dd className="mt-1 pl-8 text-navy-950">{contact.secretariat}</dd>
+                    </div>
+                  )}
                 </dl>
               </div>
 

@@ -1,5 +1,7 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CTASection } from "@/components/sections/CTASection";
+import { DownloadsSection } from "@/components/sections/DownloadsSection";
+import { FoundingPartnersSection } from "@/components/sections/FoundingPartnersSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { pageMetadata } from "@/lib/metadata";
@@ -23,7 +25,9 @@ export default function PartnersPage() {
           Become a partner
         </GoldButton>
       </PageHero>
+      <FoundingPartnersSection />
       <PartnersSection />
+      <DownloadsSection ids={["concept-note", "audience-profile"]} title="Partner resources" />
       <CTASection />
     </>
   );

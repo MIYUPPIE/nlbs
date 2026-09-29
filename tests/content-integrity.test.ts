@@ -81,17 +81,21 @@ describe("no fabricated content", () => {
     expect(programme.every((p) => p.time === null)).toBe(true);
   });
 
-  it("has no contact details until confirmed", () => {
-    expect(contact).toEqual({ email: null, phone: null, socials: [] });
+  it("uses the contact details from the convener's documents", () => {
+    expect(contact.email).toBe("info@nlbs.com.ng");
+    expect(contact.phone).toBe("+234 803 231 5349");
+    expect(contact.socials).toEqual([]); // handle only, no unverified profile URLs
   });
 
-  // Names and claims that appear in unverified client drafts. They must not
-  // reach the site until the convener confirms them.
+  // Names and claims from client drafts that CONTRADICT the brief or other
+  // pages (named keynotes vs "speakers to be announced", media partners vs
+  // "partners to be announced", prospectus figures vs $50M+). They must not
+  // reach src/. Client-approved FAQ text lives in content/, outside this scan.
+  // Approved from latest/1.md, 2.md and the flyer: Seyi Tinubu (Youth
+  // Patron), $1 Trillion agenda, 9:00 AM start, info@ email and phone.
   it.each([
     "Dangote",
     "Elumelu",
-    "Tinubu",
-    "Seyi",
     "BUA",
     "MTN",
     "Flutterwave",
@@ -100,14 +104,22 @@ describe("no fabricated content", () => {
     "TechCabal",
     "Access Bank",
     "$500M",
-    "$1 Trillion",
+    "$150B",
+    "$100B",
+    "N594M",
     "N50M",
-    "9AM",
-    "9:00",
-    "info@nlbs",
-    "+234 803",
+    "Honeywell",
+    "talentfund2026",
+    "talentfundnigeria20",
   ])("source does not mention %s", (term) => {
     expect(sourceText.includes(term)).toBe(false);
+  });
+
+  it("never publishes confidential documents", () => {
+    const files = readdirSync(join(__dirname, "..", "public", "downloads"));
+    expect(files.some((f) => /prospectus|stakeholder|sponsor|internal|application_form|youth/i.test(f))).toBe(
+      false,
+    );
   });
 
   it("has no ticket pricing or payment flow", () => {
@@ -117,12 +129,12 @@ describe("no fabricated content", () => {
 });
 
 describe("structured data", () => {
-  it("describes the event with a date-only start and no invented time", () => {
+  it("describes the event with the confirmed 9:00 AM WAT start", () => {
     const ld = eventJsonLd();
     expect(ld["@type"]).toBe("Event");
     expect(ld.name).toBe(event.fullName);
-    expect(ld.startDate).toBe("2026-11-27");
-    expect(ld.startDate).not.toMatch(/T/);
+    expect(ld.startDate).toBe("2026-11-27T09:00:00+01:00");
+    expect(ld.endDate).toBe("2026-11-27");
     expect(ld.location.name).toBe("Eko Convention Centre");
     expect(ld.location.address.addressLocality).toBe("Lagos");
     expect(ld.location.address.addressCountry).toBe("NG");

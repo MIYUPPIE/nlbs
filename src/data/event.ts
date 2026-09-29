@@ -1,9 +1,10 @@
 /**
  * Single source of truth for verified event facts.
  *
- * CONTENT RULE: only facts confirmed in the build brief live here.
- * Targets are targets. Never convert a target into an achievement.
- * Anything unconfirmed is `null` and renders as a labelled placeholder.
+ * CONTENT RULE: only facts confirmed in the build brief or the convener's own
+ * documents (latest/1.md, 2.md, the event flyer) live here. Where a document
+ * contradicts the brief, the brief wins. Targets are targets. Never convert a
+ * target into an achievement. Anything unconfirmed is `null`.
  */
 
 export const event = {
@@ -16,17 +17,21 @@ export const event = {
   tagline: "Invest in People. Invest in Possibilities.",
   convener: "HBC Business Help",
   date: {
-    /** ISO calendar date. No start/end time has been confirmed. */
+    /** ISO calendar date. */
     iso: "2026-11-27",
     display: "Friday, 27 November 2026",
     short: "27 Nov 2026",
     timeZone: "Africa/Lagos",
+    /** Start time, local (flyer: "9:00 AM prompt"; FAQ: "9AM Plenary"). */
+    startTime: "09:00",
+    startDisplay: "9:00 AM WAT",
   },
   venue: {
     name: "Eko Convention Centre",
     city: "Lagos",
     country: "Nigeria",
     display: "Eko Convention Centre, Lagos",
+    address: "Eko Hotels & Suites, Victoria Island, Lagos",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Eko+Convention+Centre+Lagos+Nigeria",
   },
   previousEdition: {
@@ -40,16 +45,21 @@ export const event = {
 } as const;
 
 /**
- * Contact details. All `null` until the convener confirms them.
- * Components render a clearly labelled placeholder for null values.
+ * Contact details from the convener's documents (2.md footer, event flyer,
+ * FAQ Q99). `socials` stays empty until full profile URLs are supplied; the
+ * handle is shown as text.
  */
 export const contact: {
   email: string | null;
   phone: string | null;
+  socialHandle: string | null;
+  secretariat: string | null;
   socials: { label: string; href: string }[];
 } = {
-  email: null,
-  phone: null,
+  email: "info@nlbs.com.ng",
+  phone: "+234 803 231 5349",
+  socialHandle: "@Nigeria20Summit",
+  secretariat: "5 Oremeji Oyo Road, Mokola, Ibadan, Oyo State. Lagos office by appointment.",
   socials: [],
 };
 

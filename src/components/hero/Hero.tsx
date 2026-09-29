@@ -52,7 +52,7 @@ export function Hero() {
               <li className="flex items-center gap-3">
                 <CalendarDays aria-hidden="true" className="size-5 shrink-0 text-gold" />
                 <time dateTime={event.date.iso} className="font-medium text-white">
-                  {event.date.display}
+                  {event.date.display} · {event.date.startDisplay}
                 </time>
               </li>
               <li className="flex items-center gap-3">

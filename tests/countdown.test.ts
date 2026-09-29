@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { event } from "@/data/event";
-import { getCountdown, pad2, startOfDayInZone, timeZoneOffsetMs } from "@/lib/countdown";
+import { getCountdown, pad2, startOfDayInZone, timeZoneOffsetMs, zonedTimeToUtc } from "@/lib/countdown";
 
 const LAGOS = "Africa/Lagos";
 
@@ -77,5 +77,24 @@ describe("pad2", () => {
     expect(pad2(7)).toBe("07");
     expect(pad2(59)).toBe("59");
     expect(pad2(120)).toBe("120");
+  });
+});
+
+describe("zonedTimeToUtc", () => {
+  it("resolves the 9:00 AM WAT start to 08:00 UTC", () => {
+    expect(new Date(zonedTimeToUtc(event.date.iso, event.date.startTime, LAGOS)).toISOString()).toBe(
+      "2026-11-27T08:00:00.000Z",
+    );
+  });
+
+  it("rejects malformed times", () => {
+    expect(() => zonedTimeToUtc("2026-11-27", "9am", LAGOS)).toThrow(/Invalid time/);
+  });
+
+  it("stays live until the custom end, then past", () => {
+    const start = zonedTimeToUtc("2026-11-27", "09:00", LAGOS);
+    const end = startOfDayInZone("2026-11-28", LAGOS);
+    expect(getCountdown(end - 1, start, end).status).toBe("live");
+    expect(getCountdown(end, start, end).status).toBe("past");
   });
 });

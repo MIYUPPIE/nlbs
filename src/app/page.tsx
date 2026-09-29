@@ -4,8 +4,10 @@ import { AudienceSection } from "@/components/sections/AudienceSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { DealMakingSection } from "@/components/sections/DealMakingSection";
 import { EditionSection } from "@/components/sections/EditionSection";
+import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { ExhibitionSection } from "@/components/sections/ExhibitionSection";
 import { InvestmentSection } from "@/components/sections/InvestmentSection";
+import { FaqTeaserSection } from "@/components/sections/FaqTeaserSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PillarsSection } from "@/components/sections/PillarsSection";
 import { ProgrammeSection } from "@/components/sections/ProgrammeSection";
@@ -34,8 +36,10 @@ export default function HomePage() {
       <ExhibitionSection />
       <DealMakingSection />
       <EditionSection />
+      <RoadmapSection compact />
       <SpeakersSection limit={4} />
       <PartnersSection compact />
+      <FaqTeaserSection />
       <CTASection />
     </>
   );

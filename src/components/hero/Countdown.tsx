@@ -2,10 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { event } from "@/data/event";
-import { getCountdown, pad2, startOfDayInZone, type Countdown as CountdownValue } from "@/lib/countdown";
+import {
+  getCountdown,
+  pad2,
+  startOfDayInZone,
+  zonedTimeToUtc,
+  type Countdown as CountdownValue,
+} from "@/lib/countdown";
 import { cn } from "@/lib/utils";
 
-const TARGET_MS = startOfDayInZone(event.date.iso, event.date.timeZone);
+const TARGET_MS = zonedTimeToUtc(event.date.iso, event.date.startTime, event.date.timeZone);
+/** "Happening today" until local midnight after the event. */
+const END_MS = startOfDayInZone(event.date.iso, event.date.timeZone) + 86_400_000;
 
 const units: { key: keyof Omit<CountdownValue, "status">; label: string }[] = [
   { key: "days", label: "Days" },
@@ -15,7 +23,7 @@ const units: { key: keyof Omit<CountdownValue, "status">; label: string }[] = [
 ];
 
 /**
- * Live countdown to 00:00 on the event day, Africa/Lagos (WAT).
+ * Live countdown to the 9:00 AM WAT start on the event day (Africa/Lagos).
  * Renders placeholders on the server and first client paint to avoid a
  * hydration mismatch, then ticks every second.
  */
@@ -23,7 +31,7 @@ export function Countdown({ className }: { className?: string }) {
   const [value, setValue] = useState<CountdownValue | null>(null);
 
   useEffect(() => {
-    const update = () => setValue(getCountdown(Date.now(), TARGET_MS));
+    const update = () => setValue(getCountdown(Date.now(), TARGET_MS, END_MS));
     const first = requestAnimationFrame(update);
     const id = window.setInterval(update, 1000);
     return () => {
@@ -81,7 +89,7 @@ export function Countdown({ className }: { className?: string }) {
         ))}
       </div>
       <p className="mt-3 text-xs text-mist">
-        Counting down to {event.date.display}, West Africa Time (Lagos).
+        Counting down to {event.date.display}, {event.date.startDisplay} (Lagos).
       </p>
     </div>
   );
