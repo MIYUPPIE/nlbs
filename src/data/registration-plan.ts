@@ -63,16 +63,16 @@ export const preEventTimeline: { when: string; what: string; channel: string }[]
   {
     when: "21 days before",
     what: "“Save your seat” email with your form link",
-    channel: "Email and WhatsApp",
+    channel: "Email",
   },
   {
     when: "14 days before",
     what: "“You're approved”: your e-badge and the dress code",
-    channel: "Email and WhatsApp",
+    channel: "Email",
   },
   { when: "7 days before", what: "Final details: parking, agenda and who you'll meet", channel: "Email" },
   { when: "2 days before", what: "Your QR code and the venue map", channel: "Email" },
-  { when: "1 day before", what: "“See you tomorrow” reminder. ID required", channel: "SMS and WhatsApp" },
+  { when: "1 day before", what: "“See you tomorrow” reminder. ID required", channel: "SMS" },
 ];
 
 /**
