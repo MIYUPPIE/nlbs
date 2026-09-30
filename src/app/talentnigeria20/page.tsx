@@ -1,5 +1,6 @@
 import { CircleCheck } from "lucide-react";
 import { talentApplication as t } from "@/data/talent-application";
+import { BOOK_PREORDER } from "@/lib/talent-form";
 import { PageHero } from "@/components/layout/PageHero";
 import { TalentWindowGate } from "@/components/talent/TalentWindowGate";
 import { Container } from "@/components/ui/Container";
@@ -8,7 +9,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata({
   title: "Talent Fund 2026 Application",
   description:
-    "Apply to the Nigeria 2.0 Talent Fund 2026: skills, jobs and capital for 10,000 young Nigerians aged 18 to 35. No payment required. Deadline 30 October 2026.",
+    "Apply to the Nigeria 2.0 Talent Fund 2026: skills, jobs and capital for 10,000 young Nigerians aged 18 to 35. Applicants pre-order Advising The Founder first. Deadline 30 October 2026.",
   path: "/talentnigeria20",
 });
 
@@ -18,7 +19,7 @@ export default function TalentApplicationPage() {
       <PageHero
         eyebrow="Nigeria 2.0 Talent Fund 2026"
         title="Application form"
-        lead="We are selecting 10,000 youths for Skills, Jobs and Capital. This form takes about 4 minutes. No payment required."
+        lead="We are selecting 10,000 youths for Skills, Jobs and Capital. This form takes about 4 minutes. Before you continue past Section 1, you will pre-order the book Advising The Founder."
       />
       <section
         aria-label="Talent Fund application"
@@ -56,6 +57,7 @@ export default function TalentApplicationPage() {
                   <ul className="mt-4 space-y-3">
                     {[
                       ...t.eligibility,
+                      `A paid pre-order of ${BOOK_PREORDER.title} (${BOOK_PREORDER.price}), made with your own email or WhatsApp number`,
                       "Have your 1-minute video link ready",
                       "Jobs track: your CV as a PDF (max 2 MB)",
                     ].map((e) => (

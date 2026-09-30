@@ -93,3 +93,53 @@ export async function submitToCentral(
   }
   return { ok: false, error: messageFor(res.status, form) };
 }
+
+export type PreorderCheck =
+  | { valid: true; seatsLeft?: number }
+  | { valid: false; message: string; status?: "not_found" | "unpaid" | "used_up" | "error" };
+
+/**
+ * Confirms a paid book pre-order for a Talent Fund applicant before they
+ * continue (GET /api/v1/talent/preorder-check). The backend enforces the
+ * same rule again when the application is submitted.
+ */
+export async function checkPreorder(
+  reference: string,
+  applicant: { email: string; whatsapp: string },
+  config: CentralConfig | null = centralConfig(),
+  fetchImpl: typeof fetch = fetch,
+): Promise<PreorderCheck> {
+  if (!config) return { valid: false, status: "error", message: NOT_OPEN.talent };
+  const q = new URLSearchParams({ reference, email: applicant.email, phone: applicant.whatsapp });
+
+  let res: Response;
+  try {
+    res = await fetchImpl(`${config.apiUrl}/api/v1/talent/preorder-check?${q.toString()}`, {
+      headers: { Accept: "application/json", "X-Site-Key": config.siteKey },
+    });
+  } catch {
+    return {
+      valid: false,
+      status: "error",
+      message: "We could not reach the server. Check your connection and try again.",
+    };
+  }
+
+  const data = (await res.json().catch(() => null)) as {
+    valid?: unknown;
+    seatsLeft?: unknown;
+    status?: unknown;
+    message?: unknown;
+  } | null;
+
+  if (res.ok && data?.valid === true) {
+    return typeof data.seatsLeft === "number" ? { valid: true, seatsLeft: data.seatsLeft } : { valid: true };
+  }
+  if (res.ok && data?.valid === false && typeof data.message === "string") {
+    const status = ["not_found", "unpaid", "used_up"].includes(data.status as string)
+      ? (data.status as "not_found" | "unpaid" | "used_up")
+      : undefined;
+    return { valid: false, status, message: data.message };
+  }
+  return { valid: false, status: "error", message: messageFor(res.status, "talent") };
+}

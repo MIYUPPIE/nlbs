@@ -9,7 +9,7 @@ import type { IconName } from "@/components/ui/Icon";
  */
 export const talentApplication = {
   heading: "Apply to the Nigeria 2.0 Talent Fund",
-  lead: "We are selecting 10,000 young Nigerians for skills, jobs and capital. The application takes about 4 minutes and no payment is required.",
+  lead: "We are selecting 10,000 young Nigerians for skills, jobs and capital. The application takes about 4 minutes. Every applicant first pre-orders Advising The Founder by Dr. Wale Busari, one copy per application.",
   portal: "/talentnigeria20",
   portalOpens: "1 October 2026",
   deadline: "30 October 2026",
@@ -55,5 +55,6 @@ export const talentApplication = {
     "One sentence on the problem you want to solve in Nigeria (150 characters)",
     "Why a CEO should hire or fund you, in 30 words",
     "Your WhatsApp number, email and state of residence",
+    "A paid pre-order of Advising The Founder by Dr. Wale Busari, made with the same email or WhatsApp number (one copy per application)",
   ],
 };

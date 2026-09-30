@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
   CircleAlert,
   CircleCheck,
+  ExternalLink,
   FileText,
   LoaderCircle,
   Upload,
@@ -34,7 +36,13 @@ import {
   TRACKS,
   YES_NO,
   type CvUpload,
+  BOOK_PREORDER,
+  bookPreorderUrl,
+  normalizeNigerianMobile,
+  normalizePreorderReference,
 } from "@/lib/talent-form";
+import { checkPreorder } from "@/lib/central";
+import { siteUrl } from "@/lib/site";
 import { sendForm } from "@/lib/outgoing";
 import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/forms/Field";
 import { useHydrated } from "@/components/hooks/useHydrated";
@@ -68,14 +76,31 @@ const EMPTY: Values = {
   devices: "",
   pitch: "",
   consent: false,
+  preorderReference: "",
   website: "",
 };
+
+const RETURN_URL = `${siteUrl}/talentnigeria20/`;
+
+type PreorderState = { status: "idle" | "checking" | "valid" | "invalid"; key?: string };
+
+/** What a confirmed pre-order was checked against; editing any of it needs a new check. */
+const preorderKey = (v: Values) =>
+  [
+    normalizePreorderReference(String(v.preorderReference ?? "")) ?? "",
+    String(v.email ?? "")
+      .trim()
+      .toLowerCase(),
+    normalizeNigerianMobile(String(v.whatsapp ?? "")) ?? String(v.whatsapp ?? ""),
+  ].join("|");
 
 const STEPS = [
   {
     title: "Who are you?",
     fields: ["fullName", "whatsapp", "email", "state", "ageBand", "referral", "referralPartner"],
   },
+  // Required between who you are (eligibility known) and the rest of the form.
+  { title: "Pre-order the book", fields: ["preorderReference"] },
   { title: "Which track?", fields: ["track"] },
   {
     title: "The filter questions",
@@ -232,11 +257,41 @@ export function TalentApplicationForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
   const [restored, setRestored] = useState(false);
+  const [preorder, setPreorder] = useState<PreorderState>({ status: "idle" });
   const formRef = useRef<HTMLFormElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Restore a saved draft (text answers only; the CV is never stored).
+  /** Confirms the pre-order with the backend. Returns true when it qualifies. */
+  const verifyPreorder = async (v: Values): Promise<boolean> => {
+    const ref = normalizePreorderReference(String(v.preorderReference ?? ""));
+    if (!ref) {
+      setPreorder({ status: "invalid" });
+      setErrors((o) => ({
+        ...o,
+        preorderReference: "Enter your pre-order reference, for example BK-7K4Q-9XPA.",
+      }));
+      return false;
+    }
+    setPreorder({ status: "checking" });
+    setErrors((o) => ({ ...o, preorderReference: "" }));
+    const whatsapp = String(v.whatsapp ?? "");
+    const res = await checkPreorder(ref, {
+      email: String(v.email ?? "").trim(),
+      whatsapp: normalizeNigerianMobile(whatsapp) ?? whatsapp,
+    });
+    if (res.valid) {
+      setValues((cur) => ({ ...cur, preorderReference: ref }));
+      setPreorder({ status: "valid", key: preorderKey({ ...v, preorderReference: ref }) });
+      return true;
+    }
+    setPreorder({ status: "invalid" });
+    setErrors((o) => ({ ...o, preorderReference: res.message }));
+    return false;
+  };
+
+  // Restore a saved draft (text answers only; the CV is never stored), and
+  // pick up ?preorder=BK-... when the book site sends the applicant back.
   useEffect(() => {
     let draft: Values | null = null;
     try {
@@ -245,13 +300,32 @@ export function TalentApplicationForm() {
     } catch {
       /* storage unavailable */
     }
+    const incoming = normalizePreorderReference(
+      new URLSearchParams(window.location.search).get("preorder") ?? "",
+    );
+    if (incoming) window.history.replaceState(null, "", window.location.pathname + window.location.hash);
     const frame = requestAnimationFrame(() => {
-      if (draft) {
-        setValues((v) => ({ ...v, ...draft, cv: null, website: "" }));
-        setRestored(true);
+      const merged: Values = {
+        ...EMPTY,
+        ...(draft ?? {}),
+        cv: null,
+        website: "",
+        ...(incoming ? { preorderReference: incoming } : {}),
+      };
+      if (draft || incoming) setValues((v) => ({ ...v, ...merged, cv: v.cv }));
+      if (draft) setRestored(true);
+      // Back from the book site with Section 1 already done: go straight to the check.
+      if (
+        incoming &&
+        Object.keys(stepErrors(merged, 0)).length === 0 &&
+        eligibility(merged as never).eligible
+      ) {
+        setStep(1);
+        void verifyPreorder(merged);
       }
     });
     return () => cancelAnimationFrame(frame);
+    // Runs once on mount; verifyPreorder only uses state setters.
   }, []);
 
   useEffect(() => {
@@ -285,6 +359,8 @@ export function TalentApplicationForm() {
   };
   const field = { onChange: (n: string, v: string) => set(n, v), onBlur: blur };
 
+  const preorderConfirmed = preorder.status === "valid" && preorder.key === preorderKey(values);
+
   const elig = eligibility({
     ageBand: text("ageBand") as never,
     available: text("available") as never,
@@ -306,7 +382,13 @@ export function TalentApplicationForm() {
     });
   };
 
-  const next = () => {
+  const next = async () => {
+    if (step === 1) {
+      if (preorderConfirmed || (await verifyPreorder(values))) return goTo(2);
+      setFormError("Pre-order the book, then confirm your reference to continue.");
+      formRef.current?.querySelector<HTMLElement>("#f-preorderReference")?.focus();
+      return;
+    }
     const e = stepErrors(values, step);
     setErrors((old) => ({ ...old, ...e }));
     if (Object.keys(e).length) {
@@ -352,6 +434,11 @@ export function TalentApplicationForm() {
       requestAnimationFrame(() => focusFirst(errs));
       return;
     }
+    if (!preorderConfirmed) {
+      goTo(1);
+      setFormError("Confirm your book pre-order before submitting.");
+      return;
+    }
     setStatus("submitting");
     setFormError(null);
     const res = await sendForm("talent", values);
@@ -369,6 +456,7 @@ export function TalentApplicationForm() {
     setStatus("error");
     setFormError(res.error);
     if (res.fieldErrors) {
+      if (res.fieldErrors.preorderReference) setPreorder({ status: "invalid" });
       setErrors(res.fieldErrors);
       const firstStep = STEPS.findIndex((s) =>
         Object.keys(res.fieldErrors!).some((k) => (s.fields as readonly string[]).includes(k)),
@@ -418,7 +506,7 @@ export function TalentApplicationForm() {
     >
       {/* Progress */}
       <div>
-        <ol className="grid grid-cols-3 gap-2" aria-label="Application progress">
+        <ol className="grid grid-cols-4 gap-2" aria-label="Application progress">
           {STEPS.map((s, i) => (
             <li key={s.title} aria-current={i === step ? "step" : undefined}>
               <span className={cn("block h-1.5 rounded-full", i <= step ? "bg-gold" : "bg-line")} />
@@ -543,6 +631,111 @@ export function TalentApplicationForm() {
         )}
 
         {step === 1 && (
+          <>
+            <div className="grid gap-6 rounded-2xl bg-navy-950 p-6 text-white sm:grid-cols-[auto_1fr] sm:p-8">
+              <Image
+                src="/brand/advising-the-founder.webp"
+                alt={`${BOOK_PREORDER.title} by ${BOOK_PREORDER.author}, book cover`}
+                width={360}
+                height={540}
+                className="h-auto w-24 rounded-md shadow-lg ring-1 ring-white/10 sm:w-28"
+              />
+              <div>
+                <p className="text-xs font-semibold tracking-[0.2em] text-gold uppercase">
+                  Required before you continue
+                </p>
+                <h3 className="mt-2 font-display text-3xl leading-tight">Pre-order {BOOK_PREORDER.title}</h3>
+                <p className="mt-1 text-sm text-mist">
+                  by {BOOK_PREORDER.author}, convener of Nigeria 2.0 · Paperback · {BOOK_PREORDER.price}
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-white/85">
+                  Every Talent Fund applicant pre-orders the book before continuing. One copy covers one
+                  application. Pre-order with the same email
+                  {text("email") ? (
+                    <>
+                      {" "}
+                      (<strong className="text-white">{text("email")}</strong>)
+                    </>
+                  ) : null}{" "}
+                  or WhatsApp number
+                  {text("whatsapp") ? (
+                    <>
+                      {" "}
+                      (<strong className="text-white">{text("whatsapp")}</strong>)
+                    </>
+                  ) : null}{" "}
+                  you gave in Section 1, so we can match it to you.
+                </p>
+                <a
+                  href={bookPreorderUrl(
+                    { fullName: text("fullName"), email: text("email"), whatsapp: text("whatsapp") },
+                    RETURN_URL,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonClasses("gold", "md", "mt-6")}
+                >
+                  Pre-order the book
+                  <ExternalLink aria-hidden="true" className="size-4" />
+                  <span className="sr-only">(opens advisingthefounder.com in a new tab)</span>
+                </a>
+              </div>
+            </div>
+
+            <ol className="grid gap-3 text-sm sm:grid-cols-3">
+              {[
+                "Pre-order and pay on advisingthefounder.com.",
+                "Tap \u201cContinue your Talent Fund application\u201d, or copy your reference (BK-\u2026) from the confirmation page or email.",
+                "Enter the reference below and confirm it.",
+              ].map((line, i) => (
+                <li key={line} className="flex gap-3 rounded-xl bg-ivory p-4 text-ink/80">
+                  <span className="font-display text-xl leading-none text-gold-ink">{i + 1}</span>
+                  {line}
+                </li>
+              ))}
+            </ol>
+
+            <div>
+              <TextField
+                name="preorderReference"
+                label="Your pre-order reference"
+                required
+                hint="Starts with BK-, for example BK-7K4Q-9XPA."
+                value={text("preorderReference")}
+                error={errors.preorderReference}
+                onChange={(n, v) => set(n, v.toUpperCase())}
+                onBlur={() => {}}
+              />
+              <div className="mt-3 flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => void verifyPreorder(values)}
+                  disabled={!hydrated || preorder.status === "checking"}
+                  className={buttonClasses("outline-dark", "md", "disabled:opacity-60")}
+                >
+                  {preorder.status === "checking" ? (
+                    <>
+                      <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+                      Checking…
+                    </>
+                  ) : (
+                    "Confirm my pre-order"
+                  )}
+                </button>
+                <p aria-live="polite" className="text-sm">
+                  {preorderConfirmed && (
+                    <span className="inline-flex items-center gap-2 font-semibold text-green-800">
+                      <CircleCheck aria-hidden="true" className="size-4" />
+                      Pre-order confirmed. You can continue.
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
           <fieldset aria-describedby={errors.track ? "f-track-error" : undefined}>
             <legend className="mb-3 text-sm font-semibold text-navy-950">
               7. Choose your track <span className="font-normal text-muted">(choose 1 only)</span>
@@ -603,13 +796,13 @@ export function TalentApplicationForm() {
           </fieldset>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <p className="rounded-xl bg-ivory px-4 py-3 text-sm text-navy-950">
               Track: <strong>{track}</strong>{" "}
               <button
                 type="button"
-                onClick={() => goTo(1)}
+                onClick={() => goTo(2)}
                 className="ml-1 font-semibold text-navy-700 underline underline-offset-4"
               >
                 Change
@@ -892,7 +1085,7 @@ export function TalentApplicationForm() {
             Back
           </button>
         ) : (
-          <p className="text-xs text-muted">Takes about 4 minutes. No payment required.</p>
+          <p className="text-xs text-muted">Takes about 4 minutes, plus the book pre-order.</p>
         )}
         {step < STEPS.length - 1 ? (
           // Distinct keys: if React reused this element as the submit button, the
