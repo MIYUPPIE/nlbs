@@ -1,10 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = Number(process.env.E2E_PORT ?? 3200);
+const CENTRAL_PORT = 3299;
 
 /**
- * Periodic eval lane. Runs against a production build:
- *   npm run build && npm run test:e2e
+ * Periodic eval lane. Runs the real static export, as cPanel serves it:
+ *   npm run test:e2e   (builds out/ against the fake backend, then tests)
+ * Apache 2.4 (Docker) serves out/ with the site's own public/.htaccess, and
+ * e2e/servers/fake-central.mjs stands in for the central backend.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -16,19 +19,22 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: `npx next start -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-    env: {
-      // Lets the e2e suite exercise the success path without a real webhook.
-      REGISTRATION_ALLOW_UNCONNECTED: "true",
-      ENQUIRY_ALLOW_UNCONNECTED: "true",
-      TALENT_ALLOW_UNCONNECTED: "true",
-      SPONSOR_ALLOW_UNCONNECTED: "true",
-      // The real window opens 1 Oct 2026; force it open so the form can be exercised.
-      TALENT_APPLICATIONS_OVERRIDE: "open",
+  webServer: [
+    {
+      command:
+        `docker rm -f nlbs-e2e-apache >/dev/null 2>&1; docker run --rm --name nlbs-e2e-apache -p ${PORT}:80 ` +
+        `-v "${process.cwd()}/out:/usr/local/apache2/htdocs:ro" ` +
+        `-v "${process.cwd()}/e2e/servers/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro" httpd:2.4`,
+      url: `http://localhost:${PORT}/`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
     },
-  },
+    {
+      command: "node e2e/servers/fake-central.mjs",
+      url: `http://localhost:${CENTRAL_PORT}/__health`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 15_000,
+      env: { FAKE_CENTRAL_PORT: String(CENTRAL_PORT), FAKE_CENTRAL_ORIGINS: `http://localhost:${PORT}` },
+    },
+  ],
 });

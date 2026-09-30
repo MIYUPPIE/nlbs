@@ -20,10 +20,7 @@ export const metadata = pageMetadata({
   path: "/register",
 });
 
-export default async function RegisterPage(props: PageProps<"/register">) {
-  const { type } = await props.searchParams;
-  const initialDelegateType = Array.isArray(type) ? type[0] : type;
-
+export default function RegisterPage() {
   return (
     <>
       <JsonLd data={eventJsonLd()} />
@@ -72,7 +69,7 @@ export default async function RegisterPage(props: PageProps<"/register">) {
         <Container>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">
-              <RegistrationForm initialDelegateType={initialDelegateType} />
+              <RegistrationForm />
             </div>
             <aside className="lg:col-span-4" aria-labelledby="register-aside-title">
               <div className="rounded-3xl bg-navy-950 p-8 text-white lg:sticky lg:top-28">

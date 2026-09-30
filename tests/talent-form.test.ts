@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   applicationWindow,
   band,
@@ -12,7 +12,7 @@ import {
   talentApplicationSchema,
   type TalentApplication,
 } from "@/lib/talent-form";
-import { POST } from "@/app/api/talent-application/route";
+import { prepare } from "@/lib/outgoing";
 
 const PDF_B64 = Buffer.from("%PDF-1.4\n%fake cv\n").toString("base64");
 
@@ -262,56 +262,24 @@ describe("applicationWindow (1-30 Oct 2026, Lagos)", () => {
   });
 });
 
-describe("POST /api/talent-application", () => {
-  const req = (body: unknown) =>
-    new Request("http://localhost/api/talent-application", { method: "POST", body: JSON.stringify(body) });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.restoreAllMocks();
+describe("prepare.talent (what the browser sends to the backend)", () => {
+  it("refuses ineligible applicants with the PDF's message", () => {
+    expect(prepare.talent({ ...validSkills, ageBand: "36+" })).toEqual({
+      ok: false,
+      error: "Thank you, you are not eligible.",
+    });
   });
 
-  it("refuses before the window opens", async () => {
-    vi.stubEnv("TALENT_APPLICATIONS_OVERRIDE", "");
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-09-29T12:00:00Z"));
-    const res = await POST(req(validSkills));
-    vi.useRealTimers();
-    expect(res.status).toBe(403);
-    expect((await res.json()).error).toMatch(/open on 1 October/);
+  it("refuses invalid input", () => {
+    expect(prepare.talent({ ...validSkills, email: "nope" }).ok).toBe(false);
   });
 
-  it("refuses ineligible applicants with the PDF's message", async () => {
-    vi.stubEnv("TALENT_APPLICATIONS_OVERRIDE", "open");
-    vi.stubEnv("NODE_ENV", "development");
-    const res = await POST(req({ ...validSkills, ageBand: "36+" }));
-    expect(res.status).toBe(422);
-    expect((await res.json()).error).toBe("Thank you, you are not eligible.");
-  });
-
-  it("delivers a normalised, screened application to the webhook", async () => {
-    vi.stubEnv("TALENT_APPLICATIONS_OVERRIDE", "open");
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("TALENT_WEBHOOK_URL", "https://hook.test/talent");
-    vi.spyOn(console, "info").mockImplementation(() => {});
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
-    const res = await POST(req({ ...validSkills, businessName: "leftover" }));
-    expect(res.status).toBe(200);
-    const sent = JSON.parse(String((fetchSpy.mock.calls[0][1] as RequestInit).body));
-    expect(sent.kind).toBe("talent");
-    expect(sent.whatsapp).toBe("+2348031234567");
-    expect(sent.businessName).toBe("");
-    expect(sent.screening.autoPoints).toBe(45);
-    expect("website" in sent).toBe(false);
-  });
-
-  it("accepts a body carrying a 2 MB CV but not larger", async () => {
-    vi.stubEnv("TALENT_APPLICATIONS_OVERRIDE", "open");
-    vi.stubEnv("NODE_ENV", "development");
-    const huge = "JVBERi0" + "A".repeat(3 * 1024 * 1024);
-    const res = await POST(
-      req({ ...validSkills, cv: { name: "a.pdf", type: "application/pdf", size: 1, data: huge } }),
-    );
-    expect(res.status).toBe(413);
+  it("sends a normalised, screened application with other tracks cleared", () => {
+    const p = prepare.talent({ ...validSkills, businessName: "leftover" });
+    if (!p.ok) throw new Error(p.error);
+    expect(p.fields.whatsapp).toBe("+2348031234567");
+    expect(p.fields.businessName).toBe("");
+    expect((p.fields.screening as { autoPoints: number }).autoPoints).toBe(45);
+    expect(p.fields.website).toBe(""); // honeypot travels; the backend checks it
   });
 });

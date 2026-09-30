@@ -8,6 +8,8 @@ import { delegateTypes, registrationSchema, sectors } from "@/lib/registration";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Honeypot, SelectField, TextField } from "@/components/forms/Field";
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
+import { sendForm } from "@/lib/outgoing";
+import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
 
 const emptyValues = {
@@ -25,13 +27,14 @@ const emptyValues = {
   website: "",
 };
 
-export function RegistrationForm({ initialDelegateType }: { initialDelegateType?: string }) {
-  const initial =
-    initialDelegateType && (delegateTypes as readonly string[]).includes(initialDelegateType)
-      ? { ...emptyValues, delegateType: initialDelegateType }
-      : emptyValues;
+const pickDelegateType = (raw: string) => ((delegateTypes as readonly string[]).includes(raw) ? raw : null);
 
-  const { formRef, ...form } = useSubmissionForm(registrationSchema, initial, "/api/register");
+export function RegistrationForm() {
+  const { formRef, ...form } = useSubmissionForm(registrationSchema, emptyValues, (v) =>
+    sendForm("registration", v),
+  );
+  // /register?type=Investor preselects the delegate type.
+  useQueryPrefill("type", pickDelegateType, (v) => form.setField("delegateType", v));
   const successRef = useRef<HTMLHeadingElement>(null);
   // Submit stays disabled until hydrated so a pre-hydration submit cannot fire natively.
   const hydrated = useHydrated();

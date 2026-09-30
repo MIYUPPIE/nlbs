@@ -16,7 +16,7 @@ test.describe("partners page", () => {
   test("sponsor enquiry opens the contact form on the Sponsorship topic", async ({ page }) => {
     await page.goto("/partners");
     await page.getByRole("link", { name: "Enquire as a Sponsor" }).click();
-    await expect(page).toHaveURL(/\/contact\?topic=sponsorship/);
+    await expect(page).toHaveURL(/\/contact\/?\?topic=sponsorship/);
     await expect(page.getByLabel(/Topic/)).toHaveValue("Sponsorship");
   });
 });

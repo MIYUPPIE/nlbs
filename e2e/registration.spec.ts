@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const CENTRAL = "http://localhost:3299";
+
 test.describe("registration", () => {
   test("shows inline validation and focuses the first invalid field", async ({ page }) => {
     await page.goto("/register");
@@ -29,6 +31,10 @@ test.describe("registration", () => {
     await expect(heading).toBeVisible();
     await expect(heading).toBeFocused();
     await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
+
+    // It really went to the central backend, from the browser, with the form name.
+    const sent = await (await page.request.get(`${CENTRAL}/__last/registration`)).json();
+    expect(sent).toMatchObject({ form: "registration", delegateType: "Investor", email: "ada@example.com" });
   });
 
   test("preselects the delegate type from ?type=", async ({ page }) => {
@@ -38,15 +44,13 @@ test.describe("registration", () => {
     await expect(page.getByLabel(/Delegate Type/)).toHaveValue("");
   });
 
-  test("surfaces a server-side outage honestly", async ({ page }) => {
-    await page.route("/api/register", (route) =>
+  test("surfaces a backend that refuses the site key honestly", async ({ page }) => {
+    await page.route("**/api/v1/submissions", (route) =>
       route.fulfill({
-        status: 503,
+        status: 401,
         contentType: "application/json",
-        body: JSON.stringify({
-          ok: false,
-          error: "Online registration is not open yet. Please check back soon.",
-        }),
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ ok: false, error: "Missing or invalid site key." }),
       }),
     );
     await page.goto("/register");

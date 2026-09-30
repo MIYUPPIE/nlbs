@@ -53,6 +53,15 @@ test.describe("unlisted sponsor form", () => {
     await expect(heading).toBeVisible();
     await expect(heading).toBeFocused();
     await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
+
+    const sent = await (await page.request.get("http://localhost:3299/__last/sponsor")).json();
+    expect(sent).toMatchObject({
+      form: "sponsor",
+      tier: "Gold",
+      passHolders: [{ name: "Ada Obi", email: "ada@example.com" }],
+      passAllowance: 6,
+    });
+    expect(sent.acknowledge).toBeUndefined();
   });
 
   for (const width of [1440, 390]) {

@@ -35,7 +35,7 @@ import {
   YES_NO,
   type CvUpload,
 } from "@/lib/talent-form";
-import { postForm } from "@/lib/forms";
+import { sendForm } from "@/lib/outgoing";
 import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/forms/Field";
 import { useHydrated } from "@/components/hooks/useHydrated";
 import { buttonClasses } from "@/components/ui/GoldButton";
@@ -354,7 +354,7 @@ export function TalentApplicationForm() {
     }
     setStatus("submitting");
     setFormError(null);
-    const res = await postForm("/api/talent-application", values);
+    const res = await sendForm("talent", values);
     if (res.ok) {
       setReference(res.reference);
       setStatus("success");

@@ -8,6 +8,7 @@ import { passLimit, sponsorFormSchema, tierOptions, TRACK_OPTIONS } from "@/lib/
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/forms/Field";
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
+import { sendForm } from "@/lib/outgoing";
 import { useHydrated } from "@/components/hooks/useHydrated";
 
 export function SponsorForm() {
@@ -32,7 +33,7 @@ export function SponsorForm() {
       acknowledge: "",
       website: "",
     },
-    "/api/sponsor",
+    (v) => sendForm("sponsor", v),
   );
   const successRef = useRef<HTMLHeadingElement>(null);
   const hydrated = useHydrated();

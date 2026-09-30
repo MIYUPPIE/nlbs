@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import type { z } from "zod";
-import { postForm } from "@/lib/forms";
+import type { SubmissionResponse } from "@/lib/forms";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -16,7 +16,8 @@ type Status = "idle" | "submitting" | "success" | "error";
 export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
   schema: S,
   initial: Record<string, string>,
-  endpoint: string,
+  /** Sends the validated values; see sendForm in @/lib/outgoing. */
+  send: (values: Record<string, string>) => Promise<SubmissionResponse>,
 ) {
   const [values, setValues] = useState<Record<string, string>>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -84,7 +85,7 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
 
     setErrors({});
     setStatus("submitting");
-    const res = await postForm(endpoint, values);
+    const res = await send(values);
     if (res.ok) {
       setReference(res.reference);
       setStatus("success");

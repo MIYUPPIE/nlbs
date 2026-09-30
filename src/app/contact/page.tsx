@@ -4,7 +4,6 @@ import { contact, event } from "@/data/event";
 import { PageHero } from "@/components/layout/PageHero";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Container } from "@/components/ui/Container";
-import { topicFromQuery } from "@/lib/enquiry";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
@@ -18,10 +17,7 @@ function Placeholder({ children }: { children: React.ReactNode }) {
   return <span className="text-muted italic">{children}</span>;
 }
 
-export default async function ContactPage(props: PageProps<"/contact">) {
-  const { topic } = await props.searchParams;
-  const initialTopic = topicFromQuery(topic);
-
+export default function ContactPage() {
   return (
     <>
       <PageHero
@@ -167,7 +163,7 @@ export default async function ContactPage(props: PageProps<"/contact">) {
             </div>
 
             <div className="lg:col-span-7">
-              <EnquiryForm initialTopic={initialTopic} />
+              <EnquiryForm />
             </div>
           </div>
         </Container>

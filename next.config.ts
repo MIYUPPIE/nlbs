@@ -1,30 +1,20 @@
 import type { NextConfig } from "next";
 
+/**
+ * Static export for cPanel: `npm run build` writes plain files to out/, which
+ * scripts/build-cpanel.sh zips for public_html. Forms post from the browser to
+ * the central backend (src/lib/central.ts). Redirects and response headers
+ * live in public/.htaccess, since a static export cannot set them.
+ */
 const nextConfig: NextConfig = {
+  output: "export",
+  // /register/ -> out/register/index.html, which Apache serves directly.
+  trailingSlash: true,
   images: {
-    formats: ["image/avif", "image/webp"],
-    qualities: [75],
+    // No image server on shared hosting; images are already sized in public/.
+    unoptimized: true,
   },
   poweredByHeader: false,
-  headers() {
-    return [
-      {
-        // Unlisted partner form: kept out of search results and caches.
-        source: "/sponsors",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-          { key: "Cache-Control", value: "private, no-store" },
-        ],
-      },
-    ];
-  },
-  redirects() {
-    return [
-      // Friendly aliases for the Talent Fund portal printed in the FAQ and 2.md.
-      { source: "/talent/apply", destination: "/talentnigeria20", permanent: true },
-      { source: "/apply", destination: "/talentnigeria20", permanent: false },
-    ];
-  },
 };
 
 export default nextConfig;

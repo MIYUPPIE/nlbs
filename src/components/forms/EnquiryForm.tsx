@@ -2,25 +2,29 @@
 
 import { useEffect, useRef } from "react";
 import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
-import { enquirySchema, enquiryTopics, type EnquiryTopic } from "@/lib/enquiry";
+import { enquirySchema, enquiryTopics, topicFromQuery } from "@/lib/enquiry";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/forms/Field";
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
+import { sendForm } from "@/lib/outgoing";
+import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
 
-export function EnquiryForm({ initialTopic }: { initialTopic?: EnquiryTopic | null }) {
+export function EnquiryForm() {
   const { formRef, ...form } = useSubmissionForm(
     enquirySchema,
     {
       fullName: "",
       email: "",
       organisation: "",
-      topic: initialTopic ?? "",
+      topic: "",
       message: "",
       website: "",
     },
-    "/api/enquiry",
+    (v) => sendForm("enquiry", v),
   );
+  // /contact?topic=sponsorship preselects the topic.
+  useQueryPrefill("topic", topicFromQuery, (v) => form.setField("topic", v));
   const successRef = useRef<HTMLHeadingElement>(null);
   // Submit stays disabled until hydrated so a pre-hydration submit cannot fire natively.
   const hydrated = useHydrated();

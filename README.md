@@ -42,25 +42,37 @@ Only facts confirmed in the build brief are published. They live in `src/data/`:
 
 Where a document contradicts the brief, the brief wins (e.g. the $50M+ target stays; prospectus figures are not used).
 
-## Forms
+## Forms and hosting
 
-`/register` and `/contact` post to `/api/register` and `/api/enquiry`. Both validate with the same Zod schemas as the client (`src/lib/registration.ts`, `src/lib/enquiry.ts`) and forward to a webhook (CRM, Zapier, Make, Sheets, your API):
+The site is a **static export** (`output: "export"`): plain files for cPanel `public_html`, no Node server. Every form posts **from the visitor's browser** to the central backend (`central-backend` repo, `POST /api/v1/submissions`) with the NLBS public key:
 
-| Variable                                           | Purpose                                                                       |
-| -------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `REGISTRATION_WEBHOOK_URL` / `ENQUIRY_WEBHOOK_URL` | POST target, JSON body with `kind`, `reference`, `submittedAt` and the fields |
-| `*_WEBHOOK_SECRET`                                 | Optional, sent as `Authorization: Bearer <secret>`                            |
-| `*_ALLOW_UNCONNECTED=true`                         | Accept without a webhook (demo/staging only)                                  |
+| File                  | Role                                                                                                                                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/lib/outgoing.ts` | What each form sends: Zod validation, then the clean-up the old API routes did (talent screening and WhatsApp normalisation, sponsor pass holders and allowance). Unit-tested against the backend's contract fixtures.                                 |
+| `src/lib/central.ts`  | Sends it and maps every backend answer (201/200, 422 field errors, 403 closed window, 401/403/413/429/5xx, network failure) to a plain message. No config means "not open yet", never a fake success.                                                  |
+| `.env.production`     | `NEXT_PUBLIC_CENTRAL_API_URL` and `NEXT_PUBLIC_CENTRAL_SITE_KEY` (a `pk_` key, public by design: the backend accepts it only from `https://www.nlbs.com.ng` / `https://nlbs.com.ng`, rate-limited). Public values only; a test fails on any `sk_` key. |
+| `public/.htaccess`    | What a static export cannot do itself: HTTPS + `www` redirect, `/apply` and `/talent/apply` redirects, `noindex` on `/sponsors/`, caching, security headers, PNG type for `/icon` and `/opengraph-image`, the 404 page, no folder listings.            |
 
-Status contract: `200` ok · `400` bad JSON · `413` too large · `422` invalid (with `fieldErrors`) · `502` webhook failed · `503` not connected. In production with no webhook, forms show "not open yet" rather than a false confirmation. Logs carry the reference and delegate type/topic only, never personal data.
+The backend enforces the Talent Fund window (1 to 30 Oct 2026, Lagos) and validates everything again. The page checks the same window in the browser (`NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE=open|closed` forces it at build time).
 
-No payment flow exists. Ticket pricing has not been supplied.
+### Deploy to cPanel
+
+```bash
+npm run build:cpanel        # -> dist/nlbs-site-<version>.zip
+```
+
+The script builds with `.env.production` only and refuses to ship a build that has test settings, a secret key, the wrong backend URL or no `.htaccess`. On the server, extract the zip in `public_html` (replace everything). The backend must allow browser posts for NLBS (central-backend `0d49d8b` or later with the static-site change) before the new site goes live.
+
+### Tests
+
+- `npm run check`: typecheck, lint, unit tests (including the backend contract).
+- `npm run test:e2e`: builds against a fake backend (`e2e/servers/fake-central.mjs`), serves `out/` with **Apache 2.4 in Docker** using the real `.htaccess`, and runs Playwright across every page. Needs Docker.
 
 ## Partner form (unlisted)
 
 `/sponsors` is the partner booking form (track, tier, organisation and billing, main contact, strategy-call availability, VIP pass holders). It is always available to anyone with the address, but no page links to it, it is not in the sitemap and it sends `noindex`. Share the URL directly. `tests/sponsor-form.test.ts` fails if a link to it is added anywhere in `src/`.
 
-Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the other forms. Point it at the central backend (`central-backend/docs/connecting-sites.md`), where requests appear under _NLBS > Partners_. The payload has `passHolders` as `[{ name, email }]` and `passAllowance` for the tier.
+Sent to the central backend like the other forms; requests appear under _NLBS > Partners_ with `passHolders` as `[{ name, email }]` and `passAllowance` for the tier.
 
 ## Talent Fund application
 
@@ -69,7 +81,7 @@ Delivery: `SPONSOR_WEBHOOK_URL` / `SPONSOR_WEBHOOK_SECRET`, same contract as the
 - **Auto-reject** (PDF rules): age 36+ or "No" to Q5 shows "Thank you, you are not eligible." and blocks submission; the API enforces the same.
 - **Window**: open 00:00 1 Oct to 23:59 30 Oct 2026, Lagos time, enforced on the page and API. `TALENT_APPLICATIONS_OVERRIDE=open|closed` to open early or extend.
 - **Video (Q3)** is a link (YouTube, Drive, TikTok, Instagram, Loom). Phone video files exceed what the site can accept without file storage.
-- **Screening** (`screen()` in `src/lib/talent-form.ts`), attached to the webhook payload, never shown to applicants: video 30, Platinum Partner referral 15, age 18-30 and available 15. Problem statement (20) and pitch (20) are left for reviewers, with `bandRange` showing the best and worst band (70+ shortlist, 50-69 waitlist, under 50 reject). Flags: `generic_problem_statement`, `skill_level_track_mismatch`, `received_prior_support`, `partner_referral_unverified`, `needs_hub_access`.
+- **Screening** (`screen()` in `src/lib/talent-form.ts`), sent to the central backend with the application (which re-checks it against its own rubric), never shown to applicants: video 30, Platinum Partner referral 15, age 18-30 and available 15. Problem statement (20) and pitch (20) are left for reviewers, with `bandRange` showing the best and worst band (70+ shortlist, 50-69 waitlist, under 50 reject). Flags: `generic_problem_statement`, `skill_level_track_mismatch`, `received_prior_support`, `partner_referral_unverified`, `needs_hub_access`.
 - WhatsApp numbers are normalised to `+234…`; answers from unchosen tracks are dropped; drafts auto-save on the device (never the CV).
 - Deviations from the PDF: "from April 2026" dropped (contradicts the deadline); Platinum Partner names are typed by the applicant until the partners are confirmed.
 

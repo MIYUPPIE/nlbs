@@ -64,6 +64,6 @@ test.describe("faq", () => {
     const teaser = page.locator("#faq");
     await expect(teaser.locator("details")).toHaveCount(6);
     await teaser.getByRole("link", { name: "View all 101 questions" }).click();
-    await expect(page).toHaveURL(/\/faq$/);
+    await expect(page).toHaveURL(/\/faq\/?$/);
   });
 });

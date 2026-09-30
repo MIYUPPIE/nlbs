@@ -10,11 +10,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run build:e2e && playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true",
+    "build:e2e": "NEXT_PUBLIC_CENTRAL_API_URL=http://localhost:3299 NEXT_PUBLIC_CENTRAL_SITE_KEY=pk_e2e_nlbs NEXT_PUBLIC_SITE_URL=http://localhost:3200 NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE=open next build",
+    "build:cpanel": "bash scripts/build-cpanel.sh"
   },
   "dependencies": {
     "clsx": "^2.1.1",

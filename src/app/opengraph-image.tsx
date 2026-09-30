@@ -1,3 +1,6 @@
+// Rendered once at build time (static export).
+export const dynamic = "force-static";
+
 import { ImageResponse } from "next/og";
 import { event } from "@/data/event";
 

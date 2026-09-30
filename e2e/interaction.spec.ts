@@ -19,7 +19,7 @@ test.describe("mobile navigation", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Open menu" }).click();
     await page.getByRole("dialog").getByRole("link", { name: "Programme" }).click();
-    await expect(page).toHaveURL(/\/programme$/);
+    await expect(page).toHaveURL(/\/programme\/?$/);
     await expect(page.getByRole("dialog")).toBeHidden();
   });
 });

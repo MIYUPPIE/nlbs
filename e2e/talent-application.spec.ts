@@ -139,5 +139,5 @@ test.describe("talent fund application", () => {
 
 test("/talent/apply redirects to the portal", async ({ page }) => {
   await page.goto("/talent/apply");
-  await expect(page).toHaveURL(/\/talentnigeria20$/);
+  await expect(page).toHaveURL(/\/talentnigeria20\/?$/);
 });

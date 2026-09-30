@@ -54,14 +54,17 @@ describe("sitemap and robots", () => {
     const urls = sitemap().map((e) => e.url);
     expect(urls).toHaveLength(allRoutes.length);
     expect(new Set(urls).size).toBe(urls.length);
-    for (const u of urls) expect(u.startsWith(siteUrl)).toBe(true);
+    for (const u of urls) {
+      expect(u.startsWith(siteUrl)).toBe(true);
+      expect(u.endsWith("/"), u).toBe(true); // matches the trailingSlash export
+    }
   });
 
-  it("robots allows the site, blocks the API, and points at the sitemap", () => {
+  it("robots allows the whole site and points at the sitemap", () => {
     const r = robots();
     const rules = Array.isArray(r.rules) ? r.rules[0] : r.rules;
     expect(rules.allow).toBe("/");
-    expect(rules.disallow).toEqual(["/api/"]);
+    expect(rules.disallow).toBeUndefined();
     expect(r.sitemap).toBe(`${siteUrl}/sitemap.xml`);
   });
 });
