@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "npm run build:e2e && playwright test",
+    "test:e2e": "npm run build:e2e && playwright test; s=$?; rm -rf out; exit $s",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run test",

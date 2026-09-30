@@ -66,7 +66,7 @@ The script builds with `.env.production` only and refuses to ship a build that h
 ### Tests
 
 - `npm run check`: typecheck, lint, unit tests (including the backend contract).
-- `npm run test:e2e`: builds against a fake backend (`e2e/servers/fake-central.mjs`), serves `out/` with **Apache 2.4 in Docker** using the real `.htaccess`, and runs Playwright across every page. Needs Docker.
+- `npm run test:e2e`: builds against a fake backend (and deletes that `out/` afterwards, so a test build can never be uploaded) (`e2e/servers/fake-central.mjs`), serves `out/` with **Apache 2.4 in Docker** using the real `.htaccess`, and runs Playwright across every page. Needs Docker.
 
 ## Partner form (unlisted)
 
