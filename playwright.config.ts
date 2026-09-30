@@ -23,7 +23,7 @@ export default defineConfig({
     {
       command:
         `docker rm -f nlbs-e2e-apache >/dev/null 2>&1; docker run --rm --name nlbs-e2e-apache -p ${PORT}:80 ` +
-        `-v "${process.cwd()}/out:/usr/local/apache2/htdocs:ro" ` +
+        `-v "${process.cwd()}:/site:ro" ` +
         `-v "${process.cwd()}/e2e/servers/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro" httpd:2.4`,
       url: `http://localhost:${PORT}/`,
       reuseExistingServer: !process.env.CI,
