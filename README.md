@@ -103,3 +103,15 @@ Aceternity components (adapted, in `src/components/aceternity/`): Spotlight, Bac
 ## Architecture
 
 Server components by default. Client islands: header/drawer, countdown, count-up numbers, programme tabs, audience hover, beams, moving border, forms, reveal observer. The mobile drawer uses HTML Invoker Commands so it opens before hydration; form submit buttons stay disabled until hydration so a native submit can never put personal data in a URL.
+
+## Privacy (NDPA 2023)
+
+`/privacy/`, `/cookies/`, `/terms/` render `src/data/legal.json`, a generated copy of
+`central-backend/contracts/privacy/dist/nlbs/legal.json`. Never edit it by hand: change the policy in the backend
+contract, then `node ../central-backend/contracts/privacy/build.mjs && node ../tools/sync-legal.mjs nlbs`.
+`/privacy/request/` posts the `privacy` form. Every form sends `privacyVersion`. Registration asks for explicit
+consent when dietary/access needs are given (`accessNeedsConsent`).
+
+`tests/legal.test.ts` fails if `legal.json` drifts from the backend, if the request types differ from the backend,
+or if the site starts using a browser storage key, cookie, iframe, `next/script` or outside script the cookie
+policy does not list. Adding analytics means a consent banner and a policy update first.

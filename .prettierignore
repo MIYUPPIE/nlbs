@@ -7,3 +7,6 @@ next-env.d.ts
 AGENTS.md
 CLAUDE.md
 content/*.md
+
+# Generated from central-backend/contracts/privacy (tests/legal.test.ts checks it byte for byte)
+src/data/legal.json

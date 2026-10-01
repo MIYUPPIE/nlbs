@@ -9,6 +9,7 @@ import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
 import { sendForm } from "@/lib/outgoing";
 import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
+import { PrivacyNotice } from "@/components/legal/PrivacyNotice";
 
 export function EnquiryForm() {
   const { formRef, ...form } = useSubmissionForm(
@@ -143,6 +144,10 @@ export function EnquiryForm() {
           "Send enquiry"
         )}
       </button>
+      <PrivacyNotice
+        className="mt-4 text-xs leading-relaxed text-muted"
+        purpose="We use your details only to answer your enquiry."
+      />
     </form>
   );
 }

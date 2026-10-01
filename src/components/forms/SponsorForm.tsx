@@ -10,6 +10,7 @@ import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/fo
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
 import { sendForm } from "@/lib/outgoing";
 import { useHydrated } from "@/components/hooks/useHydrated";
+import { PrivacyNotice } from "@/components/legal/PrivacyNotice";
 
 export function SponsorForm() {
   const { formRef, ...form } = useSubmissionForm(
@@ -320,9 +321,7 @@ export function SponsorForm() {
       <Honeypot value={v.website} onChange={(val) => form.setField("website", val)} />
 
       <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-sm text-xs leading-relaxed text-muted">
-          Fields marked * are required. Details go only to the convener&apos;s office.
-        </p>
+        <PrivacyNotice purpose="Fields marked * are required. Details go only to the convener's office. If you name pass holders, tell them you are sharing their details with us." />
         <button
           type="submit"
           disabled={submitting || !hydrated}

@@ -11,6 +11,7 @@ import {
   talentApplicationSchema,
 } from "@/lib/talent-form";
 import { submitToCentral, type CentralForm } from "@/lib/central";
+import { privacyRequestPayload, privacyRequestSchema } from "@/lib/privacy";
 
 /**
  * What each form sends to the central backend. These are the steps the old
@@ -29,7 +30,13 @@ const invalid = (): Prepared => ({ ok: false, error: "Please correct the highlig
 export const prepare: Record<CentralForm, (values: unknown) => Prepared> = {
   registration(values) {
     const r = registrationSchema.safeParse(values);
-    return r.success ? { ok: true, fields: r.data } : invalid();
+    if (!r.success) return invalid();
+    // Explicit consent travels as a boolean, and only counts when there are needs to consent to.
+    const { accessNeedsConsent, ...fields } = r.data;
+    return {
+      ok: true,
+      fields: { ...fields, accessNeedsConsent: fields.accessNeeds !== "" && accessNeedsConsent === "yes" },
+    };
   },
 
   enquiry(values) {
@@ -50,6 +57,11 @@ export const prepare: Record<CentralForm, (values: unknown) => Prepared> = {
         passAllowance: passLimit(fields.track, fields.tier),
       },
     };
+  },
+
+  privacy(values) {
+    const r = privacyRequestSchema.safeParse(values);
+    return r.success ? { ok: true, fields: privacyRequestPayload(r.data) } : invalid();
   },
 
   talent(values) {

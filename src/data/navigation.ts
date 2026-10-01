@@ -40,6 +40,14 @@ export const footerSecondaryNav: NavLink[] = [
   { label: "Innovation Exhibition", href: "/exhibition" },
 ];
 
+/** Footer legal row. Paths come from the privacy policy contract (src/data/legal.json). */
+export const legalNav: NavLink[] = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Cookie Policy", href: "/cookies" },
+  { label: "Terms of Use", href: "/terms" },
+  { label: "Privacy Request", href: "/privacy/request" },
+];
+
 /** Every public route. Drives the sitemap and route tests. */
 export const allRoutes = [
   "/",
@@ -56,4 +64,8 @@ export const allRoutes = [
   "/contact",
   "/faq",
   "/talentnigeria20",
+  "/privacy",
+  "/privacy/request",
+  "/cookies",
+  "/terms",
 ] as const;

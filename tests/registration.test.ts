@@ -41,6 +41,7 @@ describe("registrationSchema", () => {
       whatsapp: " +234 802 000 0000 ",
       nominatedBy: " Lagos Chamber ",
       accessNeeds: "Vegetarian",
+      accessNeedsConsent: "yes",
     });
     expect([full.whatsapp, full.nominatedBy, full.accessNeeds]).toEqual([
       "+234 802 000 0000",

@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { centralConfig, NOT_OPEN, submitToCentral, type CentralForm } from "@/lib/central";
 import { prepare } from "@/lib/outgoing";
+import { PRIVACY_VERSION } from "@/lib/privacy";
 import { validEnquiry, validRegistration } from "./fixtures";
 import { validSkills } from "./talent-form.test";
 
@@ -47,7 +48,7 @@ describe("centralConfig", () => {
 describe("submitToCentral", () => {
   it("says the form is not open when the backend is not configured (never a fake success)", async () => {
     const f = reply(201, { ok: true, reference: "N2-AAAA-BBBB" });
-    for (const form of ["registration", "enquiry", "talent", "sponsor"] as CentralForm[]) {
+    for (const form of ["registration", "enquiry", "talent", "sponsor", "privacy"] as CentralForm[]) {
       expect(await submitToCentral(form, {}, null, f)).toEqual({ ok: false, error: NOT_OPEN[form] });
     }
     expect(f).not.toHaveBeenCalled();
@@ -61,7 +62,12 @@ describe("submitToCentral", () => {
     expect(url).toBe("https://api.nlbs.com.ng/api/v1/submissions");
     expect(init.method).toBe("POST");
     expect(init.headers).toMatchObject({ "X-Site-Key": "pk_test_123", "Content-Type": "application/json" });
-    expect(JSON.parse(String(init.body))).toEqual({ fullName: "Ada", website: "", form: "registration" });
+    expect(JSON.parse(String(init.body))).toEqual({
+      privacyVersion: PRIVACY_VERSION,
+      fullName: "Ada",
+      website: "",
+      form: "registration",
+    });
   });
 
   it("a payload cannot override the form name", async () => {
@@ -133,7 +139,7 @@ describe("submitToCentral", () => {
 describe("contract with the central backend", () => {
   const FIXTURES = join(__dirname, "..", "..", "central-backend", "contracts", "fixtures");
   const hasBackend = existsSync(FIXTURES);
-  const ENVELOPE = ["kind", "form", "reference", "submittedAt", "event", "website"];
+  const ENVELOPE = ["kind", "form", "reference", "submittedAt", "event", "website", "privacyVersion"];
   const fixtureKeys = (name: string) =>
     Object.keys(JSON.parse(readFileSync(join(FIXTURES, `${name}.json`), "utf8")))
       .filter((k) => !ENVELOPE.includes(k))
@@ -188,6 +194,27 @@ describe("contract with the central backend", () => {
       website: "",
     };
     expect(sentKeys("sponsor", sponsor)).toEqual(fixtureKeys("nlbs-sponsor"));
+  });
+
+  it.skipIf(!hasBackend)("privacy request sends exactly the fields the backend fixture has", () => {
+    const sent = prepare.privacy({
+      fullName: "Ada Obi",
+      email: "ada.obi@example.com",
+      phone: "+234 803 555 0199",
+      requestType: "access",
+      reference: "N2-AB12-CD34",
+      details: "",
+      confirm: "yes",
+      website: "",
+    });
+    expect(sent.ok).toBe(true);
+    if (!sent.ok) return;
+    expect(
+      Object.keys(sent.fields)
+        .filter((k) => !ENVELOPE.includes(k))
+        .sort(),
+    ).toEqual(fixtureKeys("privacy-request"));
+    expect(sent.fields.confirm).toBe(true);
   });
 
   it.skipIf(!hasBackend)("talent sends exactly the fields the backend fixture has", () => {

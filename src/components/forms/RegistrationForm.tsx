@@ -11,6 +11,7 @@ import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
 import { sendForm } from "@/lib/outgoing";
 import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
+import { PrivacyNotice } from "@/components/legal/PrivacyNotice";
 
 const emptyValues = {
   fullName: "",
@@ -24,6 +25,7 @@ const emptyValues = {
   whatsapp: "",
   nominatedBy: "",
   accessNeeds: "",
+  accessNeedsConsent: "",
   website: "",
 };
 
@@ -238,17 +240,50 @@ export function RegistrationForm() {
             label="Dietary or access needs"
             value={form.values.accessNeeds}
             error={form.errors.accessNeeds}
+            hint="Optional. Used only to arrange catering and access for you."
             {...field}
           />
         </div>
+        {form.values.accessNeeds.trim() !== "" && (
+          <div className="mt-6">
+            <div className="flex items-start gap-3">
+              <input
+                id="f-accessNeedsConsent"
+                name="accessNeedsConsent"
+                type="checkbox"
+                checked={form.values.accessNeedsConsent === "yes"}
+                aria-invalid={form.errors.accessNeedsConsent ? true : undefined}
+                aria-describedby={form.errors.accessNeedsConsent ? "f-accessNeedsConsent-error" : undefined}
+                onChange={(e) => form.setField("accessNeedsConsent", e.target.checked ? "yes" : "")}
+                onBlur={() => form.blurField("accessNeedsConsent")}
+                className="mt-1 size-5 shrink-0 accent-navy-950"
+              />
+              <label htmlFor="f-accessNeedsConsent" className="text-sm leading-relaxed text-ink">
+                I consent to the summit team using my dietary or access needs (which may reveal health or
+                religious information) only to arrange catering and access for me. I can withdraw this at any
+                time.
+                <span className="text-gold-ink" aria-hidden="true">
+                  {" "}
+                  *
+                </span>
+              </label>
+            </div>
+            {form.errors.accessNeedsConsent && (
+              <p id="f-accessNeedsConsent-error" className="mt-1.5 pl-8 text-sm font-medium text-red-700">
+                {form.errors.accessNeedsConsent}
+              </p>
+            )}
+          </div>
+        )}
       </fieldset>
 
       <Honeypot value={form.values.website} onChange={(v) => form.setField("website", v)} />
 
       <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <p id="registration-note" className="max-w-sm text-xs leading-relaxed text-muted">
-          Fields marked * are required. Your details are used only to manage your participation in the summit.
-        </p>
+        <PrivacyNotice
+          id="registration-note"
+          purpose="Fields marked * are required. Your details are used only to manage your participation in the summit."
+        />
         <button
           type="submit"
           disabled={submitting || !hydrated}

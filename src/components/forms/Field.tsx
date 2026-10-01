@@ -119,7 +119,11 @@ export function SelectField({
   options,
   placeholder = "Select an option",
   ...props
-}: BaseProps & { options: readonly string[]; placeholder?: string }) {
+}: BaseProps & {
+  /** Plain strings, or {value, label} when the stored value differs from the words shown. */
+  options: readonly (string | { readonly value: string; readonly label: string })[];
+  placeholder?: string;
+}) {
   const { name, value, error, hint, required, onChange, onBlur } = props;
   return (
     <Shell {...props}>
@@ -143,11 +147,14 @@ export function SelectField({
           <option value="" disabled>
             {placeholder}
           </option>
-          {options.map((o) => (
-            <option key={o} value={o} className="text-ink">
-              {o}
-            </option>
-          ))}
+          {options.map((o) => {
+            const { value: v, label } = typeof o === "string" ? { value: o, label: o } : o;
+            return (
+              <option key={v} value={v} className="text-ink">
+                {label}
+              </option>
+            );
+          })}
         </select>
         <ChevronDown
           aria-hidden="true"

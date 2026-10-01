@@ -15,6 +15,10 @@ export const ROUTES = [
   "/contact",
   "/faq",
   "/talentnigeria20",
+  "/privacy",
+  "/privacy/request",
+  "/cookies",
+  "/terms",
 ] as const;
 
 export const WIDTHS = [1440, 1280, 1024, 768, 640, 390, 375] as const;

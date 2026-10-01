@@ -125,7 +125,7 @@ createServer((req, res) => {
     }
     if (typeof body.website === "string" && body.website !== "")
       return send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);
-    if (!["registration", "enquiry", "talent", "sponsor"].includes(body.form))
+    if (!["registration", "enquiry", "talent", "sponsor", "privacy"].includes(body.form))
       return send(res, 404, { ok: false, error: "Unknown form." }, origin);
     if (body.form === "talent") {
       if (!body.preorderReference)

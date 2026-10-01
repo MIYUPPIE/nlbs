@@ -42,6 +42,7 @@ import {
   normalizePreorderReference,
 } from "@/lib/talent-form";
 import { checkPreorder } from "@/lib/central";
+import { PRIVACY_PATHS } from "@/lib/privacy";
 import { siteUrl } from "@/lib/site";
 import { sendForm } from "@/lib/outgoing";
 import { Honeypot, SelectField, TextAreaField, TextField } from "@/components/forms/Field";
@@ -1045,8 +1046,12 @@ export function TalentApplicationForm() {
                   className="mt-0.5 size-4 shrink-0 accent-navy-950"
                 />
                 <span>
-                  I confirm my answers are true. I agree that my data is handled in line with the Nigeria Data
-                  Protection Act, and shared only with partners who select me.
+                  I confirm my answers are true. I consent to my application being used to assess, shortlist
+                  and contact me, and shared only with partners who select me, as the{" "}
+                  <Link href={PRIVACY_PATHS.privacy} className="text-navy-700 underline underline-offset-2">
+                    Privacy Policy
+                  </Link>{" "}
+                  explains (Nigeria Data Protection Act 2023). I can withdraw my consent at any time.
                 </span>
               </label>
               {errors.consent && (

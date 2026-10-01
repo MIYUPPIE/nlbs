@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { allRoutes, footerNav, mobileNav, primaryNav } from "@/data/navigation";
+import { allRoutes, footerNav, legalNav, mobileNav, primaryNav } from "@/data/navigation";
 import sitemap from "@/app/sitemap";
 import robots from "@/app/robots";
 import { siteUrl } from "@/lib/site";
@@ -26,12 +26,16 @@ describe("routes", () => {
       "/contact",
       "/faq",
       "/talentnigeria20",
+      "/privacy",
+      "/privacy/request",
+      "/cookies",
+      "/terms",
     ]);
     for (const r of allRoutes) expect(existsSync(pageFile(r)), r).toBe(true);
   });
 
   it("every nav link points at a real page", () => {
-    for (const l of [...primaryNav, ...mobileNav, ...footerNav]) {
+    for (const l of [...primaryNav, ...mobileNav, ...footerNav, ...legalNav]) {
       expect(existsSync(pageFile(l.href)), l.href).toBe(true);
     }
   });

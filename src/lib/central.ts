@@ -1,4 +1,5 @@
 import type { SubmissionResponse } from "@/lib/forms";
+import { PRIVACY_VERSION } from "@/lib/privacy";
 
 /**
  * Sends a form straight from the visitor's browser to the central backend
@@ -14,7 +15,7 @@ import type { SubmissionResponse } from "@/lib/forms";
  * open yet rather than pretending to succeed.
  */
 
-export type CentralForm = "registration" | "enquiry" | "talent" | "sponsor";
+export type CentralForm = "registration" | "enquiry" | "talent" | "sponsor" | "privacy";
 
 export type CentralConfig = { apiUrl: string; siteKey: string };
 
@@ -35,6 +36,7 @@ export const NOT_OPEN: Record<CentralForm, string> = {
   enquiry: "The contact form is not open yet. Please email us instead.",
   talent: "Online applications are not open yet. Please check back soon.",
   sponsor: "The partner form is not connected yet. Please contact the convener's office.",
+  privacy: "The privacy request form is not connected yet. Please email our Data Protection Officer instead.",
 };
 
 const GENERIC = "We could not send your submission. Please try again in a moment.";
@@ -64,7 +66,8 @@ export async function submitToCentral(
         Accept: "application/json",
         "X-Site-Key": config.siteKey,
       },
-      body: JSON.stringify({ ...fields, form }),
+      // privacyVersion: the privacy policy shown to the visitor (stored as proof of notice).
+      body: JSON.stringify({ ...fields, form, privacyVersion: PRIVACY_VERSION }),
     });
   } catch {
     return { ok: false, error: "We could not reach the server. Check your connection and try again." };

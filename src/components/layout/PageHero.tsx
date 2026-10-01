@@ -9,11 +9,14 @@ export function PageHero({
   title,
   lead,
   children,
+  showEvent = true,
 }: {
   eyebrow: string;
   title: React.ReactNode;
   lead?: React.ReactNode;
   children?: React.ReactNode;
+  /** The summit date and venue strip. Off for legal pages. */
+  showEvent?: boolean;
 }) {
   return (
     <section
@@ -35,16 +38,18 @@ export function PageHero({
         </h1>
         {lead && <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-mist">{lead}</p>}
         {children}
-        <ul className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/85 sm:flex-row sm:gap-8">
-          <li className="flex items-center gap-2">
-            <CalendarDays aria-hidden="true" className="size-4 text-gold" />
-            <time dateTime={event.date.iso}>{event.date.display}</time>
-          </li>
-          <li className="flex items-center gap-2">
-            <MapPin aria-hidden="true" className="size-4 text-gold" />
-            {event.venue.display}
-          </li>
-        </ul>
+        {showEvent && (
+          <ul className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/85 sm:flex-row sm:gap-8">
+            <li className="flex items-center gap-2">
+              <CalendarDays aria-hidden="true" className="size-4 text-gold" />
+              <time dateTime={event.date.iso}>{event.date.display}</time>
+            </li>
+            <li className="flex items-center gap-2">
+              <MapPin aria-hidden="true" className="size-4 text-gold" />
+              {event.venue.display}
+            </li>
+          </ul>
+        )}
       </Container>
     </section>
   );

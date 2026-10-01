@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { contact, event } from "@/data/event";
-import { footerNav, footerSecondaryNav } from "@/data/navigation";
+import { footerNav, footerSecondaryNav, legalNav } from "@/data/navigation";
 import { Container } from "@/components/ui/Container";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { GoldButton } from "@/components/ui/GoldButton";
@@ -131,7 +131,17 @@ export function Footer() {
         </div>
         <div className="flex flex-col gap-3 py-8 text-xs text-mist sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 {event.convener}. All rights reserved.</p>
-          <p>{event.theme}</p>
+          <nav aria-label="Legal">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+              {legalNav.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="transition-colors hover:text-gold-bright">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </Container>
     </footer>
