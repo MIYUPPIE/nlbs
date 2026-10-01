@@ -650,21 +650,8 @@ export function TalentApplicationForm() {
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-white/85">
                   Every Talent Fund applicant pre-orders the book before continuing. One copy covers one
-                  application. Pre-order with the same email
-                  {text("email") ? (
-                    <>
-                      {" "}
-                      (<strong className="text-white">{text("email")}</strong>)
-                    </>
-                  ) : null}{" "}
-                  or WhatsApp number
-                  {text("whatsapp") ? (
-                    <>
-                      {" "}
-                      (<strong className="text-white">{text("whatsapp")}</strong>)
-                    </>
-                  ) : null}{" "}
-                  you gave in Section 1, so we can match it to you.
+                  application. Pre-order with the same email or WhatsApp number you gave in Section 1, so we
+                  can match it to you.
                 </p>
                 <a
                   href={bookPreorderUrl(

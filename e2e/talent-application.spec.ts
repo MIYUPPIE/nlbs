@@ -178,6 +178,11 @@ test.describe("talent fund application", () => {
     expect(url.searchParams.get("email")).toBe("amaka@example.com");
     expect(url.searchParams.get("return")).toMatch(/^https?:\/\/[^/]+\/talentnigeria20\/$/);
     await expect(page.locator("form").getByText(/₦10,000/)).toBeVisible();
+    // The step must not echo the applicant's own email or phone back on screen.
+    const card = page.locator("form").getByText(/Every Talent Fund applicant pre-orders the book/);
+    await expect(card).toHaveText(/same email or WhatsApp number you gave in Section 1/);
+    await expect(card).not.toContainText("amaka@example.com");
+    await expect(card).not.toContainText("0803 123 4567");
     await expect(page.getByRole("img", { name: /Advising The Founder by Dr\. Wale Busari/ })).toBeVisible();
   });
 
