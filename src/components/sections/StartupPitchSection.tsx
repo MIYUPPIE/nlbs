@@ -1,10 +1,12 @@
 import { CalendarClock } from "lucide-react";
 import { pitchArena } from "@/data/content";
+import { illustration } from "@/data/illustrations";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 
 export function StartupPitchSection({ cta = true }: { cta?: boolean }) {
   return (
@@ -37,7 +39,12 @@ export function StartupPitchSection({ cta = true }: { cta?: boolean }) {
             )}
           </div>
 
-          <div className="lg:col-span-7" data-reveal>
+          <div className="space-y-6 lg:col-span-7" data-reveal>
+            <SectionImage
+              image={illustration("startup-pitch")}
+              className="aspect-[16/9] border border-white/10"
+              sizes="(min-width: 1024px) 55vw, 100vw"
+            />
             {/* The stage: a spotlight card with the pitch format */}
             <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-navy-900 to-navy-950 p-8 transition-colors duration-500 hover:border-gold/40 sm:p-10">
               <div

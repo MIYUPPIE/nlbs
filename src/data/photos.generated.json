@@ -143,6 +143,54 @@
       "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourceUrl": "https://commons.wikimedia.org/wiki/File:WCN_2024_15.jpg",
       "title": "File:WCN 2024 15.jpg"
+    },
+    {
+      "id": "lagos-skyline-marina",
+      "kind": "place",
+      "event": null,
+      "src": "/photos/lagos-skyline-marina.webp",
+      "width": 1920,
+      "height": 512,
+      "alt": "Panorama of the Lagos Island skyline across the water from the marina",
+      "caption": "The Lagos Island skyline from the marina.",
+      "author": "kopee15",
+      "authorUrl": null,
+      "licence": "Public domain",
+      "licenceUrl": null,
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_skyline_with_marina.jpg",
+      "title": "File:Lagos skyline with marina.jpg"
+    },
+    {
+      "id": "lagos-island-cityscape",
+      "kind": "place",
+      "event": null,
+      "src": "/photos/lagos-island-cityscape.webp",
+      "width": 1600,
+      "height": 830,
+      "alt": "Office towers and rooftops of Lagos Island's business district",
+      "caption": "Lagos Island's business district.",
+      "author": "Jamie Tubers",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Jamie_Tubers",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_Island_City_Scape.jpg",
+      "title": "File:Lagos Island City Scape.jpg"
+    },
+    {
+      "id": "lagos-road-victoria-island",
+      "kind": "place",
+      "event": null,
+      "src": "/photos/lagos-road-victoria-island.webp",
+      "width": 1600,
+      "height": 1067,
+      "alt": "A wide road on Outer Marina, Lagos, leading toward Victoria Island and Ikoyi",
+      "caption": "Outer Marina road leading to Victoria Island and Ikoyi, Lagos.",
+      "author": "Johnbrainyvisuals (Ogedengbe Tobi John)",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Johnbrainyvisuals",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:CMS_Outer_Marina_road_leading_to_Victoria_Island,_Ikoyi,_Lagos,_Nigeria_3.jpg",
+      "title": "File:CMS Outer Marina road leading to Victoria Island, Ikoyi, Lagos, Nigeria 3.jpg"
     }
   ]
 }

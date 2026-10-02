@@ -40,6 +40,9 @@ Every photo on the site is a real, freely licensed photograph. None is an AI ima
 | `venue-eko-night`              | Summit Experience section (About), contact venue card |
 | `lagos-business-district`      | CTA band (every page that ends with it)               |
 | `room-*` (five event photos)   | Homepage "In the room" section, after About           |
+| `lagos-skyline-marina`         | Backdrop of "The 2026 Summit at a glance" band        |
+| `lagos-island-cityscape`       | About section, under the heading                      |
+| `lagos-road-victoria-island`   | 10-Year Roadmap, above the phases                     |
 
 - **Source of truth:** `content/photos.json` lists Wikimedia Commons file titles with alt text and captions.
 - **Sync:** run `npm run photos:sync` (`scripts/sync-photos.mjs`). It pulls licence, author and source from Commons, rejects anything outside CC0, public domain, CC BY or CC BY-SA, then writes `public/photos/<id>.webp` (resized, EXIF and GPS stripped) and `src/data/photos.generated.json`. Never edit the generated file by hand.
@@ -53,13 +56,18 @@ Every photo on the site is a real, freely licensed photograph. None is an AI ima
 
 Illustrations are kept separate from photos. They are listed in `src/data/illustrations.ts` and stored under `public/illustrations/`.
 
-| Illustration              | Where it renders                                                      |
-| ------------------------- | --------------------------------------------------------------------- |
-| `technology-productivity` | Banner in the Technology section (homepage, /technology, /exhibition) |
+| Illustration                                      | Where it renders                                                      |
+| ------------------------------------------------- | --------------------------------------------------------------------- |
+| `technology-productivity`                         | Banner in the Technology section (homepage, /technology, /exhibition) |
+| `pillars`, `audience`, `programme`, `deal-making` | Banner under each section heading                                     |
+| `investment`, `talent`, `startup-pitch`           | Right-hand column of each section                                     |
+| `exhibition`, `faq`                               | Left column under the call to action (FAQ: desktop only)              |
+| `edition`                                         | Abstract backdrop of the 2026 card in "Building on 2025" (no people)  |
 
 - Every illustration's alt text starts with "AI-generated illustration:". Each one is disclosed under "AI-generated illustrations" on `/credits`, with its generator and date. The banner element carries `data-ai-generated="true"`.
 - Illustrations show ideas only, never the summit, a real event or a named person. `tests/illustrations.test.ts` enforces this, along with file size, dimensions and stripped metadata.
-- To replace one: generate it, convert it with sharp to WebP at 1600px wide, save it at the same path, and update `width`/`height` in `illustrations.ts`.
+- To add or replace one: generate it, then run `node scripts/add-illustration.mjs <file.png> <id>` and record the printed size in `illustrations.ts`. Render it with `<SectionImage image={illustration("<id>")} />`.
+- Every homepage section shows an image except Speakers and Partners, which stay as placeholders until real speakers and partners are confirmed (`tests/illustrations.test.ts`).
 
 ## Client documents
 

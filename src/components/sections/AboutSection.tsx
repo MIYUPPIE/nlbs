@@ -1,7 +1,9 @@
 import { introduction, pillars } from "@/data/content";
+import { photo } from "@/data/photos";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 
 export function AboutSection() {
   return (
@@ -11,6 +13,11 @@ export function AboutSection() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading id="about-title" eyebrow="About the Summit" title={introduction.heading} />
+            <SectionImage
+              image={photo("lagos-island-cityscape")}
+              className="mt-10 aspect-[4/3]"
+              sizes="(min-width: 1024px) 40vw, 100vw"
+            />
           </div>
           <div className="space-y-6 text-lg leading-relaxed text-ink/80 lg:col-span-7" data-reveal>
             {introduction.paragraphs.map((p, i) => (

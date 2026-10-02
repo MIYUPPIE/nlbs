@@ -1,8 +1,10 @@
+import { illustration } from "@/data/illustrations";
 import { programme, programmeHeading } from "@/data/programme";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { ProgrammeTabs } from "@/components/sections/ProgrammeTabs";
 
 export function ProgrammeSection({ showLink = true }: { showLink?: boolean }) {
@@ -22,7 +24,11 @@ export function ProgrammeSection({ showLink = true }: { showLink?: boolean }) {
             </GoldButton>
           )}
         </div>
-        <div className="mt-12 lg:mt-16">
+        <SectionImage
+          image={illustration("programme")}
+          className="mt-12 aspect-[4/3] sm:aspect-[16/9] lg:mt-16 lg:aspect-[21/9]"
+        />
+        <div className="mt-10">
           <ProgrammeTabs items={programme} />
         </div>
       </Container>

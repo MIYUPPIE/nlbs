@@ -19,7 +19,10 @@ export type PhotoId =
   | "room-edo-entrepreneurs"
   | "room-ysan-delegates"
   | "room-wcn-session"
-  | "room-wcn-panel";
+  | "room-wcn-panel"
+  | "lagos-skyline-marina"
+  | "lagos-island-cityscape"
+  | "lagos-road-victoria-island";
 
 export type Photo = {
   id: PhotoId;

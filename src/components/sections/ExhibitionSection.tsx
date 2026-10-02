@@ -1,10 +1,12 @@
 import { exhibitionCategories } from "@/data/content";
+import { illustration } from "@/data/illustrations";
 import { BentoGrid, BentoGridItem } from "@/components/aceternity/BentoGrid";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Icon } from "@/components/ui/Icon";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 
 export function ExhibitionSection({ cta = true }: { cta?: boolean }) {
   return (
@@ -24,6 +26,11 @@ export function ExhibitionSection({ cta = true }: { cta?: boolean }) {
                   Exhibit at Nigeria 2.0
                 </GoldButton>
               )}
+              <SectionImage
+                image={illustration("exhibition")}
+                className="mt-10 aspect-[4/3]"
+                sizes="(min-width: 1024px) 30vw, 100vw"
+              />
             </div>
           </div>
           <div className="lg:col-span-8">

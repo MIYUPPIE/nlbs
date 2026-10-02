@@ -11,7 +11,7 @@ export function PhotoCredit({ photo, className }: { photo: Photo; className?: st
           href={photo.authorUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline-offset-2 hover:underline"
+          className="underline underline-offset-2"
         >
           {photo.author}
         </a>
@@ -24,7 +24,7 @@ export function PhotoCredit({ photo, className }: { photo: Photo; className?: st
           href={photo.licenceUrl}
           target="_blank"
           rel="noopener noreferrer license"
-          className="underline-offset-2 hover:underline"
+          className="underline underline-offset-2"
         >
           {photo.licence}
         </a>
@@ -36,7 +36,7 @@ export function PhotoCredit({ photo, className }: { photo: Photo; className?: st
         href={photo.sourceUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="underline-offset-2 hover:underline"
+        className="underline underline-offset-2"
       >
         Wikimedia Commons
       </a>

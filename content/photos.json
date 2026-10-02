@@ -77,6 +77,30 @@
       "alt": "A panel of speakers seated on a conference stage in front of a branded backdrop",
       "caption": "A panel discussion on stage at WikiConference Nigeria 2024, Abuja.",
       "width": 1200
+    },
+    {
+      "id": "lagos-skyline-marina",
+      "kind": "place",
+      "commons": "File:Lagos skyline with marina.jpg",
+      "alt": "Panorama of the Lagos Island skyline across the water from the marina",
+      "caption": "The Lagos Island skyline from the marina.",
+      "width": 1920
+    },
+    {
+      "id": "lagos-island-cityscape",
+      "kind": "place",
+      "commons": "File:Lagos Island City Scape.jpg",
+      "alt": "Office towers and rooftops of Lagos Island's business district",
+      "caption": "Lagos Island's business district.",
+      "width": 1600
+    },
+    {
+      "id": "lagos-road-victoria-island",
+      "kind": "place",
+      "commons": "File:CMS Outer Marina road leading to Victoria Island, Ikoyi, Lagos, Nigeria 3.jpg",
+      "alt": "A wide road on Outer Marina, Lagos, leading toward Victoria Island and Ikoyi",
+      "caption": "Outer Marina road leading to Victoria Island and Ikoyi, Lagos.",
+      "width": 1600
     }
   ]
 }

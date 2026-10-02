@@ -1,10 +1,12 @@
 import { talent } from "@/data/content";
 import { formatStat, statById } from "@/data/event";
+import { illustration } from "@/data/illustrations";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Icon } from "@/components/ui/Icon";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { TargetBadge } from "@/components/ui/TargetBadge";
 
 export function TalentSection({
@@ -49,8 +51,13 @@ export function TalentSection({
             </ul>
           </div>
 
-          <div className="lg:col-span-5" data-reveal>
-            <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-gold/40 bg-gradient-to-br from-navy-700/60 to-navy-950 p-8 sm:p-10">
+          <div className="flex flex-col gap-6 lg:col-span-5" data-reveal>
+            <SectionImage
+              image={illustration("talent")}
+              className="aspect-[16/9] border border-white/10"
+              sizes="(min-width: 1024px) 40vw, 100vw"
+            />
+            <div className="relative flex flex-1 flex-col justify-between overflow-hidden rounded-3xl border border-gold/40 bg-gradient-to-br from-navy-700/60 to-navy-950 p-8 sm:p-10">
               <div>
                 <TargetBadge kind={target.kind} />
                 <p className="mt-6 font-display text-7xl leading-none text-gold sm:text-8xl">

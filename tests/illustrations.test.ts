@@ -56,4 +56,23 @@ describe("AI-generated illustrations", () => {
   it("illustration() throws for an unknown id", () => {
     expect(() => illustration("nope" as never)).toThrow(/missing/);
   });
+
+  it("every homepage section shows an image, except Speakers and Partners", () => {
+    const page = readFileSync(join(ROOT, "src/app/page.tsx"), "utf8");
+    const sections = [...page.matchAll(/<([A-Z][A-Za-z]+Section)\b/g)].map((m) => m[1]);
+    // No real speakers or partners are confirmed; a picture of people or logos there would invent them.
+    const exempt = new Set(["SpeakersSection", "PartnersSection"]);
+    expect(sections.length).toBeGreaterThanOrEqual(17);
+    for (const name of sections.filter((n) => !exempt.has(n))) {
+      const src = readFileSync(join(ROOT, "src/components/sections", `${name}.tsx`), "utf8");
+      expect(src, name).toMatch(/<SectionImage\b|<Image\b|photo\(|illustration\(/);
+    }
+    const hero = readFileSync(join(ROOT, "src/components/hero/Hero.tsx"), "utf8");
+    expect(hero).toMatch(/<Image\b/);
+  });
+
+  it("the edition backdrop is the abstract path, which shows no people", () => {
+    expect(illustration("edition").alt).toMatch(/abstract/);
+    expect(illustration("edition").alt).not.toMatch(/people|delegates|crowd|audience|speaker/i);
+  });
 });

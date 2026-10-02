@@ -1,9 +1,11 @@
 import { audience, delegateMix, whyThisAudience } from "@/data/audience";
 import { statById, formatStat } from "@/data/event";
+import { illustration } from "@/data/illustrations";
 import { HoverEffect } from "@/components/aceternity/HoverEffect";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { TargetBadge } from "@/components/ui/TargetBadge";
 
 /** `detailed` adds the delegate mix and why the audience matters (About page). */
@@ -26,8 +28,12 @@ export function AudienceSection({ detailed = false }: { detailed?: boolean }) {
             {delegates.label.toLowerCase()} from six communities.
           </p>
         </div>
+        <SectionImage
+          image={illustration("audience")}
+          className="mt-12 aspect-[4/3] border border-white/10 sm:aspect-[16/9] lg:aspect-[21/9]"
+        />
         <HoverEffect
-          className="-mx-1.5 mt-12"
+          className="-mx-1.5 mt-6"
           items={audience.map((a) => ({
             title: a.label,
             description: a.description,

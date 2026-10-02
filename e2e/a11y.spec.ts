@@ -5,6 +5,8 @@ import { ROUTES, revealAll } from "./helpers";
 for (const width of [1440, 390]) {
   for (const route of ROUTES) {
     test(`axe ${route} @${width}px: no serious or critical violations`, async ({ page }) => {
+      // Long, image-rich pages (home, about) need more than the default 30s to scroll and scan.
+      test.setTimeout(90_000);
       await page.setViewportSize({ width, height: 900 });
       await page.goto(route, { waitUntil: "networkidle" });
       await revealAll(page);

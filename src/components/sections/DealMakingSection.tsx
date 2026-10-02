@@ -1,10 +1,12 @@
 import { Info } from "lucide-react";
 import { dealFlow, dealPhases } from "@/data/content";
 import { formatStat, statById } from "@/data/event";
+import { illustration } from "@/data/illustrations";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { TargetBadge } from "@/components/ui/TargetBadge";
 import { cn } from "@/lib/utils";
 
@@ -191,6 +193,11 @@ export function DealMakingSection() {
               <MeetingsPanel className="mt-10 lg:col-span-5 lg:mt-0" />
             </div>
           </div>
+
+          <SectionImage
+            image={illustration("deal-making")}
+            className="aspect-[16/9] md:col-span-12 lg:aspect-[21/9]"
+          />
 
           <VerticalPipeline className="md:col-span-7 lg:hidden" />
           <div className="hidden lg:col-span-12 lg:block">

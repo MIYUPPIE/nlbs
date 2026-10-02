@@ -1,11 +1,13 @@
 import { Plus } from "lucide-react";
 import { faqByNumber, featuredFaqNumbers, faqItems } from "@/data/faq";
+import { illustration } from "@/data/illustrations";
 import { faqAnchor } from "@/lib/faq";
 import { FaqAnswer } from "@/components/faq/FaqAnswer";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 
 /** Homepage FAQ preview: a handful of questions, native accordion, link to all. */
 export function FaqTeaserSection() {
@@ -25,6 +27,11 @@ export function FaqTeaserSection() {
               <GoldButton href="/faq" variant="outline-dark" className="mt-8">
                 View all {faqItems.length} questions
               </GoldButton>
+              <SectionImage
+                image={illustration("faq")}
+                className="mt-10 hidden aspect-[4/3] lg:block"
+                sizes="30vw"
+              />
             </div>
           </div>
           <ul className="space-y-3 lg:col-span-8">

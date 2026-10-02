@@ -92,9 +92,10 @@ describe("content rule: no photo passes as the summit", () => {
     }
   });
 
-  it("the 2025 edition section renders no photos until real event photos exist", () => {
+  it("the 2025 edition section shows no photo, only the abstract no-people illustration", () => {
     const src = readFileSync(join(ROOT, "src/components/sections/EditionSection.tsx"), "utf8");
-    expect(src).not.toMatch(/@\/data\/photos|<Image/);
+    expect(src).not.toMatch(/@\/data\/photos/);
+    expect([...src.matchAll(/illustration\("([a-z-]+)"\)/g)].map((m) => m[1])).toEqual(["edition"]);
   });
 
   it("every photo is credited on /credits, which the footer links from every page", () => {
@@ -105,10 +106,9 @@ describe("content rule: no photo passes as the summit", () => {
     expect(allRoutes as readonly string[]).toContain("/credits");
   });
 
-  it("the uncaptioned conference tiles still say they are not from Nigeria 2.0 and link to credits", () => {
+  it("the conference tiles' lead still says the photos come from conferences across the country", () => {
     const src = readFileSync(join(ROOT, "src/components/sections/InTheRoomSection.tsx"), "utf8");
-    expect(src).toMatch(/not from Nigeria 2\.0/);
-    expect(src).toMatch(/href="\/credits"/);
+    expect(src).toMatch(/from conferences across the country/);
   });
 });
 

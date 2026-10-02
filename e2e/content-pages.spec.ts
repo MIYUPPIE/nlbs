@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { ROUTES } from "./helpers";
 
@@ -87,11 +88,19 @@ test.describe("venue photos", () => {
 test("/credits credits every photo with author, licence and source", async ({ page }) => {
   await page.goto("/credits");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("photographers");
-  const credits = page.locator("[data-photo-credit]");
-  await expect(credits).toHaveCount(9);
-  for (const credit of await credits.all()) {
+  const { photos } = JSON.parse(readFileSync("src/data/photos.generated.json", "utf8")) as {
+    photos: { id: string; licence: string }[];
+  };
+  await expect(page.locator("[data-photo-credit]")).toHaveCount(photos.length);
+  for (const p of photos) {
+    const credit = page.locator(`[data-photo-credit="${p.id}"]`);
     await expect(credit).toContainText("Wikimedia Commons");
-    await expect(credit.getByRole("link", { name: /CC BY/ })).toHaveAttribute("href", /creativecommons\.org/);
+    if (p.licence.startsWith("CC BY"))
+      await expect(credit.getByRole("link", { name: p.licence })).toHaveAttribute(
+        "href",
+        /creativecommons\.org/,
+      );
+    else await expect(credit).toContainText(p.licence);
   }
   await page.goto("/");
   await expect(
@@ -118,4 +127,20 @@ test.describe("technology illustration", () => {
       "AI-generated with",
     );
   });
+});
+
+test("every homepage section image loads, and AI ones are disclosed in alt text", async ({ page }) => {
+  await page.goto("/");
+  const frames = page.locator("[data-section-image]");
+  expect(await frames.count()).toBeGreaterThanOrEqual(11);
+  for (const frame of await frames.all()) {
+    const img = frame.locator("img");
+    await img.scrollIntoViewIfNeeded();
+    await expect(img).toHaveJSProperty("complete", true);
+    expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+    if ((await frame.getAttribute("data-ai-generated")) === "true") {
+      await expect(img).toHaveAttribute("alt", /^AI-generated illustration: /);
+    }
+  }
+  await expect(page.locator("main")).not.toContainText("not from Nigeria 2.0");
 });

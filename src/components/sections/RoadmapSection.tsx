@@ -1,8 +1,10 @@
 import { CircleCheck } from "lucide-react";
+import { photo } from "@/data/photos";
 import { bigIdea, roadmap } from "@/data/vision";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { cn } from "@/lib/utils";
 
 /** The 10-year roadmap (2026-2036) in three phases. Phase 1 is current. */
@@ -22,7 +24,12 @@ export function RoadmapSection({ compact = false }: { compact?: boolean }) {
           </p>
         </div>
 
-        <ol className="group/pipe relative mt-14 grid gap-6 lg:mt-16 lg:grid-cols-3" data-reveal>
+        <SectionImage
+          image={photo("lagos-road-victoria-island")}
+          className="mt-12 aspect-[16/9] lg:mt-16 lg:aspect-[21/9]"
+          position="center 60%"
+        />
+        <ol className="group/pipe relative mt-12 grid gap-6 lg:grid-cols-3" data-reveal>
           {/* Rail joining the phase markers (desktop) */}
           <span
             aria-hidden="true"

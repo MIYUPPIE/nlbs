@@ -1,10 +1,12 @@
 import { ArrowLeftRight } from "lucide-react";
 import { investment } from "@/data/content";
 import { formatStat, statById } from "@/data/event";
+import { illustration } from "@/data/illustrations";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionImage } from "@/components/ui/SectionImage";
 import { TargetBadge } from "@/components/ui/TargetBadge";
 
 export function InvestmentSection({ cta = true }: { cta?: boolean }) {
@@ -45,6 +47,11 @@ export function InvestmentSection({ cta = true }: { cta?: boolean }) {
           </div>
 
           <div className="lg:col-span-6" data-reveal>
+            <SectionImage
+              image={illustration("investment")}
+              className="mb-10 aspect-[16/9] border border-white/10"
+              sizes="(min-width: 1024px) 45vw, 100vw"
+            />
             <h3 className="text-sm font-semibold tracking-[0.2em] text-white uppercase">
               Structured connections between
             </h3>
