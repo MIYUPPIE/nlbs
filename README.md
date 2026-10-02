@@ -31,7 +31,7 @@ Only facts confirmed in the build brief are published. They live in `src/data/`:
 
 ## Photos
 
-Every photo on the site is a real, freely licensed photograph of the venue or Lagos. There are no AI images and no stock pictures passed off as the summit.
+Every photo on the site is a real, freely licensed photograph. None is an AI image, and none is passed off as the summit. There are two kinds: `place` (the venue, Lagos) and `event` (people at other real Nigerian conferences, captioned with the event they show).
 
 | Photo                          | Where it renders                                      |
 | ------------------------------ | ----------------------------------------------------- |
@@ -39,11 +39,14 @@ Every photo on the site is a real, freely licensed photograph of the venue or La
 | `venue-eko-hotels`             | Summit Experience section (About)                     |
 | `venue-eko-night`              | Summit Experience section (About), contact venue card |
 | `lagos-business-district`      | CTA band (every page that ends with it)               |
+| `room-*` (five event photos)   | Homepage "In the room" section, after About           |
 
 - **Source of truth:** `content/photos.json` lists Wikimedia Commons file titles with alt text and captions.
 - **Sync:** run `npm run photos:sync` (`scripts/sync-photos.mjs`). It pulls licence, author and source from Commons, rejects anything outside CC0, public domain, CC BY or CC BY-SA, then writes `public/photos/<id>.webp` (resized, EXIF and GPS stripped) and `src/data/photos.generated.json`. Never edit the generated file by hand.
 - **Credit:** render a photo through `photo(id)` from `src/data/photos.ts`, and always place `<PhotoCredit>` next to it. CC BY-SA requires the credit.
-- **2025 edition:** no public photos of the 2025 summit exist, so `EditionSection` keeps its placeholder. When the convener supplies real event photos, add them as their own source with the photographer credited. Never reuse photos from another event.
+- **Event photos:** a `kind: "event"` entry must set `event` to the real event it shows, and its caption must contain that name. The sync refuses anything else. These photos sit in their own section, never in the 2025 edition section.
+- **Provenance:** prefer files with camera EXIF from an identifiable photographer. Skip contest uploads still under review, and professional press shots with no camera data (likely copied).
+- **2025 edition:** no public photos of the 2025 summit exist, so `EditionSection` keeps its placeholder. When the convener supplies real summit photos, add them with the photographer credited. Never caption another event's photo as the summit.
 - `tests/photos.test.ts` guards licences, credits, file sizes, EXIF and the rule that no caption implies a photo shows the summit. `e2e/content-pages.spec.ts` checks that every placed photo loads and shows its credit.
 
 ## Client documents

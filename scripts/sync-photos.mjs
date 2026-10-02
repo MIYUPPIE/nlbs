@@ -12,6 +12,11 @@
  * Licence and credit are never typed by hand: they come from Commons, and a
  * file whose licence is not on the allowlist fails the sync. Rerun after
  * editing the manifest; the output is deterministic for the same upstream file.
+ *
+ * Every entry has a `kind`: "place" (the venue, the city) or "event" (people
+ * at a real conference). An event photo must name the event it actually shows
+ * in `event`, and its caption must contain that name, so no photo from
+ * another conference can pass as one of the summit's own.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -27,6 +32,22 @@ const UA = "nlbs-site-photo-sync/1.0 (https://nlbs.com.ng; info@nlbs.com.ng)";
 
 /** Licences that allow commercial reuse with attribution. Keep in sync with tests/photos.test.ts. */
 export const ALLOWED_LICENCES = /^(CC0|Public domain|CC BY(-SA)? [1-4]\.0)$/;
+
+/** Validates one manifest entry; returns an error message or null. */
+export function entryError(entry) {
+  if (!/^[a-z0-9-]+$/.test(entry.id ?? "")) return `Bad id "${entry.id}"`;
+  if (!entry.commons?.startsWith("File:")) return `${entry.id}: "commons" must be a File: title`;
+  if (!entry.alt?.trim() || !entry.caption?.trim()) return `${entry.id}: alt and caption are required`;
+  if (entry.kind !== "place" && entry.kind !== "event") return `${entry.id}: kind must be "place" or "event"`;
+  if (entry.kind === "event") {
+    if (!entry.event?.trim()) return `${entry.id}: an event photo must name the event it shows`;
+    if (!entry.caption.includes(entry.event))
+      return `${entry.id}: caption must name the event "${entry.event}"`;
+  } else if (entry.event) return `${entry.id}: only event photos take "event"`;
+  return null;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export const stripHtml = (s) =>
   s
@@ -46,16 +67,21 @@ export const firstHref = (html) => {
 
 async function getJson(params) {
   const url = `${API}?${new URLSearchParams({ format: "json", ...params })}`;
-  const res = await fetch(url, { headers: { "User-Agent": UA } });
-  if (!res.ok) throw new Error(`Commons API ${res.status} for ${url}`);
-  return res.json();
+  // Commons throttles bursts with a non-JSON reply; back off and retry.
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(url, { headers: { "User-Agent": UA } });
+    const text = await res.text();
+    try {
+      if (res.ok) return JSON.parse(text);
+    } catch {}
+    if (attempt === 5) throw new Error(`Commons API ${res.status} for ${url}`);
+    await sleep(2000 * attempt);
+  }
 }
 
 async function syncOne(entry) {
-  if (!/^[a-z0-9-]+$/.test(entry.id)) throw new Error(`Bad id "${entry.id}"`);
-  if (!entry.commons?.startsWith("File:")) throw new Error(`${entry.id}: "commons" must be a File: title`);
-  if (!entry.alt?.trim() || !entry.caption?.trim())
-    throw new Error(`${entry.id}: alt and caption are required`);
+  const invalid = entryError(entry);
+  if (invalid) throw new Error(invalid);
 
   const data = await getJson({
     action: "query",
@@ -82,6 +108,8 @@ async function syncOne(entry) {
 
   return {
     id: entry.id,
+    kind: entry.kind,
+    event: entry.event ?? null,
     src: `/photos/${entry.id}.webp`,
     width: out.width,
     height: out.height,
@@ -104,6 +132,7 @@ async function main() {
     const p = await syncOne(entry);
     console.log(`photos: ${p.id} ${p.width}x${p.height} ${p.licence} by ${p.author}`);
     photos.push(p);
+    await sleep(1000);
   }
   await writeFile(OUT_DATA, `${JSON.stringify({ photos }, null, 2)}\n`);
   console.log(`photos: wrote ${photos.length} to public/photos and ${OUT_DATA.replace(ROOT + "/", "")}`);

@@ -1,33 +1,82 @@
 {
-  "$comment": "Real, freely licensed photographs. Source of truth for scripts/sync-photos.mjs. Only 'commons' titles are accepted; licence, author and URLs are pulled from Wikimedia Commons, never typed by hand. None of these show the 2025 edition: add real event photos with source 'nlbs' once the convener supplies them.",
+  "$comment": "Real, freely licensed photographs. Source of truth for scripts/sync-photos.mjs. Only 'commons' titles are accepted; licence, author and URLs are pulled from Wikimedia Commons, never typed by hand. kind 'place' = venue/city; kind 'event' = people at a real conference, which must name that event in 'event' and in the caption. No photo here shows the summit or its 2025 edition: add real summit photos only when the convener supplies them.",
   "photos": [
     {
       "id": "venue-eko-hotels",
       "commons": "File:Wide view of Eko Hotels and suites Lagos.jpg",
       "alt": "Eko Hotels & Suites, Victoria Island, Lagos, home of the Eko Convention Centre",
       "caption": "Eko Hotels & Suites, Victoria Island: home of the Eko Convention Centre.",
-      "width": 1600
+      "width": 1600,
+      "kind": "place"
     },
     {
       "id": "venue-eko-night",
       "commons": "File:Night view of Eko Hotel Extension, Victory Island, Lagos.jpg",
       "alt": "The Eko Hotel extension towers lit up at night on Victoria Island, Lagos",
       "caption": "The Eko Hotel extension at night, Victoria Island.",
-      "width": 1600
+      "width": 1600,
+      "kind": "place"
     },
     {
       "id": "lagos-victoria-island-aerial",
       "commons": "File:Aerial view of victoria island in Lagos, Nigeria with habours for yatches.jpg",
       "alt": "Aerial view of Victoria Island, Lagos, with the lagoon and marina",
       "caption": "Victoria Island, Lagos: the business district around the venue.",
-      "width": 1920
+      "width": 1920,
+      "kind": "place"
     },
     {
       "id": "lagos-business-district",
       "commons": "File:Mirrors, Lagos.jpg",
       "alt": "Office towers in the Lagos business district",
       "caption": "Lagos business district.",
+      "width": 1600,
+      "kind": "place"
+    },
+    {
+      "id": "room-lagos-auditorium",
+      "kind": "event",
+      "event": "a 2024 conference in Lagos",
+      "commons": "File:Fuji Documentary at Lagos Conference.jpg",
+      "alt": "A full auditorium of conference attendees watching a screening in Lagos",
+      "caption": "A full house at a 2024 conference in Lagos.",
       "width": 1600
+    },
+    {
+      "id": "room-edo-entrepreneurs",
+      "kind": "event",
+      "event": "the Edojobs entrepreneurship forum, Edo State, 2017",
+      "commons": "File:Entrepreneurship training Edojobs.jpg",
+      "alt": "Entrepreneurs seated in a hall facing a stage and screen at an entrepreneurship forum",
+      "caption": "Entrepreneurs in the hall at the Edojobs entrepreneurship forum, Edo State, 2017.",
+      "width": 1600
+    },
+    {
+      "id": "room-ysan-delegates",
+      "kind": "event",
+      "event": "the Yoruba Studies Association of Nigeria conference, 2024",
+      "commons": "File:Cross-section of participants at the YSAN conference 26.jpg",
+      "alt": "Rows of conference participants in traditional attire seated at desks in a hall",
+      "caption": "Participants at the Yoruba Studies Association of Nigeria conference, 2024.",
+      "width": 1200
+    },
+    {
+      "id": "room-wcn-session",
+      "kind": "event",
+      "event": "WikiConference Nigeria 2024, Abuja",
+      "commons": "File:Grouped participants in a session at the WikiConference Nigeria, 2024.jpg",
+      "alt": "Participants working together around tables during a conference breakout session",
+      "caption": "A working session at WikiConference Nigeria 2024, Abuja.",
+      "width": 1024
+    },
+    {
+      "id": "room-wcn-panel",
+      "kind": "event",
+      "event": "WikiConference Nigeria 2024, Abuja",
+      "commons": "File:WCN 2024 15.jpg",
+      "alt": "A panel of speakers seated on a conference stage in front of a branded backdrop",
+      "caption": "A panel discussion on stage at WikiConference Nigeria 2024, Abuja.",
+      "width": 1200
     }
   ]
 }

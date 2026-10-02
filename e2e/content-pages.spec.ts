@@ -56,7 +56,18 @@ test("no page offers a document download", async ({ page }) => {
 
 test.describe("venue photos", () => {
   for (const [path, ids] of [
-    ["/", ["lagos-victoria-island-aerial", "lagos-business-district"]],
+    [
+      "/",
+      [
+        "lagos-victoria-island-aerial",
+        "lagos-business-district",
+        "room-lagos-auditorium",
+        "room-wcn-panel",
+        "room-ysan-delegates",
+        "room-edo-entrepreneurs",
+        "room-wcn-session",
+      ],
+    ],
     ["/about", ["venue-eko-hotels", "venue-eko-night", "lagos-business-district"]],
     ["/contact", ["venue-eko-night"]],
   ] as const) {

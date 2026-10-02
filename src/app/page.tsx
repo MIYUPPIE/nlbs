@@ -8,6 +8,7 @@ import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { ExhibitionSection } from "@/components/sections/ExhibitionSection";
 import { InvestmentSection } from "@/components/sections/InvestmentSection";
 import { FaqTeaserSection } from "@/components/sections/FaqTeaserSection";
+import { InTheRoomSection } from "@/components/sections/InTheRoomSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PillarsSection } from "@/components/sections/PillarsSection";
 import { ProgrammeSection } from "@/components/sections/ProgrammeSection";
@@ -26,6 +27,7 @@ export default function HomePage() {
       <Hero />
       <StatisticsSection />
       <AboutSection />
+      <InTheRoomSection />
       <PillarsSection />
       <AudienceSection />
       <ProgrammeSection />

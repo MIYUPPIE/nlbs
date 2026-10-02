@@ -9,11 +9,11 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { photo, photos } from "@/data/photos";
-import { ALLOWED_LICENCES, firstHref, stripHtml } from "../scripts/sync-photos.mjs";
+import { ALLOWED_LICENCES, entryError, firstHref, stripHtml } from "../scripts/sync-photos.mjs";
 
 const ROOT = join(__dirname, "..");
 const manifest = JSON.parse(readFileSync(join(ROOT, "content", "photos.json"), "utf8")) as {
-  photos: { id: string; commons: string; alt: string; caption: string }[];
+  photos: { id: string; kind: string; event?: string; commons: string; alt: string; caption: string }[];
 };
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((f) => {
@@ -28,7 +28,20 @@ describe("photo manifest and synced output", () => {
       expect(photos[i].title).toBe(m.commons);
       expect(photos[i].alt).toBe(m.alt);
       expect(photos[i].caption).toBe(m.caption);
+      expect(photos[i].kind).toBe(m.kind);
+      expect(photos[i].event).toBe(m.event ?? null);
     }
+  });
+
+  it("every manifest entry passes the sync script's own validation", () => {
+    for (const m of manifest.photos) expect(entryError(m), m.id).toBeNull();
+  });
+
+  it("the PhotoId type lists exactly the synced ids", () => {
+    const src = readFileSync(join(ROOT, "src/data/photos.ts"), "utf8");
+    const union = /export type PhotoId =([^;]+);/.exec(src)![1];
+    const ids = [...union.matchAll(/"([a-z0-9-]+)"/g)].map((m) => m[1]);
+    expect(ids.sort()).toEqual(photos.map((p) => p.id).sort());
   });
 
   it("every photo is a Commons file under an allowed licence with a named author", () => {
@@ -58,9 +71,25 @@ describe("photo manifest and synced output", () => {
   });
 });
 
-describe("content rule: venue photos are not event photos", () => {
-  it("no alt text or caption claims to show the summit, delegates or a past edition", () => {
-    for (const p of photos) {
+describe("content rule: no photo passes as the summit", () => {
+  const SUMMIT =
+    /\b(NLBS|Nigeria 2\.0|Nigerian Leadership Business Summit|Leadership Beyond the Norm|HBC)\b/i;
+
+  it("no photo's alt, caption or event names this summit or its 2025 edition", () => {
+    for (const p of photos) expect(`${p.alt} ${p.caption} ${p.event ?? ""}`, p.id).not.toMatch(SUMMIT);
+  });
+
+  it("every event photo names the real event it shows in its caption", () => {
+    const events = photos.filter((p) => p.kind === "event");
+    expect(events.length).toBeGreaterThanOrEqual(5);
+    for (const p of events) {
+      expect(p.event, p.id).toBeTruthy();
+      expect(p.caption).toContain(p.event!);
+    }
+  });
+
+  it("place photos make no claim about people or events", () => {
+    for (const p of photos.filter((x) => x.kind === "place")) {
       expect(`${p.alt} ${p.caption}`).not.toMatch(
         /\b(20(1|2)\d|summit|edition|delegates?|attendees?|speakers?|panel)\b/i,
       );
@@ -90,6 +119,16 @@ describe("sync script helpers", () => {
       expect(ok).toMatch(ALLOWED_LICENCES);
     for (const bad of ["CC BY-NC 4.0", "CC BY-ND 4.0", "All rights reserved", "Fair use", ""])
       expect(bad).not.toMatch(ALLOWED_LICENCES);
+  });
+
+  it("entryError rejects event photos that hide which event they show", () => {
+    const base = { id: "x", commons: "File:x.jpg", alt: "a", caption: "At Foo Conf 2024.", kind: "event" };
+    expect(entryError({ ...base, event: "Foo Conf 2024" })).toBeNull();
+    expect(entryError(base)).toMatch(/must name the event/);
+    expect(entryError({ ...base, event: "Bar Forum" })).toMatch(/caption must name/);
+    expect(entryError({ ...base, kind: "place", event: "Foo Conf 2024" })).toMatch(/only event photos/);
+    expect(entryError({ ...base, kind: "stock" })).toMatch(/kind must be/);
+    expect(entryError({ ...base, commons: "https://example.com/x.jpg" })).toMatch(/File: title/);
   });
 
   it("strips Commons artist HTML to plain text and extracts the first link", () => {

@@ -2,6 +2,8 @@
   "photos": [
     {
       "id": "venue-eko-hotels",
+      "kind": "place",
+      "event": null,
       "src": "/photos/venue-eko-hotels.webp",
       "width": 1600,
       "height": 1205,
@@ -16,6 +18,8 @@
     },
     {
       "id": "venue-eko-night",
+      "kind": "place",
+      "event": null,
       "src": "/photos/venue-eko-night.webp",
       "width": 1600,
       "height": 1205,
@@ -30,6 +34,8 @@
     },
     {
       "id": "lagos-victoria-island-aerial",
+      "kind": "place",
+      "event": null,
       "src": "/photos/lagos-victoria-island-aerial.webp",
       "width": 1920,
       "height": 1245,
@@ -44,6 +50,8 @@
     },
     {
       "id": "lagos-business-district",
+      "kind": "place",
+      "event": null,
       "src": "/photos/lagos-business-district.webp",
       "width": 1600,
       "height": 981,
@@ -55,6 +63,86 @@
       "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
       "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mirrors,_Lagos.jpg",
       "title": "File:Mirrors, Lagos.jpg"
+    },
+    {
+      "id": "room-lagos-auditorium",
+      "kind": "event",
+      "event": "a 2024 conference in Lagos",
+      "src": "/photos/room-lagos-auditorium.webp",
+      "width": 1600,
+      "height": 1068,
+      "alt": "A full auditorium of conference attendees watching a screening in Lagos",
+      "caption": "A full house at a 2024 conference in Lagos.",
+      "author": "WheelHelms WS",
+      "authorUrl": "https://commons.wikimedia.org/w/index.php?title=User:WheelHelms_WS&amp;action=edit&amp;redlink=1",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fuji_Documentary_at_Lagos_Conference.jpg",
+      "title": "File:Fuji Documentary at Lagos Conference.jpg"
+    },
+    {
+      "id": "room-edo-entrepreneurs",
+      "kind": "event",
+      "event": "the Edojobs entrepreneurship forum, Edo State, 2017",
+      "src": "/photos/room-edo-entrepreneurs.webp",
+      "width": 1600,
+      "height": 730,
+      "alt": "Entrepreneurs seated in a hall facing a stage and screen at an entrepreneurship forum",
+      "caption": "Entrepreneurs in the hall at the Edojobs entrepreneurship forum, Edo State, 2017.",
+      "author": "Preciousayara",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Preciousayara",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Entrepreneurship_training_Edojobs.jpg",
+      "title": "File:Entrepreneurship training Edojobs.jpg"
+    },
+    {
+      "id": "room-ysan-delegates",
+      "kind": "event",
+      "event": "the Yoruba Studies Association of Nigeria conference, 2024",
+      "src": "/photos/room-ysan-delegates.webp",
+      "width": 1200,
+      "height": 800,
+      "alt": "Rows of conference participants in traditional attire seated at desks in a hall",
+      "caption": "Participants at the Yoruba Studies Association of Nigeria conference, 2024.",
+      "author": "Yemi festus",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Yemi_festus",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cross-section_of_participants_at_the_YSAN_conference_26.jpg",
+      "title": "File:Cross-section of participants at the YSAN conference 26.jpg"
+    },
+    {
+      "id": "room-wcn-session",
+      "kind": "event",
+      "event": "WikiConference Nigeria 2024, Abuja",
+      "src": "/photos/room-wcn-session.webp",
+      "width": 1024,
+      "height": 684,
+      "alt": "Participants working together around tables during a conference breakout session",
+      "caption": "A working session at WikiConference Nigeria 2024, Abuja.",
+      "author": "Ridzaina",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Ridzaina",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Grouped_participants_in_a_session_at_the_WikiConference_Nigeria,_2024.jpg",
+      "title": "File:Grouped participants in a session at the WikiConference Nigeria, 2024.jpg"
+    },
+    {
+      "id": "room-wcn-panel",
+      "kind": "event",
+      "event": "WikiConference Nigeria 2024, Abuja",
+      "src": "/photos/room-wcn-panel.webp",
+      "width": 1200,
+      "height": 801,
+      "alt": "A panel of speakers seated on a conference stage in front of a branded backdrop",
+      "caption": "A panel discussion on stage at WikiConference Nigeria 2024, Abuja.",
+      "author": "Dappasolomon001",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Dappasolomon001",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:WCN_2024_15.jpg",
+      "title": "File:WCN 2024 15.jpg"
     }
   ]
 }
