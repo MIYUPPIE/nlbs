@@ -1,10 +1,14 @@
+import Image from "next/image";
 import { technologyAreas } from "@/data/content";
+import { illustration } from "@/data/illustrations";
 import { BentoGrid, BentoGridItem } from "@/components/aceternity/BentoGrid";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+
+const banner = illustration("technology-productivity");
 
 // Bento layout: 2+1, 1+1+1, 2+1 (the last "1" is the exhibition tile).
 const spans = ["md:col-span-2", "md:col-span-1", "md:col-span-1", "md:col-span-1", "md:col-span-2"];
@@ -47,7 +51,24 @@ export function TechnologySection({ cta = true }: { cta?: boolean }) {
             </GoldButton>
           )}
         </div>
-        <BentoGrid className="mt-12 lg:mt-16">
+        <div
+          data-reveal
+          data-ai-generated="true"
+          className="relative mt-12 aspect-[4/3] overflow-hidden rounded-3xl bg-navy-950 sm:aspect-[16/9] lg:mt-16 lg:aspect-[21/9]"
+        >
+          <Image
+            src={banner.src}
+            alt={banner.alt}
+            fill
+            sizes="(min-width: 1280px) 1200px, 100vw"
+            className="object-cover object-[center_30%]"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+          />
+        </div>
+        <BentoGrid className="mt-4">
           {technologyAreas.map((area, i) => (
             <BentoGridItem
               key={area.title}

@@ -98,3 +98,24 @@ test("/credits credits every photo with author, licence and source", async ({ pa
     page.getByRole("navigation", { name: "Legal" }).getByRole("link", { name: "Photo Credits" }),
   ).toBeVisible();
 });
+
+test.describe("technology illustration", () => {
+  for (const path of ["/", "/technology", "/exhibition"]) {
+    test(`${path} shows the AI-generated technology banner`, async ({ page }) => {
+      await page.goto(path);
+      const img = page.locator('#technology [data-ai-generated="true"] img');
+      await img.scrollIntoViewIfNeeded();
+      await expect(img).toHaveJSProperty("complete", true);
+      expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+      await expect(img).toHaveAttribute("alt", /^AI-generated illustration: /);
+    });
+  }
+
+  test("/credits discloses it as AI-generated", async ({ page }) => {
+    await page.goto("/credits");
+    await expect(page.getByRole("heading", { name: "AI-generated illustrations" })).toBeVisible();
+    await expect(page.locator('#technology-productivity[data-ai-generated="true"]')).toContainText(
+      "AI-generated with",
+    );
+  });
+});

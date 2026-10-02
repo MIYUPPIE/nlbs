@@ -49,6 +49,18 @@ Every photo on the site is a real, freely licensed photograph. None is an AI ima
 - **2025 edition:** no public photos of the 2025 summit exist, so `EditionSection` keeps its placeholder. When the convener supplies real summit photos, add them with the photographer credited. Never caption another event's photo as the summit.
 - `tests/photos.test.ts` guards licences, the credits page, file sizes, EXIF and the rule that no photo is passed off as the summit. `e2e/content-pages.spec.ts` checks that every placed photo loads uncaptioned and that `/credits` credits all of them.
 
+## AI-generated illustrations
+
+Illustrations are kept separate from photos. They are listed in `src/data/illustrations.ts` and stored under `public/illustrations/`.
+
+| Illustration              | Where it renders                                                      |
+| ------------------------- | --------------------------------------------------------------------- |
+| `technology-productivity` | Banner in the Technology section (homepage, /technology, /exhibition) |
+
+- Every illustration's alt text starts with "AI-generated illustration:". Each one is disclosed under "AI-generated illustrations" on `/credits`, with its generator and date. The banner element carries `data-ai-generated="true"`.
+- Illustrations show ideas only, never the summit, a real event or a named person. `tests/illustrations.test.ts` enforces this, along with file size, dimensions and stripped metadata.
+- To replace one: generate it, convert it with sharp to WebP at 1600px wide, save it at the same path, and update `width`/`height` in `illustrations.ts`.
+
 ## Client documents
 
 | Source (in `../latest`)                            | Where it lives                                                                                                                                                                       | Notes                                                                                                                                                                                                                                                                                                                                |
