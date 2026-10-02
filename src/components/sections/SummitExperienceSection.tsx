@@ -4,7 +4,6 @@ import { photo, type PhotoId } from "@/data/photos";
 import { summitExperience } from "@/data/vision";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
-import { PhotoCredit } from "@/components/ui/PhotoCredit";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -34,10 +33,6 @@ export function SummitExperienceSection() {
                   className="object-cover"
                 />
               </div>
-              <figcaption className="mt-3 space-y-1">
-                <span className="block text-sm text-white">{p.caption}</span>
-                <PhotoCredit photo={p} className="text-mist" />
-              </figcaption>
             </figure>
           ))}
         </div>

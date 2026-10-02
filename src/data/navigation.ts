@@ -46,6 +46,7 @@ export const legalNav: NavLink[] = [
   { label: "Cookie Policy", href: "/cookies" },
   { label: "Terms of Use", href: "/terms" },
   { label: "Privacy Request", href: "/privacy/request" },
+  { label: "Photo Credits", href: "/credits" },
 ];
 
 /** Every public route. Drives the sitemap and route tests. */
@@ -68,4 +69,5 @@ export const allRoutes = [
   "/privacy/request",
   "/cookies",
   "/terms",
+  "/credits",
 ] as const;

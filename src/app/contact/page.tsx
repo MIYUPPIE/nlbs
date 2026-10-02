@@ -5,7 +5,6 @@ import { photo } from "@/data/photos";
 import { PageHero } from "@/components/layout/PageHero";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Container } from "@/components/ui/Container";
-import { PhotoCredit } from "@/components/ui/PhotoCredit";
 import { pageMetadata } from "@/lib/metadata";
 
 const venuePhoto = photo("venue-eko-night");
@@ -171,7 +170,6 @@ export default function ContactPage() {
                     <span className="sr-only">(opens in a new tab)</span>
                   </a>
                 </div>
-                <PhotoCredit photo={venuePhoto} className="relative mt-6 text-center text-mist" />
               </div>
             </div>
 

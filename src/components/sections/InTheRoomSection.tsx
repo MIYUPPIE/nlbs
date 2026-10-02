@@ -1,15 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
 import { event } from "@/data/event";
 import { photo, type PhotoId } from "@/data/photos";
 import { Container } from "@/components/ui/Container";
-import { PhotoCredit } from "@/components/ui/PhotoCredit";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn } from "@/lib/utils";
 
 /**
- * Real rooms from other Nigerian conferences, each captioned with the event it
- * shows. Deliberately not inside the 2025 edition section: none of these is a
+ * Real rooms from other Nigerian conferences. No caption on the tiles (convener
+ * decision, 2 Oct 2026); each event and photographer is named on /credits. Deliberately not inside the 2025 edition section: none of these is a
  * summit photo (tests/photos.test.ts enforces the captions).
  */
 const tiles: { id: PhotoId; className: string; sizes: string }[] = [
@@ -67,18 +67,21 @@ export function InTheRoomSection() {
                   sizes={sizes}
                   className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-950/95 via-navy-950/70 to-transparent px-5 pt-12 pb-4">
-                  <span className="block text-sm leading-snug font-medium text-white">{p.caption}</span>
-                  <PhotoCredit photo={p} className="mt-1 text-white/75" />
-                </figcaption>
               </figure>
             );
           })}
         </div>
 
         <p className="mt-6 text-sm text-muted">
-          Photographs from other Nigerian conferences, each named and credited. Photos from Nigeria 2.0 itself
-          will be added once published.
+          Photographs from other Nigerian conferences, not from Nigeria 2.0. Each event and photographer is
+          named on the{" "}
+          <Link
+            href="/credits"
+            className="font-medium text-navy-950 underline underline-offset-2 hover:text-gold-ink"
+          >
+            photo credits
+          </Link>{" "}
+          page. Photos from Nigeria 2.0 itself will be added once published.
         </p>
       </Container>
     </Section>

@@ -4,10 +4,11 @@
  * licensed for reuse, credited wherever they render, and never presented as
  * pictures of the summit or its 2025 edition.
  */
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
+import { allRoutes, legalNav } from "@/data/navigation";
 import { photo, photos } from "@/data/photos";
 import { ALLOWED_LICENCES, entryError, firstHref, stripHtml } from "../scripts/sync-photos.mjs";
 
@@ -15,11 +16,6 @@ const ROOT = join(__dirname, "..");
 const manifest = JSON.parse(readFileSync(join(ROOT, "content", "photos.json"), "utf8")) as {
   photos: { id: string; kind: string; event?: string; commons: string; alt: string; caption: string }[];
 };
-const walk = (dir: string): string[] =>
-  readdirSync(dir).flatMap((f) => {
-    const p = join(dir, f);
-    return statSync(p).isDirectory() ? walk(p) : /\.tsx$/.test(p) ? [p] : [];
-  });
 
 describe("photo manifest and synced output", () => {
   it("generated data matches the manifest one to one", () => {
@@ -101,15 +97,18 @@ describe("content rule: no photo passes as the summit", () => {
     expect(src).not.toMatch(/@\/data\/photos|<Image/);
   });
 
-  it("every component that renders a synced photo also renders its credit", () => {
-    const users = walk(join(ROOT, "src")).filter((f) =>
-      /from "@\/data\/photos"/.test(readFileSync(f, "utf8")),
-    );
-    expect(users.length).toBeGreaterThanOrEqual(4);
-    for (const f of users) {
-      const src = readFileSync(f, "utf8");
-      if (/\bphoto\(/.test(src)) expect(src, f).toMatch(/<PhotoCredit\b/);
-    }
+  it("every photo is credited on /credits, which the footer links from every page", () => {
+    const page = readFileSync(join(ROOT, "src/app/credits/page.tsx"), "utf8");
+    expect(page).toMatch(/photos\.map\(/);
+    expect(page).toMatch(/<PhotoCredit\b/);
+    expect(legalNav.map((l) => l.href)).toContain("/credits");
+    expect(allRoutes as readonly string[]).toContain("/credits");
+  });
+
+  it("the uncaptioned conference tiles still say they are not from Nigeria 2.0 and link to credits", () => {
+    const src = readFileSync(join(ROOT, "src/components/sections/InTheRoomSection.tsx"), "utf8");
+    expect(src).toMatch(/not from Nigeria 2\.0/);
+    expect(src).toMatch(/href="\/credits"/);
   });
 });
 

@@ -6,7 +6,6 @@ import { MovingBorderFrame } from "@/components/aceternity/MovingBorder";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
-import { PhotoCredit } from "@/components/ui/PhotoCredit";
 
 const backdrop = photo("lagos-business-district");
 
@@ -64,7 +63,6 @@ export function CTASection({
           </div>
         </MovingBorderFrame>
       </Container>
-      <PhotoCredit photo={backdrop} className="absolute right-4 bottom-3 text-mist/80 sm:right-6" />
     </section>
   );
 }

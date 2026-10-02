@@ -43,11 +43,11 @@ Every photo on the site is a real, freely licensed photograph. None is an AI ima
 
 - **Source of truth:** `content/photos.json` lists Wikimedia Commons file titles with alt text and captions.
 - **Sync:** run `npm run photos:sync` (`scripts/sync-photos.mjs`). It pulls licence, author and source from Commons, rejects anything outside CC0, public domain, CC BY or CC BY-SA, then writes `public/photos/<id>.webp` (resized, EXIF and GPS stripped) and `src/data/photos.generated.json`. Never edit the generated file by hand.
-- **Credit:** render a photo through `photo(id)` from `src/data/photos.ts`, and always place `<PhotoCredit>` next to it. CC BY-SA requires the credit.
+- **Credit:** photos render without captions or credits (convener decision, 2 Oct 2026). All attribution lives on `/credits` (`src/app/credits/page.tsx`), which lists every synced photo and is linked from the footer on every page. CC BY and CC BY-SA require that credit, so never remove the page or its footer link.
 - **Event photos:** a `kind: "event"` entry must set `event` to the real event it shows, and its caption must contain that name. The sync refuses anything else. These photos sit in their own section, never in the 2025 edition section.
 - **Provenance:** prefer files with camera EXIF from an identifiable photographer. Skip contest uploads still under review, and professional press shots with no camera data (likely copied).
 - **2025 edition:** no public photos of the 2025 summit exist, so `EditionSection` keeps its placeholder. When the convener supplies real summit photos, add them with the photographer credited. Never caption another event's photo as the summit.
-- `tests/photos.test.ts` guards licences, credits, file sizes, EXIF and the rule that no caption implies a photo shows the summit. `e2e/content-pages.spec.ts` checks that every placed photo loads and shows its credit.
+- `tests/photos.test.ts` guards licences, the credits page, file sizes, EXIF and the rule that no photo is passed off as the summit. `e2e/content-pages.spec.ts` checks that every placed photo loads uncaptioned and that `/credits` credits all of them.
 
 ## Client documents
 

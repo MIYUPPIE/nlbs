@@ -71,20 +71,30 @@ test.describe("venue photos", () => {
     ["/about", ["venue-eko-hotels", "venue-eko-night", "lagos-business-district"]],
     ["/contact", ["venue-eko-night"]],
   ] as const) {
-    test(`${path} shows real photos, each loaded and credited`, async ({ page }) => {
+    test(`${path} shows real photos, loaded and without captions`, async ({ page }) => {
       await page.goto(path);
       for (const id of ids) {
         const img = page.locator(`img[src*="/photos/${id}.webp"]`).first();
         await img.scrollIntoViewIfNeeded();
         await expect(img).toHaveJSProperty("complete", true);
         expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
-        const credit = page.locator(`[data-photo-credit="${id}"]`).first();
-        await expect(credit).toContainText("Wikimedia Commons");
-        await expect(credit.getByRole("link", { name: /CC BY/ })).toHaveAttribute(
-          "href",
-          /creativecommons\.org/,
-        );
+        await expect(page.locator(`[data-photo-credit="${id}"]`)).toHaveCount(0);
       }
     });
   }
+});
+
+test("/credits credits every photo with author, licence and source", async ({ page }) => {
+  await page.goto("/credits");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("photographers");
+  const credits = page.locator("[data-photo-credit]");
+  await expect(credits).toHaveCount(9);
+  for (const credit of await credits.all()) {
+    await expect(credit).toContainText("Wikimedia Commons");
+    await expect(credit.getByRole("link", { name: /CC BY/ })).toHaveAttribute("href", /creativecommons\.org/);
+  }
+  await page.goto("/");
+  await expect(
+    page.getByRole("navigation", { name: "Legal" }).getByRole("link", { name: "Photo Credits" }),
+  ).toBeVisible();
 });

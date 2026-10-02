@@ -30,6 +30,7 @@ describe("routes", () => {
       "/privacy/request",
       "/cookies",
       "/terms",
+      "/credits",
     ]);
     for (const r of allRoutes) expect(existsSync(pageFile(r)), r).toBe(true);
   });

@@ -8,7 +8,6 @@ import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Countdown } from "@/components/hero/Countdown";
 import { NetworkGraphic } from "@/components/hero/NetworkGraphic";
-import { PhotoCredit } from "@/components/ui/PhotoCredit";
 
 const backdrop = photo("lagos-victoria-island-aerial");
 
@@ -98,7 +97,6 @@ export function Hero() {
           </div>
         </div>
       </Container>
-      <PhotoCredit photo={backdrop} className="absolute right-4 bottom-3 text-mist/80 sm:right-6" />
     </section>
   );
 }
