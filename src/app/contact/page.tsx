@@ -1,10 +1,14 @@
 import Image from "next/image";
 import { ArrowUpRight, AtSign, Building2, Mail, MapPin, Phone } from "lucide-react";
 import { contact, event } from "@/data/event";
+import { photo } from "@/data/photos";
 import { PageHero } from "@/components/layout/PageHero";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
 import { Container } from "@/components/ui/Container";
+import { PhotoCredit } from "@/components/ui/PhotoCredit";
 import { pageMetadata } from "@/lib/metadata";
+
+const venuePhoto = photo("venue-eko-night");
 
 export const metadata = pageMetadata({
   title: "Contact",
@@ -131,9 +135,17 @@ export default function ContactPage() {
                 </dl>
               </div>
 
-              {/* Map placeholder: no embed until an API key or approved embed is supplied. */}
+              {/* Venue card: real photo of the venue; no map embed until an API key or approved embed is supplied. */}
               <div className="relative overflow-hidden rounded-3xl bg-navy-950 p-8 text-white">
-                <div aria-hidden="true" className="bg-grid absolute inset-0" />
+                <Image
+                  src={venuePhoto.src}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover opacity-50"
+                />
+                <div aria-hidden="true" className="absolute inset-0 bg-navy-950/70" />
                 <div
                   aria-hidden="true"
                   className="absolute top-1/2 left-1/2 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold/20"
@@ -159,6 +171,7 @@ export default function ContactPage() {
                     <span className="sr-only">(opens in a new tab)</span>
                   </a>
                 </div>
+                <PhotoCredit photo={venuePhoto} className="relative mt-6 text-center text-mist" />
               </div>
             </div>
 

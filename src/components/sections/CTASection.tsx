@@ -1,9 +1,14 @@
+import Image from "next/image";
 import { CalendarDays, MapPin } from "lucide-react";
 import { event } from "@/data/event";
+import { photo } from "@/data/photos";
 import { MovingBorderFrame } from "@/components/aceternity/MovingBorder";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { PhotoCredit } from "@/components/ui/PhotoCredit";
+
+const backdrop = photo("lagos-business-district");
 
 export function CTASection({
   title = "Take your seat at the table.",
@@ -14,6 +19,18 @@ export function CTASection({
 }) {
   return (
     <section aria-labelledby="cta-title" className="relative overflow-hidden bg-navy-950 py-20 sm:py-28">
+      <Image
+        src={backdrop.src}
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes="100vw"
+        className="object-cover opacity-30"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-b from-navy-950/80 via-navy-950/60 to-navy-950/90"
+      />
       <Spotlight className="-top-40 left-10 md:left-1/3" fill="#E5C45A" />
       <Container size="narrow" className="relative">
         <MovingBorderFrame innerClassName="bg-navy-900/90 backdrop-blur" radius="2rem">
@@ -47,6 +64,7 @@ export function CTASection({
           </div>
         </MovingBorderFrame>
       </Container>
+      <PhotoCredit photo={backdrop} className="absolute right-4 bottom-3 text-mist/80 sm:right-6" />
     </section>
   );
 }

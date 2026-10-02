@@ -1,11 +1,16 @@
+import Image from "next/image";
 import { CalendarDays, MapPin } from "lucide-react";
 import { event } from "@/data/event";
+import { photo } from "@/data/photos";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { BackgroundBeams } from "@/components/aceternity/BackgroundBeams";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Countdown } from "@/components/hero/Countdown";
 import { NetworkGraphic } from "@/components/hero/NetworkGraphic";
+import { PhotoCredit } from "@/components/ui/PhotoCredit";
+
+const backdrop = photo("lagos-victoria-island-aerial");
 
 export function Hero() {
   return (
@@ -13,6 +18,20 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-navy-950 pt-28 pb-16 text-white lg:pt-32 lg:pb-24"
     >
+      {/* Real photo of Victoria Island, kept behind a navy wash so text holds AA contrast. */}
+      <Image
+        src={backdrop.src}
+        alt=""
+        aria-hidden="true"
+        fill
+        priority
+        sizes="100vw"
+        className="-z-20 object-cover object-center opacity-70"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 bg-navy-950/80 lg:bg-gradient-to-r lg:from-navy-950 lg:from-35% lg:via-navy-950/70 lg:to-navy-950/10"
+      />
       <div aria-hidden="true" className="bg-grid mask-fade-b absolute inset-0 -z-10" />
       <div
         aria-hidden="true"
@@ -79,6 +98,7 @@ export function Hero() {
           </div>
         </div>
       </Container>
+      <PhotoCredit photo={backdrop} className="absolute right-4 bottom-3 text-mist/80 sm:right-6" />
     </section>
   );
 }

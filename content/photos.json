@@ -1,0 +1,33 @@
+{
+  "$comment": "Real, freely licensed photographs. Source of truth for scripts/sync-photos.mjs. Only 'commons' titles are accepted; licence, author and URLs are pulled from Wikimedia Commons, never typed by hand. None of these show the 2025 edition: add real event photos with source 'nlbs' once the convener supplies them.",
+  "photos": [
+    {
+      "id": "venue-eko-hotels",
+      "commons": "File:Wide view of Eko Hotels and suites Lagos.jpg",
+      "alt": "Eko Hotels & Suites, Victoria Island, Lagos, home of the Eko Convention Centre",
+      "caption": "Eko Hotels & Suites, Victoria Island: home of the Eko Convention Centre.",
+      "width": 1600
+    },
+    {
+      "id": "venue-eko-night",
+      "commons": "File:Night view of Eko Hotel Extension, Victory Island, Lagos.jpg",
+      "alt": "The Eko Hotel extension towers lit up at night on Victoria Island, Lagos",
+      "caption": "The Eko Hotel extension at night, Victoria Island.",
+      "width": 1600
+    },
+    {
+      "id": "lagos-victoria-island-aerial",
+      "commons": "File:Aerial view of victoria island in Lagos, Nigeria with habours for yatches.jpg",
+      "alt": "Aerial view of Victoria Island, Lagos, with the lagoon and marina",
+      "caption": "Victoria Island, Lagos: the business district around the venue.",
+      "width": 1920
+    },
+    {
+      "id": "lagos-business-district",
+      "commons": "File:Mirrors, Lagos.jpg",
+      "alt": "Office towers in the Lagos business district",
+      "caption": "Lagos business district.",
+      "width": 1600
+    }
+  ]
+}

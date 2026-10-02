@@ -1,9 +1,14 @@
+import Image from "next/image";
 import { event } from "@/data/event";
+import { photo, type PhotoId } from "@/data/photos";
 import { summitExperience } from "@/data/vision";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
+import { PhotoCredit } from "@/components/ui/PhotoCredit";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+
+const venuePhotos: PhotoId[] = ["venue-eko-hotels", "venue-eko-night"];
 
 export function SummitExperienceSection() {
   return (
@@ -17,6 +22,25 @@ export function SummitExperienceSection() {
           title="A working day, built for outcomes."
           lead={`${event.venue.display}. From ${event.date.startDisplay}, with 800 leaders in the room.`}
         />
+        <div className="mt-12 grid gap-4 sm:grid-cols-2">
+          {venuePhotos.map(photo).map((p) => (
+            <figure key={p.id} data-reveal>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10 bg-navy-900">
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  sizes="(min-width: 640px) 45vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="mt-3 space-y-1">
+                <span className="block text-sm text-white">{p.caption}</span>
+                <PhotoCredit photo={p} className="text-mist" />
+              </figcaption>
+            </figure>
+          ))}
+        </div>
         <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
           {summitExperience.map((x, i) => (
             <li

@@ -53,3 +53,27 @@ test("no page offers a document download", async ({ page }) => {
     await expect(page.locator("a[download], a[href$='.pdf'], a[href*='/downloads/']"), route).toHaveCount(0);
   }
 });
+
+test.describe("venue photos", () => {
+  for (const [path, ids] of [
+    ["/", ["lagos-victoria-island-aerial", "lagos-business-district"]],
+    ["/about", ["venue-eko-hotels", "venue-eko-night", "lagos-business-district"]],
+    ["/contact", ["venue-eko-night"]],
+  ] as const) {
+    test(`${path} shows real photos, each loaded and credited`, async ({ page }) => {
+      await page.goto(path);
+      for (const id of ids) {
+        const img = page.locator(`img[src*="/photos/${id}.webp"]`).first();
+        await img.scrollIntoViewIfNeeded();
+        await expect(img).toHaveJSProperty("complete", true);
+        expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+        const credit = page.locator(`[data-photo-credit="${id}"]`).first();
+        await expect(credit).toContainText("Wikimedia Commons");
+        await expect(credit.getByRole("link", { name: /CC BY/ })).toHaveAttribute(
+          "href",
+          /creativecommons\.org/,
+        );
+      }
+    });
+  }
+});

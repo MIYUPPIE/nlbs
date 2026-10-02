@@ -33,7 +33,9 @@ test.describe("registration", () => {
     await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
 
     // It really went to the central backend, from the browser, with the form name.
-    const sent = await (await page.request.get(`${CENTRAL}/__last/registration`)).json();
+    const sent = await (
+      await page.request.get(`${CENTRAL}/__last/registration?email=ada@example.com`)
+    ).json();
     expect(sent).toMatchObject({ form: "registration", delegateType: "Investor", email: "ada@example.com" });
   });
 

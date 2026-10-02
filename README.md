@@ -29,6 +29,23 @@ Only facts confirmed in the build brief are published. They live in `src/data/`:
 
 `tests/content-integrity.test.ts` fails the build if unverified names or claims from draft client documents (named keynotes, media partners, pricing, times, contact details) appear in `src/`. When the convener confirms one, remove it from that test's list in the same commit that publishes it.
 
+## Photos
+
+Every photo on the site is a real, freely licensed photograph of the venue or Lagos. There are no AI images and no stock pictures passed off as the summit.
+
+| Photo                          | Where it renders                                      |
+| ------------------------------ | ----------------------------------------------------- |
+| `lagos-victoria-island-aerial` | Homepage hero background                              |
+| `venue-eko-hotels`             | Summit Experience section (About)                     |
+| `venue-eko-night`              | Summit Experience section (About), contact venue card |
+| `lagos-business-district`      | CTA band (every page that ends with it)               |
+
+- **Source of truth:** `content/photos.json` lists Wikimedia Commons file titles with alt text and captions.
+- **Sync:** run `npm run photos:sync` (`scripts/sync-photos.mjs`). It pulls licence, author and source from Commons, rejects anything outside CC0, public domain, CC BY or CC BY-SA, then writes `public/photos/<id>.webp` (resized, EXIF and GPS stripped) and `src/data/photos.generated.json`. Never edit the generated file by hand.
+- **Credit:** render a photo through `photo(id)` from `src/data/photos.ts`, and always place `<PhotoCredit>` next to it. CC BY-SA requires the credit.
+- **2025 edition:** no public photos of the 2025 summit exist, so `EditionSection` keeps its placeholder. When the convener supplies real event photos, add them as their own source with the photographer credited. Never reuse photos from another event.
+- `tests/photos.test.ts` guards licences, credits, file sizes, EXIF and the rule that no caption implies a photo shows the summit. `e2e/content-pages.spec.ts` checks that every placed photo loads and shows its credit.
+
 ## Client documents
 
 | Source (in `../latest`)                            | Where it lives                                                                                                                                                                       | Notes                                                                                                                                                                                                                                                                                                                                |

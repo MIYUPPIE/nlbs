@@ -1,0 +1,60 @@
+{
+  "photos": [
+    {
+      "id": "venue-eko-hotels",
+      "src": "/photos/venue-eko-hotels.webp",
+      "width": 1600,
+      "height": 1205,
+      "alt": "Eko Hotels & Suites, Victoria Island, Lagos, home of the Eko Convention Centre",
+      "caption": "Eko Hotels & Suites, Victoria Island: home of the Eko Convention Centre.",
+      "author": "Yemi festus",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Yemi_festus",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Wide_view_of_Eko_Hotels_and_suites_Lagos.jpg",
+      "title": "File:Wide view of Eko Hotels and suites Lagos.jpg"
+    },
+    {
+      "id": "venue-eko-night",
+      "src": "/photos/venue-eko-night.webp",
+      "width": 1600,
+      "height": 1205,
+      "alt": "The Eko Hotel extension towers lit up at night on Victoria Island, Lagos",
+      "caption": "The Eko Hotel extension at night, Victoria Island.",
+      "author": "Yemi festus",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Yemi_festus",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Night_view_of_Eko_Hotel_Extension,_Victory_Island,_Lagos.jpg",
+      "title": "File:Night view of Eko Hotel Extension, Victory Island, Lagos.jpg"
+    },
+    {
+      "id": "lagos-victoria-island-aerial",
+      "src": "/photos/lagos-victoria-island-aerial.webp",
+      "width": 1920,
+      "height": 1245,
+      "alt": "Aerial view of Victoria Island, Lagos, with the lagoon and marina",
+      "caption": "Victoria Island, Lagos: the business district around the venue.",
+      "author": "Ayorinde Ogundele",
+      "authorUrl": "https://commons.wikimedia.org/wiki/User:Ayorinde_Ogundele",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_victoria_island_in_Lagos,_Nigeria_with_habours_for_yatches.jpg",
+      "title": "File:Aerial view of victoria island in Lagos, Nigeria with habours for yatches.jpg"
+    },
+    {
+      "id": "lagos-business-district",
+      "src": "/photos/lagos-business-district.webp",
+      "width": 1600,
+      "height": 981,
+      "alt": "Office towers in the Lagos business district",
+      "caption": "Lagos business district.",
+      "author": "Clara Sanchiz",
+      "authorUrl": "https://www.flickr.com/photos/clarasanchiz/",
+      "licence": "CC BY-SA 2.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mirrors,_Lagos.jpg",
+      "title": "File:Mirrors, Lagos.jpg"
+    }
+  ]
+}

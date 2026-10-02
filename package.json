@@ -16,7 +16,8 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "prepare": "git config core.hooksPath .githooks || true",
     "build:e2e": "NEXT_PUBLIC_CENTRAL_API_URL=http://localhost:3299 NEXT_PUBLIC_CENTRAL_SITE_KEY=pk_e2e_nlbs NEXT_PUBLIC_SITE_URL=http://localhost:3200 NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE=open next build",
-    "build:cpanel": "bash scripts/build-cpanel.sh"
+    "build:cpanel": "bash scripts/build-cpanel.sh",
+    "photos:sync": "node scripts/sync-photos.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -40,6 +41,7 @@
     "eslint-config-next": "16.3.6",
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.0.2"

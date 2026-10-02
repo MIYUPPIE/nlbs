@@ -88,7 +88,9 @@ test.describe("privacy (NDPA)", () => {
     await page.getByLabel(/I consent to the summit team/).check();
     await page.getByRole("button", { name: "Request Invitation" }).click();
     await expect(page.getByRole("heading", { name: "Request received" })).toBeVisible();
-    const sent = await (await page.request.get(`${CENTRAL}/__last/registration`)).json();
+    const sent = await (
+      await page.request.get(`${CENTRAL}/__last/registration?email=ada.consent@example.com`)
+    ).json();
     expect(sent).toMatchObject({
       accessNeeds: "Halal meals",
       accessNeedsConsent: true,

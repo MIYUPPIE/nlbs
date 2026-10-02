@@ -3,6 +3,8 @@
 // browser: CORS preflight, the X-Site-Key public key and the Origin allowlist.
 // Stores the last body per form so tests can assert exactly what was sent:
 //   GET /__last/<form>  -> last JSON body for that form (404 if none)
+//   GET /__last/<form>?email=<e> -> last body for that form from that email,
+//     so parallel tests posting the same form never read each other's body
 //   POST /__reset       -> forget everything
 //   GET /__health       -> 200 (Playwright readiness)
 // Talent applications need a paid book pre-order (like the real backend):
@@ -15,6 +17,10 @@ const PORT = Number(process.env.FAKE_CENTRAL_PORT ?? 3299);
 const KEY = process.env.FAKE_CENTRAL_KEY ?? "pk_e2e_nlbs";
 const ORIGINS = (process.env.FAKE_CENTRAL_ORIGINS ?? "http://localhost:3200").split(",");
 const last = new Map();
+function remember(body) {
+  last.set(body.form, body);
+  if (typeof body.email === "string") last.set(`${body.form}|${body.email.trim().toLowerCase()}`, body);
+}
 
 const PREORDERS = {
   "BK-PAID-2222": { paid: true, copies: 1000, email: "amaka@example.com", phone: "8031234567" },
@@ -69,7 +75,9 @@ createServer((req, res) => {
 
   if (req.method === "GET" && url.pathname === "/__health") return send(res, 200, { ok: true });
   if (req.method === "GET" && url.pathname.startsWith("/__last/")) {
-    const body = last.get(url.pathname.slice("/__last/".length));
+    const form = url.pathname.slice("/__last/".length);
+    const email = url.searchParams.get("email");
+    const body = last.get(email ? `${form}|${email.toLowerCase()}` : form);
     return body ? send(res, 200, body) : send(res, 404, { ok: false });
   }
   if (req.method === "POST" && url.pathname === "/__reset") {
@@ -155,7 +163,7 @@ createServer((req, res) => {
         );
       used.set(r.ref, (used.get(r.ref) ?? 0) + 1);
     }
-    last.set(body.form, body);
+    remember(body);
     send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);
   });
 }).listen(PORT, () => console.log(`fake central on :${PORT}`));
