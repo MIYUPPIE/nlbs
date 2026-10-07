@@ -1,6 +1,6 @@
 export type NavLink = { label: string; href: string };
 
-/** Desktop header links, in the order given by the brief. */
+/** Desktop header links, in the order given by the brief, then FAQ (it was mobile-only until Oct 2026). */
 export const primaryNav: NavLink[] = [
   { label: "About", href: "/about" },
   { label: "Programme", href: "/programme" },
@@ -9,6 +9,7 @@ export const primaryNav: NavLink[] = [
   { label: "Talent", href: "/talent" },
   { label: "Technology", href: "/technology" },
   { label: "Partners", href: "/partners" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 /** Mobile drawer adds the secondary pages. */
@@ -17,7 +18,6 @@ export const mobileNav: NavLink[] = [
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
   { label: "Talent Fund Application", href: "/talentnigeria20" },
-  { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
 

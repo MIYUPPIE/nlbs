@@ -50,7 +50,13 @@ describe("routes", () => {
       "Talent",
       "Technology",
       "Partners",
+      "FAQ",
     ]);
+  });
+
+  it("FAQ is reachable from the header at every width, exactly once in the drawer", () => {
+    expect(primaryNav.filter((l) => l.href === "/faq")).toHaveLength(1);
+    expect(mobileNav.filter((l) => l.href === "/faq")).toHaveLength(1);
   });
 });
 

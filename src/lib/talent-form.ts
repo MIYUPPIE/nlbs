@@ -103,41 +103,6 @@ export const TRACK_DETAILS: Record<(typeof TRACKS)[number], { title: string; bod
   },
 };
 
-/**
- * Every applicant must pre-order Dr. Wale Busari's book first (one paid copy
- * per application). The price is the backend's BOOK_PREORDER_PRICE_KOBO:
- * change both together. Enforced by central-backend (PaidBookPreorder).
- */
-export const BOOK_PREORDER = {
-  title: "Advising The Founder",
-  author: "Dr. Wale Busari",
-  price: "₦10,000",
-  url: "https://advisingthefounder.com/preorder/",
-} as const;
-
-/** "BK-7K4Q-9XPA": upper-cased and without spaces, or null if it cannot be a reference. */
-export function normalizePreorderReference(input: string): string | null {
-  const ref = input.replace(/\s+/g, "").toUpperCase();
-  return /^[A-Z0-9]{2,10}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(ref) ? ref : null;
-}
-
-/**
- * Link to the book's pre-order page, prefilled with the applicant's details
- * and a way back here (the book site shows "Continue your Talent Fund
- * application" once paid, returning with ?preorder=<reference>).
- */
-export function bookPreorderUrl(
-  applicant: { fullName?: string; email?: string; whatsapp?: string },
-  returnUrl: string,
-): string {
-  const q = new URLSearchParams({ from: "nlbs-talent" });
-  if (applicant.fullName) q.set("name", applicant.fullName);
-  if (applicant.email) q.set("email", applicant.email);
-  if (applicant.whatsapp) q.set("phone", applicant.whatsapp);
-  q.set("return", returnUrl);
-  return `${BOOK_PREORDER.url}?${q.toString()}`;
-}
-
 export const PROBLEM_MAX = 150;
 export const PITCH_MAX_WORDS = 30;
 export const CV_MAX_BYTES = 2 * 1024 * 1024;
@@ -229,8 +194,6 @@ export const talentApplicationSchema = z
       .refine((v) => countWords(v) >= 5, "Give us at least a few words."),
     consent: z.literal(true, { error: "Please agree to how your data is used." }),
     website: z.string().max(0).optional().or(z.literal("")),
-    // Paid book pre-order; confirmed with the backend before Section 3 and enforced there.
-    preorderReference: z.string().trim().max(30).optional().default(""),
   })
   .superRefine((d, ctx) => {
     for (const [path, message] of Object.entries(conditionalErrors(d))) {

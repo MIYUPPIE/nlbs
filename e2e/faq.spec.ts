@@ -1,5 +1,37 @@
 import { expect, test } from "@playwright/test";
 
+// Regression (Oct 2026): FAQ was only in the mobile drawer and the footer.
+test.describe("faq in the desktop header", () => {
+  for (const width of [1024, 1280, 1440]) {
+    test(`is visible, fits and opens the FAQ at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/");
+      const nav = page.getByRole("navigation", { name: "Main" });
+      const faq = nav.getByRole("link", { name: "FAQ" });
+      await expect(faq).toBeVisible();
+      const fits = await page.evaluate(() => {
+        const header = document.querySelector("header > div")!;
+        const boxes = [...header.querySelectorAll("a, button")]
+          .filter((el) => (el as HTMLElement).offsetParent && !el.classList.contains("sr-only"))
+          .map((el) => el.getBoundingClientRect())
+          .filter((r) => r.width > 0);
+        const overlap = boxes.some((a, i) =>
+          boxes.some(
+            (b, j) =>
+              i < j && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom && b.top < a.bottom,
+          ),
+        );
+        const oneRow = new Set(boxes.map((r) => Math.round(r.top + r.height / 2))).size <= 2;
+        return { overlap, oneRow, overflow: document.documentElement.scrollWidth > innerWidth };
+      });
+      expect(fits).toEqual({ overlap: false, oneRow: true, overflow: false });
+      await faq.click();
+      await expect(page).toHaveURL(/\/faq\/?$/);
+      await expect(nav.getByRole("link", { name: "FAQ" })).toHaveAttribute("aria-current", "page");
+    });
+  }
+});
+
 test.describe("faq", () => {
   test("lists all 101 questions in five categories", async ({ page }) => {
     await page.goto("/faq");

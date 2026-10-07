@@ -16,7 +16,7 @@ import { eventJsonLd } from "@/lib/site";
 export const metadata = pageMetadata({
   title: "Request an Invitation",
   description:
-    "Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. Friday 27 November 2026, Eko Convention Centre, Lagos.",
+    "Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. Monday 30 November 2026, Eko Convention Centre, Lagos.",
   path: "/register",
 });
 
