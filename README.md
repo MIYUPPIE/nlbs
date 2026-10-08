@@ -140,6 +140,21 @@ Tokens are in `src/app/globals.css` (`@theme`). Gold (`#D4AF37`) is for dark sur
 
 Aceternity components (adapted, in `src/components/aceternity/`): Spotlight, Background Beams (18 beams, deterministic timings, desktop only, static under reduced motion), Moving Border (partnership + final CTA), Bento Grid (technology, exhibition), Card Hover Effect (audience). Scroll reveal uses one IntersectionObserver; content is visible without JS, under reduced motion and in print.
 
+## Logo
+
+The Nigeria 2.0 logo is original work made for this site (Oct 2026), owned outright: an "N" whose two ivory pillars
+(government and business) are joined by a gold diagonal (dialogue to deals), with a gold point above (the "2.0"),
+on a navy tile with a gold hairline.
+
+- **On the site:** `src/lib/logo.ts` holds the shapes. `LogoMark` draws them in the header and footer; `icon.tsx`,
+  `apple-icon.tsx` and `opengraph-image.tsx` render the favicon, home-screen icon and share image from the same source.
+- **For print, press and partners:** `public/brand/nlbs-logo-dark.svg` (navy or photo backgrounds),
+  `nlbs-logo-light.svg` (white or ivory), `nlbs-mark.svg` (the tile alone). Lettering is outlined Geist (SIL OFL),
+  so the files need no fonts. Live at `https://www.nlbs.com.ng/brand/<file>`.
+- **To change it:** edit `MARK` in `scripts/brand/build-logo.py` and `src/lib/logo.ts` together, then run
+  `python3 scripts/brand/build-logo.py`. `tests/brand.test.ts` fails if they drift, if lettering stops being outlined,
+  if the mark stops reading at 16px, or if the watermarked Design.com preview (`logo.jpeg`) is ever used.
+
 ## Architecture
 
 Server components by default. Client islands: header/drawer, countdown, count-up numbers, programme tabs, audience hover, beams, moving border, forms, reveal observer. The mobile drawer uses HTML Invoker Commands so it opens before hydration; form submit buttons stay disabled until hydration so a native submit can never put personal data in a URL.

@@ -13,6 +13,10 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "browser",
     background_color: "#071A33",
     theme_color: "#071A33",
-    icons: [{ src: "/icon", sizes: "64x64", type: "image/png" }],
+    icons: [
+      { src: "/icon", sizes: "64x64", type: "image/png" },
+      { src: "/apple-icon", sizes: "180x180", type: "image/png" },
+      { src: "/brand/nlbs-mark.svg", sizes: "any", type: "image/svg+xml" },
+    ],
   };
 }

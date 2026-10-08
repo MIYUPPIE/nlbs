@@ -3,6 +3,7 @@ export const dynamic = "force-static";
 
 import { ImageResponse } from "next/og";
 import { event } from "@/data/event";
+import { logoDataUri } from "@/lib/logo-image";
 
 export const alt =
   "Nigeria 2.0: Nigerian Leadership Business Summit 2026, 30 November 2026, Eko Convention Centre, Lagos";
@@ -24,8 +25,8 @@ export default function OpenGraphImage() {
         fontFamily: "sans-serif",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ width: 48, height: 2, background: "#D4AF37" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <img src={logoDataUri()} width={72} height={72} alt="" />
         <div style={{ fontSize: 22, letterSpacing: 6, color: "#D4AF37", textTransform: "uppercase" }}>
           {event.name}
         </div>
