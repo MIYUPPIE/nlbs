@@ -46,6 +46,14 @@ test.describe("about page", () => {
     await expect(page.getByText("Est. 200 seats").first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "Seniority" })).toBeVisible();
   });
+
+  test("the convener card shows the HBC logo, loaded", async ({ page }) => {
+    await page.goto("/about");
+    const logo = page.locator('main img[alt="HBC Business Help"]');
+    await logo.scrollIntoViewIfNeeded();
+    await expect(logo).toBeVisible();
+    expect(await logo.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
+  });
 });
 
 test("no page offers a document download", async ({ page }) => {

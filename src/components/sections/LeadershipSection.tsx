@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { leadership } from "@/data/vision";
 import { event } from "@/data/event";
 import { Container } from "@/components/ui/Container";
@@ -22,7 +23,23 @@ export function LeadershipSection() {
           title="Convened with purpose."
           lead={`Nigeria 2.0 is convened by ${event.convener}, a private-sector, non-partisan initiative.`}
         />
-        <ul className="mt-12 grid gap-5 md:grid-cols-2">
+        <div
+          data-reveal
+          className="mt-12 flex flex-col gap-5 rounded-3xl border border-line bg-white p-7 sm:flex-row sm:items-center sm:gap-8 sm:p-8"
+        >
+          <Image
+            src="/brand/hbc-logo.png"
+            alt={event.convener}
+            width={200}
+            height={83}
+            className="h-14 w-auto self-start sm:self-center"
+          />
+          <div>
+            <p className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">Convener</p>
+            <p className="mt-1 font-display text-3xl text-navy-950">{event.convener}</p>
+          </div>
+        </div>
+        <ul className="mt-5 grid gap-5 md:grid-cols-2">
           {leadership.map((p) => (
             <li
               key={p.name}
