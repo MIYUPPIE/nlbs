@@ -89,16 +89,16 @@ test.describe("programme tabs", () => {
 });
 
 test.describe("countdown", () => {
-  test("counts down to 30 Nov 2026 09:00 WAT from a frozen clock", async ({ page }) => {
-    // 28 Sep 2026 12:00 WAT → 30 Nov 09:00 WAT is 62 days, 21 hours.
+  test("counts down to 23 Nov 2026 09:00 WAT from a frozen clock", async ({ page }) => {
+    // 28 Sep 2026 12:00 WAT → 23 Nov 09:00 WAT is 55 days, 21 hours.
     await page.clock.setFixedTime(new Date("2026-09-28T11:00:00Z"));
     await page.goto("/");
     const timer = page.getByRole("timer");
-    await expect(timer).toHaveAttribute("aria-label", "62 days, 21 hours, 0 minutes until the summit");
+    await expect(timer).toHaveAttribute("aria-label", "55 days, 21 hours, 0 minutes until the summit");
   });
 
   test("shows the event-day state on the day", async ({ page }) => {
-    await page.clock.setFixedTime(new Date("2026-11-30T09:00:00Z"));
+    await page.clock.setFixedTime(new Date("2026-11-23T09:00:00Z"));
     await page.goto("/");
     await expect(page.getByText("Happening today")).toBeVisible();
   });
@@ -195,7 +195,7 @@ test.describe("seo", () => {
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? "{}");
     expect(ld["@type"]).toBe("Event");
-    expect(ld.startDate).toBe("2026-11-30T09:00:00+01:00");
+    expect(ld.startDate).toBe("2026-11-23T09:00:00+01:00");
   });
 
   test("sitemap and robots are served", async ({ request }) => {

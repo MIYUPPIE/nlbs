@@ -1,6 +1,6 @@
 {
-  "_note": "Replacements by question number: a string replaces the answer, an object can replace the question and/or answer. Each entry exists because the source was missing, malformed, or contradicted the build brief (Q4: the summit moved to Monday 30 November 2026, convener decision 7 Oct 2026; Q13: the source says every last Thursday, which 2026 is not; Q67: partners are announced only once confirmed). Q24, Q46-48, Q50, Q53, Q55, Q63, Q69 and Q72 follow the Stakeholders + Sponsors structure with fees on request (convener decision, 29 Sep 2026; see src/data/partnership.ts). Keep all other facts identical to the source.",
-  "4": "Monday, 30th November 2026, Eko Convention Centre, Eko Hotels, Lagos. 9AM - 6PM.",
+  "_note": "Replacements by question number: a string replaces the answer, an object can replace the question and/or answer. Each entry exists because the source was missing, malformed, or contradicted the build brief (Q4: the summit moved to Monday 23 November 2026, convener decision 9 Oct 2026; Q13: the source says every last Thursday, which 2026 is not; Q67: partners are announced only once confirmed). Q24, Q46-48, Q50, Q53, Q55, Q63, Q69 and Q72 follow the Stakeholders + Sponsors structure with fees on request (convener decision, 29 Sep 2026; see src/data/partnership.ts). Keep all other facts identical to the source.",
+  "4": "Monday, 23rd November 2026, Eko Convention Centre, Eko Hotels, Lagos. 9AM - 6PM.",
   "13": "Yes. The summit convenes every November until 2036.",
   "19": "Open application on http://nlbs.com.ng/talentnigeria20, followed by CBT screening, an interview and state quota balancing.",
   "24": "No recruitment fee in Year 1. Founding Stakeholders get first pick of the talent pool as part of their partnership.",

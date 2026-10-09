@@ -26,16 +26,16 @@ describe("verified event facts", () => {
     expect(event.fullName).toBe("Nigeria 2.0 Nigerian Leadership Business Summit 2026");
     expect(event.theme).toBe("Nigeria 2.0: Unlocking Capital, Talent & Technology for a Resilient Economy");
     expect(event.tagline).toBe("Invest in People. Invest in Possibilities.");
-    expect(event.date.display).toBe("Monday, 30 November 2026");
+    expect(event.date.display).toBe("Monday, 23 November 2026");
     expect(event.venue.display).toBe("Eko Convention Centre, Lagos");
     expect(event.convener).toBe("HBC Business Help");
     expect(event.previousEdition).toEqual({ year: 2025, theme: "Leadership Beyond the Norm" });
   });
 
-  it("30 November 2026 is a Monday, and display, short and ISO agree", () => {
-    expect(event.date.iso).toBe("2026-11-30");
+  it("23 November 2026 is a Monday, and display, short and ISO agree", () => {
+    expect(event.date.iso).toBe("2026-11-23");
     expect(new Date(`${event.date.iso}T12:00:00Z`).getUTCDay()).toBe(1);
-    expect(event.date.short).toBe("30 Nov 2026");
+    expect(event.date.short).toBe("23 Nov 2026");
   });
 });
 
@@ -145,8 +145,8 @@ describe("structured data", () => {
     const ld = eventJsonLd();
     expect(ld["@type"]).toBe("Event");
     expect(ld.name).toBe(event.fullName);
-    expect(ld.startDate).toBe("2026-11-30T09:00:00+01:00");
-    expect(ld.endDate).toBe("2026-11-30");
+    expect(ld.startDate).toBe("2026-11-23T09:00:00+01:00");
+    expect(ld.endDate).toBe("2026-11-23");
     expect(ld.location.name).toBe("Eko Convention Centre");
     expect(ld.location.address.addressLocality).toBe("Lagos");
     expect(ld.location.address.addressCountry).toBe("NG");

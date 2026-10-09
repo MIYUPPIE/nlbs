@@ -10,7 +10,7 @@ describe("startOfDayInZone", () => {
   });
 
   it("uses the event's configured date and timezone", () => {
-    expect(event.date.iso).toBe("2026-11-30");
+    expect(event.date.iso).toBe("2026-11-23");
     expect(event.date.timeZone).toBe(LAGOS);
   });
 
@@ -83,7 +83,7 @@ describe("pad2", () => {
 describe("zonedTimeToUtc", () => {
   it("resolves the 9:00 AM WAT start to 08:00 UTC", () => {
     expect(new Date(zonedTimeToUtc(event.date.iso, event.date.startTime, LAGOS)).toISOString()).toBe(
-      "2026-11-30T08:00:00.000Z",
+      "2026-11-23T08:00:00.000Z",
     );
   });
 

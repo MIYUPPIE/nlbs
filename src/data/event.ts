@@ -18,9 +18,9 @@ export const event = {
   convener: "HBC Business Help",
   date: {
     /** ISO calendar date. */
-    iso: "2026-11-30",
-    display: "Monday, 30 November 2026",
-    short: "30 Nov 2026",
+    iso: "2026-11-23",
+    display: "Monday, 23 November 2026",
+    short: "23 Nov 2026",
     timeZone: "Africa/Lagos",
     /** Start time, local (flyer: "9:00 AM prompt"; FAQ: "9AM Plenary"). */
     startTime: "09:00",

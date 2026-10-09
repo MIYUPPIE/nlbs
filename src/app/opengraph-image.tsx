@@ -6,7 +6,7 @@ import { event } from "@/data/event";
 import { logoDataUri } from "@/lib/logo-image";
 
 export const alt =
-  "Nigeria 2.0: Nigerian Leadership Business Summit 2026, 30 November 2026, Eko Convention Centre, Lagos";
+  "Nigeria 2.0: Nigerian Leadership Business Summit 2026, 23 November 2026, Eko Convention Centre, Lagos";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

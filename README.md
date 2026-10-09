@@ -1,6 +1,6 @@
 # Nigeria 2.0: Nigerian Leadership Business Summit 2026
 
-Official website for **Nigeria 2.0**, Monday 30 November 2026, Eko Convention Centre, Lagos. Convened by HBC Business Help.
+Official website for **Nigeria 2.0**, Monday 23 November 2026, Eko Convention Centre, Lagos. Convened by HBC Business Help.
 
 Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS 4 · Aceternity UI patterns · Motion · Lucide · Zod.
 
