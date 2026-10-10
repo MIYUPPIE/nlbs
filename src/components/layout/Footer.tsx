@@ -3,7 +3,7 @@ import Link from "next/link";
 import { contact, event } from "@/data/event";
 import { footerNav, footerSecondaryNav, legalNav } from "@/data/navigation";
 import { Container } from "@/components/ui/Container";
-import { Wordmark } from "@/components/layout/Wordmark";
+import { LOGO } from "@/lib/logo";
 import { GoldButton } from "@/components/ui/GoldButton";
 
 export function Footer() {
@@ -13,8 +13,15 @@ export function Footer() {
       <Container className="relative">
         <div className="grid gap-14 border-b border-white/10 py-16 lg:grid-cols-12 lg:py-20">
           <div className="lg:col-span-5">
-            <Wordmark />
-            <p className="mt-6 max-w-sm text-sm leading-relaxed text-mist">{event.name}</p>
+            <Link href="/" aria-label="Nigeria 2.0 home" className="inline-block">
+              <Image
+                src={LOGO.full}
+                alt={LOGO.alt}
+                width={LOGO.fullSize.width}
+                height={LOGO.fullSize.height}
+                className="h-28 w-auto sm:h-32"
+              />
+            </Link>
             <p className="mt-8 font-display text-3xl leading-tight text-white sm:text-4xl">
               Invest in People.
               <br />

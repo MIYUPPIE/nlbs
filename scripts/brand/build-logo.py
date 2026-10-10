@@ -1,88 +1,108 @@
 #!/usr/bin/env python3
-"""Nigeria 2.0 logo: writes the SVG files in public/brand/.
+"""NLBS logo assets for the site, from the convener's logo file.
 
-The mark is original work made for this site (Oct 2026): an "N" whose two
-ivory pillars (government and business) are joined by a gold diagonal (the
-path from dialogue to deals), with a gold point above (the "2.0", the next
-chapter), on a navy tile with a gold hairline. Colours are the site tokens in
-src/app/globals.css. The same geometry is drawn in React by
-src/components/layout/LogoMark.tsx (tests/brand.test.ts keeps them in step).
+Source: scripts/brand/nlbs-logo-source.jpg (copy of NLBS/logo.jpg, 1120x912, the logo on a flat navy background), the
+convener's official Nigeria Leadership Business Summit 2026 logo (9 Oct 2026).
+Not to be confused with logo.jpeg, the watermarked Design.com preview, which
+is never used (tests/brand.test.ts).
 
-Lettering is Geist (SIL Open Font License, files in this folder) converted to
-outlines, so the logo looks the same in any app without the font installed.
+The background is removed with colour-to-alpha against the measured navy, so
+the logo sits on any surface. Writes to public/brand/:
+  nlbs-logo.png / .webp    full logo, transparent, for dark backgrounds (white lettering)
+  nlbs-logo-light.png / .webp  same, lettering in navy, for white or ivory backgrounds
+  nlbs-logo-navy.png       the logo on its own navy, as supplied (dark slides, print)
+  nlbs-icon.png / .webp    the rising bars alone, transparent, square (header, footer)
+  nlbs-icon-tile.png       the bars on a navy tile, 512px (favicon, app icon, share image)
 
 Usage: python3 scripts/brand/build-logo.py
 """
 from pathlib import Path
 
-from fontTools.pens.svgPathPen import SVGPathPen
-from fontTools.pens.transformPen import TransformPen
-from fontTools.ttLib import TTFont
+from PIL import Image
 
-HERE = Path(__file__).resolve().parent
-OUT = HERE.parent.parent / "public" / "brand"
+ROOT = Path(__file__).resolve().parent.parent.parent
+SRC = Path(__file__).resolve().parent / "nlbs-logo-source.jpg"  # copy of NLBS/logo.jpg
+OUT = ROOT / "public" / "brand"
 
-NAVY_950 = "#071A33"
-NAVY_700 = "#123B67"
-GOLD = "#D4AF37"
-GOLD_DEEP = "#A8841F"  # gold that holds up on ivory
-IVORY = "#F8F7F2"
-MIST = "#A8B3C7"
-
-# The mark on a 64-unit grid. LogoMark.tsx copies these numbers.
-MARK = f"""<rect width="64" height="64" rx="14" fill="{NAVY_950}"/>
-<rect x=".75" y=".75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="{GOLD}" stroke-opacity=".45" stroke-width="1.5"/>
-<rect x="13" y="22" width="8" height="30" rx="1.5" fill="{IVORY}"/>
-<rect x="36" y="22" width="8" height="30" rx="1.5" fill="{IVORY}"/>
-<polygon points="13,22 21,22 44,52 36,52" fill="{GOLD}"/>
-<circle cx="49" cy="15" r="4.5" fill="{GOLD}"/>"""
+BG = (1, 16, 38)  # measured background navy of logo.jpg
+LOW, HIGH = 14, 70  # colour distance from BG: <= LOW is background, >= HIGH fully opaque
+# Content boxes in source pixels (left, top, right, bottom), measured from the file.
+LOGO_BOX = (66, 148, 1069, 727)
+ICON_BOX = (376, 148, 761, 537)
+NAVY_TILE = (7, 26, 51)  # site navy-950 #071A33
+# Source rows of the white "NIGERIA LEADERSHIP" line, recoloured for light backgrounds.
+WHITE_LINE_ROWS = (575, 672)
 
 
-def text_path(font: TTFont, text: str, size: float, x: float, baseline: float, tracking_em: float) -> tuple[str, float]:
-    """SVG path data for `text` at `size`, left edge `x`, and the advance it used."""
-    glyphs = font.getGlyphSet()
-    cmap = font.getBestCmap()
-    scale = size / font["head"].unitsPerEm
-    pen = SVGPathPen(glyphs)
-    cursor = x
-    for i, ch in enumerate(text):
-        name = cmap[ord(ch)]
-        glyphs[name].draw(TransformPen(pen, (scale, 0, 0, -scale, cursor, baseline)))
-        cursor += glyphs[name].width * scale
-        if i < len(text) - 1:
-            cursor += tracking_em * size
-    return pen.getCommands(), cursor - x
+def to_alpha(img: Image.Image) -> Image.Image:
+    """Turns the navy background transparent and recovers each pixel's own colour."""
+    rgb = img.convert("RGB")
+    out = Image.new("RGBA", rgb.size)
+    src, dst = rgb.load(), out.load()
+    w, h = rgb.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b = src[x, y]
+            d = max(abs(r - BG[0]), abs(g - BG[1]), abs(b - BG[2]))
+            a = 0.0 if d <= LOW else 1.0 if d >= HIGH else (d - LOW) / (HIGH - LOW)
+            if a == 0:
+                dst[x, y] = (0, 0, 0, 0)
+                continue
+            # un-premultiply: pixel = a * colour + (1 - a) * BG
+            c = [min(255, max(0, round((v - (1 - a) * bv) / a))) for v, bv in zip((r, g, b), BG)]
+            dst[x, y] = (*c, round(a * 255))
+    return out
 
 
-def lockup(name_fill: str, two_fill: str, tag_fill: str) -> str:
-    semi = TTFont(HERE / "Geist-SemiBold.ttf")
-    medium = TTFont(HERE / "Geist-Medium.ttf")
-    x0 = 82  # mark is 64 wide, then an 18-unit gap
-    nigeria, w1 = text_path(semi, "NIGERIA ", 26, x0, 31, 0.16)
-    two, w2 = text_path(semi, "2.0", 26, x0 + w1 + 0.16 * 26, 31, 0.16)
-    tag, w3 = text_path(medium, "LEADERSHIP BUSINESS SUMMIT 2026", 10.4, x0 + 1, 52, 0.18)
-    width = round(x0 + max(w1 + 0.16 * 26 + w2, w3 + 1) + 2)
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} 64" width="{width * 4}" height="256" role="img" aria-label="Nigeria 2.0 Leadership Business Summit 2026">
-{MARK}
-<path fill="{name_fill}" d="{nigeria}"/>
-<path fill="{two_fill}" d="{two}"/>
-<path fill="{tag_fill}" d="{tag}"/>
-</svg>
-"""
+def navy_lettering(img: Image.Image) -> Image.Image:
+    """Recolours the white lettering line to navy, keeping its anti-aliased alpha."""
+    out = img.copy()
+    px = out.load()
+    top, bottom = (r - LOGO_BOX[1] for r in WHITE_LINE_ROWS)
+    for y in range(max(0, top), min(out.height, bottom)):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if a and min(r, g, b) > 150 and max(r, g, b) - min(r, g, b) < 40:  # white or light grey
+                px[x, y] = (*NAVY_TILE, a)
+    return out
+
+
+def pad(img: Image.Image, frac: float, square: bool = False) -> Image.Image:
+    w, h = img.size
+    m = round(max(w, h) * frac)
+    W, H = (max(w, h) + 2 * m,) * 2 if square else (w + 2 * m, h + 2 * m)
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    canvas.paste(img, ((W - w) // 2, (H - h) // 2), img)
+    return canvas
+
+
+def save(img: Image.Image, stem: str) -> None:
+    img.save(OUT / f"{stem}.png", optimize=True)
+    img.save(OUT / f"{stem}.webp", quality=90, method=6)
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    files = {
-        "nlbs-mark.svg": f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="512" height="512" role="img" aria-label="Nigeria 2.0">\n{MARK}\n</svg>\n',
-        # For navy or photo backgrounds (the site header and footer use this look).
-        "nlbs-logo-dark.svg": lockup("#FFFFFF", GOLD, MIST),
-        # For white or ivory backgrounds (letters, slides, partner pages).
-        "nlbs-logo-light.svg": lockup(NAVY_950, GOLD_DEEP, NAVY_700),
-    }
-    for name, svg in files.items():
-        (OUT / name).write_text(svg)
-        print(f"public/brand/{name}  {len(svg) / 1024:.1f} KB")
+    src = Image.open(SRC)
+    if src.size != (1120, 912):
+        raise SystemExit(f"{SRC.name} is {src.size}; re-measure LOGO_BOX and ICON_BOX")
+
+    cut = to_alpha(src.crop(LOGO_BOX))
+    save(pad(cut, 0.04), "nlbs-logo")
+    save(pad(navy_lettering(cut), 0.04), "nlbs-logo-light")
+    src.convert("RGB").save(OUT / "nlbs-logo-navy.png", optimize=True)  # PNG: public/ holds no JPEGs (content-integrity test)
+
+    icon = pad(to_alpha(src.crop(ICON_BOX)), 0.06, square=True)
+    icon = icon.resize((512, 512), Image.Resampling.LANCZOS)
+    save(icon, "nlbs-icon")
+
+    tile = Image.new("RGBA", (512, 512), (*NAVY_TILE, 255))
+    inner = icon.resize((400, 400), Image.Resampling.LANCZOS)
+    tile.paste(inner, (56, 52), inner)
+    tile.convert("RGB").save(OUT / "nlbs-icon-tile.png", optimize=True)
+
+    for p in sorted(OUT.glob("nlbs-*")):
+        print(f"public/brand/{p.name:22} {p.stat().st_size / 1024:6.1f} KB")
 
 
 if __name__ == "__main__":

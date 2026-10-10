@@ -16,7 +16,7 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       { src: "/icon", sizes: "64x64", type: "image/png" },
       { src: "/apple-icon", sizes: "180x180", type: "image/png" },
-      { src: "/brand/nlbs-mark.svg", sizes: "any", type: "image/svg+xml" },
+      { src: "/brand/nlbs-icon-tile.png", sizes: "512x512", type: "image/png" },
     ],
   };
 }

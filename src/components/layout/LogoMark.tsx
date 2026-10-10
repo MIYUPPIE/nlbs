@@ -1,15 +1,17 @@
-import { LOGO_MARK } from "@/lib/logo";
+import { LOGO } from "@/lib/logo";
 import { cn } from "@/lib/utils";
 
-/** The Nigeria 2.0 mark (see src/lib/logo.ts). Decorative: the link around it carries the name. */
+/** The NLBS rising-bars icon (see src/lib/logo.ts). Decorative: the link around it carries the name. */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 64 64"
+    // eslint-disable-next-line @next/next/no-img-element -- static export, already sized
+    <img
+      src={LOGO.icon}
+      alt=""
       aria-hidden="true"
-      focusable="false"
+      width={512}
+      height={512}
       className={cn("shrink-0", className)}
-      dangerouslySetInnerHTML={{ __html: LOGO_MARK }}
     />
   );
 }

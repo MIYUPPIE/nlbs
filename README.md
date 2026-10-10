@@ -142,18 +142,20 @@ Aceternity components (adapted, in `src/components/aceternity/`): Spotlight, Bac
 
 ## Logo
 
-The Nigeria 2.0 logo is original work made for this site (Oct 2026), owned outright: an "N" whose two ivory pillars
-(government and business) are joined by a gold diagonal (dialogue to deals), with a gold point above (the "2.0"),
-on a navy tile with a gold hairline.
+The official NLBS logo is the convener's file `NLBS/logo.jpg` (rising bars over "Nigeria Leadership Business Summit 2026"),
+copied to `scripts/brand/nlbs-logo-source.jpg`. `python3 scripts/brand/build-logo.py` removes its navy background and writes
+`public/brand/`:
 
-- **On the site:** `src/lib/logo.ts` holds the shapes. `LogoMark` draws them in the header and footer; `icon.tsx`,
-  `apple-icon.tsx` and `opengraph-image.tsx` render the favicon, home-screen icon and share image from the same source.
-- **For print, press and partners:** `public/brand/nlbs-logo-dark.svg` (navy or photo backgrounds),
-  `nlbs-logo-light.svg` (white or ivory), `nlbs-mark.svg` (the tile alone). Lettering is outlined Geist (SIL OFL),
-  so the files need no fonts. Live at `https://www.nlbs.com.ng/brand/<file>`.
-- **To change it:** edit `MARK` in `scripts/brand/build-logo.py` and `src/lib/logo.ts` together, then run
-  `python3 scripts/brand/build-logo.py`. `tests/brand.test.ts` fails if they drift, if lettering stops being outlined,
-  if the mark stops reading at 16px, or if the watermarked Design.com preview (`logo.jpeg`) is ever used.
+| File                        | Use                                                                     |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `nlbs-logo.webp/.png`       | full logo, white lettering, for navy or photo backgrounds (site footer) |
+| `nlbs-logo-light.webp/.png` | full logo, navy lettering, for white or ivory backgrounds               |
+| `nlbs-logo-navy.png`        | the logo on its own navy, as supplied                                   |
+| `nlbs-icon.webp/.png`       | the bars alone (header)                                                 |
+| `nlbs-icon-tile.png`        | the bars on a navy tile (favicon, app icon, share image)                |
+
+Paths live in `src/lib/logo.ts`. `tests/brand.test.ts` checks the files, their transparency and where they are used, and fails
+if the watermarked preview the convener first sent (`logo.jpeg`) is ever referenced.
 
 ## Architecture
 

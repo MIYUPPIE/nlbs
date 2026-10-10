@@ -1,19 +1,19 @@
 /**
- * The Nigeria 2.0 logo is our own (src/lib/logo.ts, Oct 2026). Guards: one
- * geometry everywhere (site, icons, public/brand files, generator script),
- * logo files use outlined lettering (no font needed to view them), the mark
- * stays legible at favicon size, and the watermarked Design.com preview the
- * convener once sent (NLBS/logo.jpeg) is never used.
+ * The site uses the convener's official NLBS logo (scripts/brand/
+ * nlbs-logo-source.jpg, a copy of NLBS/logo.jpg). Guards: every asset in
+ * src/lib/logo.ts exists at its recorded size with a real transparent
+ * background, the header/footer and icons use it, and the watermarked
+ * Design.com preview (NLBS/logo.jpeg) is never published or referenced.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import { LOGO_GLYPH, LOGO_MARK, LOGO_TILE } from "@/lib/logo";
+import { LOGO } from "@/lib/logo";
 
 const ROOT = join(__dirname, "..");
 const read = (p: string) => readFileSync(join(ROOT, p), "utf8");
-const squash = (s: string) => s.replace(/>\s+</g, "><").trim();
+const pub = (url: string) => join(ROOT, "public", url);
 
 const files = (dir: string): string[] =>
   readdirSync(join(ROOT, dir)).flatMap((n) => {
@@ -21,64 +21,81 @@ const files = (dir: string): string[] =>
     return statSync(join(ROOT, p)).isDirectory() ? files(p) : [p];
   });
 
-describe("Nigeria 2.0 logo", () => {
-  it("the mark is the tile plus the glyph, in the site colours", () => {
-    expect(LOGO_MARK).toBe(LOGO_TILE + LOGO_GLYPH);
-    const css = read("src/app/globals.css");
-    for (const hex of ["#071A33", "#D4AF37", "#F8F7F2"]) {
-      expect(LOGO_MARK).toContain(hex);
-      expect(css.toLowerCase()).toContain(hex.toLowerCase());
-    }
+/** Share of fully transparent pixels and of opaque pixels. */
+async function alphaProfile(url: string) {
+  const { data, info } = await sharp(pub(url)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let clear = 0;
+  let solid = 0;
+  for (let i = 3; i < data.length; i += info.channels) {
+    if (data[i] === 0) clear++;
+    if (data[i] === 255) solid++;
+  }
+  const n = data.length / info.channels;
+  return { clear: clear / n, solid: solid / n, width: info.width, height: info.height };
+}
+
+describe("NLBS logo", () => {
+  it("every logo asset exists and the source is the convener's file", () => {
+    for (const url of [LOGO.icon, LOGO.tile, LOGO.full, LOGO.fullLight])
+      expect(existsSync(pub(url)), url).toBe(true);
+    expect(existsSync(join(ROOT, "scripts/brand/nlbs-logo-source.jpg"))).toBe(true);
+    expect(existsSync(pub("/brand/nlbs-logo-navy.png"))).toBe(true);
   });
 
-  it("public/brand files and the generator script draw exactly the same mark", () => {
-    for (const f of ["nlbs-mark.svg", "nlbs-logo-dark.svg", "nlbs-logo-light.svg"]) {
-      expect(squash(read(`public/brand/${f}`)), f).toContain(LOGO_MARK);
+  it("cut-outs have a real transparent background and the recorded size", async () => {
+    for (const url of [LOGO.icon, LOGO.full, LOGO.fullLight]) {
+      const a = await alphaProfile(url);
+      expect(a.clear, `${url} background`).toBeGreaterThan(0.45);
+      expect(a.solid, `${url} artwork`).toBeGreaterThan(0.05);
     }
-    const py = read("scripts/brand/build-logo.py");
-    const mark = py.match(/^MARK = f"""([\s\S]*?)"""/m)?.[1] ?? "";
-    const filled = mark
-      .replace(/\{NAVY_950\}/g, "#071A33")
-      .replace(/\{GOLD\}/g, "#D4AF37")
-      .replace(/\{IVORY\}/g, "#F8F7F2");
-    expect(squash(filled)).toBe(LOGO_MARK);
+    const full = await sharp(pub(LOGO.full)).metadata();
+    expect({ width: full.width, height: full.height }).toEqual(LOGO.fullSize);
+    const icon = await sharp(pub(LOGO.icon)).metadata();
+    expect([icon.width, icon.height]).toEqual([512, 512]);
   });
 
-  it("logo files are self-contained vectors: outlined lettering, no fonts, images or scripts", () => {
-    for (const f of ["nlbs-mark.svg", "nlbs-logo-dark.svg", "nlbs-logo-light.svg"]) {
-      const svg = read(`public/brand/${f}`);
-      expect(svg, f).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 \d+ 64"/);
-      expect(svg, f).toMatch(/aria-label="Nigeria 2\.0/);
-      expect(svg, f).not.toMatch(/<(text|image|script|style|foreignObject)\b|font-family|href=/);
-    }
-    // the lockups carry the lettering as paths: name, "2.0" and the event line
-    expect(read("public/brand/nlbs-logo-dark.svg").match(/<path /g)).toHaveLength(3);
+  it("the light variant has navy lettering where the dark one has white", async () => {
+    // Middle of the "NIGERIA LEADERSHIP" line in the 1083x659 files.
+    const sample = async (url: string) => {
+      const { data, info } = await sharp(pub(url))
+        .extract({ left: 0, top: 455, width: 1083, height: 70 })
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let light = 0;
+      let dark = 0;
+      for (let i = 0; i < data.length; i += info.channels) {
+        if (data[i + 3] < 200) continue;
+        const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        if (lum > 200) light++;
+        if (lum < 60) dark++;
+      }
+      return { light, dark };
+    };
+    const dark = await sample(LOGO.full);
+    const light = await sample(LOGO.fullLight);
+    expect(dark.light).toBeGreaterThan(1000);
+    expect(light.dark).toBeGreaterThan(1000);
+    expect(light.light).toBeLessThan(dark.light / 10);
   });
 
-  it("stays legible at favicon size: gold and ivory both show at 16px", async () => {
-    const svg = Buffer.from(read("public/brand/nlbs-mark.svg"));
-    const { data, info } = await sharp(svg, { density: 72 })
-      .resize(16, 16)
+  it("the tile is opaque navy, so the favicon has no ragged edge", async () => {
+    const a = await alphaProfile(LOGO.tile);
+    expect(a.solid).toBe(1);
+    const { data } = await sharp(pub(LOGO.tile))
+      .extract({ left: 0, top: 0, width: 1, height: 1 })
       .raw()
       .toBuffer({ resolveWithObject: true });
-    let gold = 0;
-    let ivory = 0;
-    for (let i = 0; i < data.length; i += info.channels) {
-      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
-      if (r > 170 && g > 140 && b < 120) gold++;
-      if (r > 200 && g > 200 && b > 190) ivory++;
-    }
-    expect(gold).toBeGreaterThanOrEqual(6);
-    expect(ivory).toBeGreaterThanOrEqual(6);
+    expect([...data.subarray(0, 3)]).toEqual([7, 26, 51]);
   });
 
-  it("the header/footer wordmark draws the mark, not the old 2.0 text badge", () => {
-    const wordmark = read("src/components/layout/Wordmark.tsx");
-    expect(wordmark).toContain("<LogoMark");
-    expect(wordmark).not.toContain("border-gold/50 bg-navy-900 font-display"); // the old badge
-    for (const f of ["src/app/icon.tsx", "src/app/apple-icon.tsx", "src/app/opengraph-image.tsx"]) {
-      expect(read(f), f).toContain("logoDataUri(");
-    }
+  it("header/footer, favicon, app icon, share image and manifest use the logo", () => {
+    expect(read("src/components/layout/Wordmark.tsx")).toContain("<LogoMark");
+    expect(read("src/components/layout/LogoMark.tsx")).toContain("LOGO.icon");
+    expect(read("src/components/layout/Footer.tsx")).toContain("LOGO.full");
+    expect(read("src/app/icon.tsx")).toContain('brandDataUri("nlbs-icon-tile.png")');
+    expect(read("src/app/apple-icon.tsx")).toContain('brandDataUri("nlbs-icon-tile.png")');
+    expect(read("src/app/opengraph-image.tsx")).toContain('brandDataUri("nlbs-icon.png")');
+    expect(read("src/app/manifest.ts")).toContain("/brand/nlbs-icon-tile.png");
   });
 
   it("the Design.com preview is never published or referenced", () => {
@@ -88,7 +105,7 @@ describe("Nigeria 2.0 logo", () => {
     )) {
       const text = read(f);
       expect(text, f).not.toMatch(/design\.com/i);
-      expect(text, f).not.toMatch(/logo\.jpe?g/i);
+      expect(text, f).not.toMatch(/logo\.jpeg/i);
     }
   });
 });
