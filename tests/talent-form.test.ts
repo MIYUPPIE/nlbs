@@ -23,6 +23,7 @@ export const validSkills = {
   state: "Lagos",
   ageBand: "18-24",
   referral: "University",
+  university: "unilag",
   referralPartner: "",
   track: "Skills",
   skillLevel: "Beginner - I am learning",

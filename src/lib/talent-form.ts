@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { startOfDayInZone, zonedTimeToUtc } from "@/lib/countdown";
+import { universities, universityBySlug, UNIVERSITY_OTHER } from "@/data/universities";
 
 /**
  * Nigeria 2.0 Talent Fund 2026 application.
@@ -122,7 +123,7 @@ export function normalizeNigerianMobile(input: string): string | null {
 }
 
 /** Base64 of "%PDF-" starts with "JVBERi0". */
-const looksLikePdf = (base64: string) => base64.startsWith("JVBERi0");
+export const looksLikePdf = (base64: string) => base64.startsWith("JVBERi0");
 
 export const base64Bytes = (b64: string) => Math.floor((b64.replace(/=+$/, "").length * 3) / 4);
 
@@ -170,6 +171,9 @@ export const talentApplicationSchema = z
     ageBand: z.enum(AGE_BANDS, { error: "Select your age." }),
     referral: z.enum(REFERRALS, { error: "Tell us who referred you." }),
     referralPartner: opt,
+    // Referred by a university: its slug (src/data/universities.ts) or "other" plus its name.
+    university: opt,
+    universityOther: opt,
     // Section 2: track
     track: z.enum(TRACKS, { error: "Choose one track." }),
     // Section 3: filter questions
@@ -220,6 +224,13 @@ export function conditionalErrors(d: Record<string, unknown>): Record<string, st
   const has = (k: string) => typeof d[k] === "string" && (d[k] as string).trim() !== "";
   if (d.referral === "Platinum Partner" && !has("referralPartner"))
     out.referralPartner = "Which partner referred you?";
+  if (d.referral === "University") {
+    const u = typeof d.university === "string" ? d.university : "";
+    if (!universityBySlug(u) && u !== UNIVERSITY_OTHER) out.university = "Select your university.";
+    else if (u === UNIVERSITY_OTHER && !has("universityOther")) out.universityOther = "Which university?";
+    else if (typeof d.universityOther === "string" && d.universityOther.length > 120)
+      out.universityOther = "Keep the name to 120 characters or fewer.";
+  }
   if (d.priorSupport === "Yes" && !has("priorSupportFrom"))
     out.priorSupportFrom = "Who provided the grant or training?";
   if (d.track === "Skills" && !(SKILLS as readonly unknown[]).includes(d.skill))
@@ -263,6 +274,9 @@ export function stripOtherTracks(d: TalentApplication): TalentApplication {
     cacStatus: d.track === "Capital" ? d.cacStatus : "",
     monthlyRevenue: d.track === "Capital" ? d.monthlyRevenue : "",
     referralPartner: d.referral === "Platinum Partner" ? d.referralPartner : "",
+    university: d.referral === "University" ? d.university : "",
+    universityOther:
+      d.referral === "University" && d.university === UNIVERSITY_OTHER ? d.universityOther : "",
     priorSupportFrom: d.priorSupport === "Yes" ? d.priorSupportFrom : "",
   };
 }
@@ -350,3 +364,15 @@ export function applicationWindow(nowMs: number, override?: string): WindowStatu
   if (nowMs >= closes) return "closed";
   return "open";
 }
+
+/** University choices for the form: the invited list, then "Other". */
+export const UNIVERSITY_OPTIONS = [
+  ...universities.map((u) => ({ value: u.slug, label: u.name })),
+  { value: UNIVERSITY_OTHER, label: "Another university" },
+] as const;
+
+/** `?university=unilag` on /talentnigeria20 (the link a university shares): a known slug, or null. */
+export const universityFromQuery = (raw: string): string | null => {
+  const slug = raw.trim().toLowerCase();
+  return universityBySlug(slug) ? slug : null;
+};

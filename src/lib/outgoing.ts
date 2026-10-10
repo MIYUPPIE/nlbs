@@ -12,6 +12,7 @@ import {
 } from "@/lib/talent-form";
 import { submitToCentral, type CentralForm } from "@/lib/central";
 import { privacyRequestPayload, privacyRequestSchema } from "@/lib/privacy";
+import { universityFormSchema, universityPayload } from "@/lib/university-form";
 
 /**
  * What each form sends to the central backend. These are the steps the old
@@ -62,6 +63,11 @@ export const prepare: Record<CentralForm, (values: unknown) => Prepared> = {
   privacy(values) {
     const r = privacyRequestSchema.safeParse(values);
     return r.success ? { ok: true, fields: privacyRequestPayload(r.data) } : invalid();
+  },
+
+  university(values) {
+    const r = universityFormSchema.safeParse(values);
+    return r.success ? { ok: true, fields: universityPayload(r.data) } : invalid();
   },
 
   talent(values) {

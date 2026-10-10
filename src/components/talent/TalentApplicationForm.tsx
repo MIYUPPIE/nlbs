@@ -33,6 +33,8 @@ import {
   TRACK_DETAILS,
   TRACKS,
   YES_NO,
+  UNIVERSITY_OPTIONS,
+  universityFromQuery,
   type CvUpload,
 } from "@/lib/talent-form";
 import { PRIVACY_PATHS } from "@/lib/privacy";
@@ -53,6 +55,8 @@ const EMPTY: Values = {
   ageBand: "",
   referral: "",
   referralPartner: "",
+  university: "",
+  universityOther: "",
   track: "",
   skillLevel: "",
   problem: "",
@@ -75,7 +79,17 @@ const EMPTY: Values = {
 const STEPS = [
   {
     title: "Who are you?",
-    fields: ["fullName", "whatsapp", "email", "state", "ageBand", "referral", "referralPartner"],
+    fields: [
+      "fullName",
+      "whatsapp",
+      "email",
+      "state",
+      "ageBand",
+      "referral",
+      "referralPartner",
+      "university",
+      "universityOther",
+    ],
   },
   { title: "Which track?", fields: ["track"] },
   {
@@ -237,7 +251,8 @@ export function TalentApplicationForm() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Restore a saved draft (text answers only; the CV is never stored).
+  // Restore a saved draft (text answers only; the CV is never stored), then
+  // apply a university's link (?university=unilag) on top of it.
   useEffect(() => {
     let draft: Values | null = null;
     try {
@@ -246,11 +261,14 @@ export function TalentApplicationForm() {
     } catch {
       /* storage unavailable */
     }
+    const fromLink = universityFromQuery(new URLSearchParams(window.location.search).get("university") ?? "");
     const frame = requestAnimationFrame(() => {
       if (draft) {
         setValues((v) => ({ ...v, ...draft, cv: null, website: "" }));
         setRestored(true);
       }
+      if (fromLink)
+        setValues((v) => ({ ...v, referral: "University", university: fromLink, universityOther: "" }));
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -537,6 +555,28 @@ export function TalentApplicationForm() {
                 required
                 value={text("referralPartner")}
                 error={errors.referralPartner}
+                {...field}
+              />
+            )}
+            {text("referral") === "University" && (
+              <SelectField
+                name="university"
+                label="Which university?"
+                required
+                options={UNIVERSITY_OPTIONS}
+                placeholder="Select your university"
+                value={text("university")}
+                error={errors.university}
+                {...field}
+              />
+            )}
+            {text("referral") === "University" && text("university") === "other" && (
+              <TextField
+                name="universityOther"
+                label="Name of your university"
+                required
+                value={text("universityOther")}
+                error={errors.universityOther}
                 {...field}
               />
             )}

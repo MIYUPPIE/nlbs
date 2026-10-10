@@ -9,6 +9,7 @@ async function fillStep1(page: Page, overrides: { age?: string } = {}) {
   await page.getByLabel(/4\. State of Residence/).selectOption("Lagos");
   await page.getByText(overrides.age ?? "18-24", { exact: true }).click();
   await page.getByLabel(/6\. Who referred you/).selectOption("University");
+  await page.getByLabel(/Which university/).selectOption("unilag");
 }
 
 async function fillCommon(page: Page) {

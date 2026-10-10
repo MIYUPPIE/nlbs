@@ -15,7 +15,7 @@ import { PRIVACY_VERSION } from "@/lib/privacy";
  * open yet rather than pretending to succeed.
  */
 
-export type CentralForm = "registration" | "enquiry" | "talent" | "sponsor" | "privacy";
+export type CentralForm = "registration" | "enquiry" | "talent" | "sponsor" | "university" | "privacy";
 
 export type CentralConfig = { apiUrl: string; siteKey: string };
 
@@ -36,6 +36,7 @@ export const NOT_OPEN: Record<CentralForm, string> = {
   enquiry: "The contact form is not open yet. Please email us instead.",
   talent: "Online applications are not open yet. Please check back soon.",
   sponsor: "The partner form is not connected yet. Please contact the convener's office.",
+  university: "The confirmation form is not connected yet. Please email info@nlbs.com.ng instead.",
   privacy: "The privacy request form is not connected yet. Please email our Data Protection Officer instead.",
 };
 
@@ -95,4 +96,44 @@ export async function submitToCentral(
     return { ok: false, error: data.error };
   }
   return { ok: false, error: messageFor(res.status, form) };
+}
+
+export type UniversityStat = {
+  slug: string;
+  status: "invited" | "received" | "confirmed";
+  applications: number;
+};
+
+/**
+ * Each invited university's status and how many Talent Fund applications name
+ * it (GET /api/v1/talent/universities, aggregates only). Null when the backend
+ * is unreachable or not configured: the pages then say so instead of showing
+ * a number.
+ */
+export async function fetchUniversityStats(
+  config: CentralConfig | null = centralConfig(),
+  fetchImpl: typeof fetch = fetch,
+): Promise<Map<string, UniversityStat> | null> {
+  if (!config) return null;
+  try {
+    const res = await fetchImpl(`${config.apiUrl}/api/v1/talent/universities`, {
+      headers: { Accept: "application/json", "X-Site-Key": config.siteKey },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { ok?: unknown; universities?: unknown };
+    if (data.ok !== true || !Array.isArray(data.universities)) return null;
+    const out = new Map<string, UniversityStat>();
+    for (const u of data.universities as UniversityStat[]) {
+      if (
+        typeof u?.slug === "string" &&
+        ["invited", "received", "confirmed"].includes(u.status) &&
+        Number.isInteger(u.applications) &&
+        u.applications >= 0
+      )
+        out.set(u.slug, { slug: u.slug, status: u.status, applications: u.applications });
+    }
+    return out;
+  } catch {
+    return null;
+  }
 }

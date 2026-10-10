@@ -13,6 +13,30 @@ const PORT = Number(process.env.FAKE_CENTRAL_PORT ?? 3299);
 const KEY = process.env.FAKE_CENTRAL_KEY ?? "pk_e2e_nlbs";
 const ORIGINS = (process.env.FAKE_CENTRAL_ORIGINS ?? "http://localhost:3200").split(",");
 const last = new Map();
+// Mirrors src/data/universities.ts (tests/universities.test.ts pins the same list).
+const UNIVERSITY_SLUGS = [
+  "unilag",
+  "ui",
+  "covenant",
+  "oau",
+  "abu",
+  "unn",
+  "unilorin",
+  "futa",
+  "uniben",
+  "uniport",
+  "lasu",
+  "pau",
+  "babcock",
+  "unijos",
+  "futminna",
+  "buk",
+  "landmark",
+  "unical",
+  "funaab",
+  "nile",
+  "baze",
+];
 function remember(body) {
   last.set(body.form, body);
   if (typeof body.email === "string") last.set(`${body.form}|${body.email.trim().toLowerCase()}`, body);
@@ -46,6 +70,38 @@ createServer((req, res) => {
     last.clear();
     return send(res, 200, { ok: true });
   }
+  // Talent Fund university numbers (GET, aggregates only). Fixed values the e2e
+  // asserts: UNILAG confirmed with 7 applications, OAU received with 3, the rest invited.
+  if (url.pathname === "/api/v1/talent/universities") {
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : "",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Accept, X-Site-Key",
+        "Access-Control-Max-Age": "600",
+      });
+      return res.end();
+    }
+    if (req.headers["x-site-key"] !== KEY)
+      return send(res, 401, { ok: false, error: "Missing or invalid site key." }, origin);
+    if (!ORIGINS.includes(origin))
+      return send(res, 403, { ok: false, error: "This origin is not allowed for this site." }, origin);
+    const fixed = { unilag: ["confirmed", 7], oau: ["received", 3] };
+    return send(
+      res,
+      200,
+      {
+        ok: true,
+        updatedAt: new Date().toISOString(),
+        universities: UNIVERSITY_SLUGS.map((slug) => ({
+          slug,
+          status: fixed[slug]?.[0] ?? "invited",
+          applications: fixed[slug]?.[1] ?? 0,
+        })),
+      },
+      origin,
+    );
+  }
   if (url.pathname !== "/api/v1/submissions")
     return send(res, 404, { ok: false, error: "Not found." }, origin);
 
@@ -74,7 +130,7 @@ createServer((req, res) => {
     }
     if (typeof body.website === "string" && body.website !== "")
       return send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);
-    if (!["registration", "enquiry", "talent", "sponsor", "privacy"].includes(body.form))
+    if (!["registration", "enquiry", "talent", "sponsor", "university", "privacy"].includes(body.form))
       return send(res, 404, { ok: false, error: "Unknown form." }, origin);
     remember(body);
     send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);

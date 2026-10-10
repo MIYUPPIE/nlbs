@@ -140,6 +140,24 @@ Tokens are in `src/app/globals.css` (`@theme`). Gold (`#D4AF37`) is for dark sur
 
 Aceternity components (adapted, in `src/components/aceternity/`): Spotlight, Background Beams (18 beams, deterministic timings, desktop only, static under reduced motion), Moving Border (partnership + final CTA), Bento Grid (technology, exhibition), Card Hover Effect (audience). Scroll reveal uses one IntersectionObserver; content is visible without JS, under reduced motion and in print.
 
+## Talent Fund universities (unlisted)
+
+`/talentnigeria20/universities/` and one page per invited university (`/talentnigeria20/universities/<slug>/`, 21 from the
+convener's concept note, `src/data/universities.ts`). Like `/sponsors`: not linked, not in the sitemap, `noindex`; send the
+link to each university.
+
+- **Student link** `/talentnigeria20/?university=<slug>` preselects "University" and the university on the application form.
+  Every student applies and consents for themselves.
+- **Live numbers** come from `GET /api/v1/talent/universities` (status and application count, aggregates only). If the
+  backend cannot be reached the page says so; it never shows a number it did not get.
+- **Confirmation form** (form `university`): the Career Services contact and an optional letterhead PDF. Staff check it in
+  the dashboard (_NLBS > Universities_) and mark it Done; the page then shows "Confirmed".
+- The concept note's funders, auditors and verification partners are not confirmed, so they are not published;
+  `tests/content-integrity.test.ts` keeps those names out of `src/`.
+
+Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list must match central-backend
+`App\Talent\Universities`.
+
 ## Logo
 
 The official NLBS logo is the convener's file `NLBS/logo.jpg` (rising bars over "Nigeria Leadership Business Summit 2026"),

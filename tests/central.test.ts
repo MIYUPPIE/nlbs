@@ -220,6 +220,23 @@ describe("contract with the central backend", () => {
   it.skipIf(!hasBackend)("talent sends exactly the fields the backend fixture has", () => {
     expect(sentKeys("talent", validSkills)).toEqual(fixtureKeys("nlbs-talent-jobs"));
   });
+
+  it.skipIf(!hasBackend)("university confirmation sends exactly the fields the backend fixture has", () => {
+    expect(
+      sentKeys("university", {
+        university: "unilag",
+        focalName: "Dr. Folake Adeyemi",
+        focalTitle: "Director, Career Services",
+        email: "careers@unilag.example",
+        phone: "+2348031112222",
+        expectedNominees: "100",
+        letterhead: { name: "u.pdf", type: "application/pdf", size: 15, data: "JVBERi0xLjQKJSVFT0YK" },
+        message: "",
+        consent: true,
+        website: "",
+      }),
+    ).toEqual(fixtureKeys("nlbs-university"));
+  });
 });
 
 describe("static site guarantees", () => {

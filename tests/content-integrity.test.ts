@@ -115,6 +115,16 @@ describe("no fabricated content", () => {
     "Honeywell",
     "talentfund2026",
     "talentfundnigeria20",
+    // University concept note (Oct 2026): funders, auditors and verification
+    // partners not confirmed by the convener, so never published.
+    "World Bank",
+    "UNDP",
+    "Big 4",
+    "NNPC",
+    "Transcorp",
+    "KoboToolbox",
+    "AccessPay",
+    "BVN",
   ])("source does not mention %s", (term) => {
     expect(sourceText.includes(term)).toBe(false);
   });
