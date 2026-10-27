@@ -1,4 +1,7 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { talentApplication } from "@/data/talent-application";
 import {
   applicationWindow,
   band,
@@ -7,10 +10,13 @@ import {
   eligibility,
   NIGERIAN_STATES,
   normalizeNigerianMobile,
+  normalizeNyscCallUp,
+  normalizeNyscStateCode,
   screen,
   stripOtherTracks,
   talentApplicationSchema,
   type TalentApplication,
+  WINDOW,
 } from "@/lib/talent-form";
 import { prepare } from "@/lib/outgoing";
 
@@ -239,6 +245,75 @@ describe("screen (PDF scoring rubric)", () => {
   });
 });
 
+describe("NYSC referral", () => {
+  const nysc = { ...validSkills, referral: "NYSC", university: "" };
+
+  it.each([
+    ["LA/24A/1234", "LA/24A/1234"],
+    [" la/24a/1234 ", "LA/24A/1234"],
+    ["FC / 23B / 0123", "FC/23B/0123"],
+    ["OY/25A2/56789", "OY/25A2/56789"],
+  ])("state code %j → %j", (input, out) => expect(normalizeNyscStateCode(input)).toBe(out));
+
+  it.each(["LA24A1234", "LAG/24A/1234", "LA/2024/1234", "LA/24A/", "1234", "LA/24A/1234567"])(
+    "rejects state code %j",
+    (input) => expect(normalizeNyscStateCode(input)).toBeNull(),
+  );
+
+  it.each([
+    ["NYSC/UNILAG/2024/123456", "NYSC/UNILAG/2024/123456"],
+    ["nysc/futa/2023/98765", "NYSC/FUTA/2023/98765"],
+    ["NYSC/ABU-ZARIA/2025/1", "NYSC/ABU-ZARIA/2025/1"],
+  ])("call-up number %j → %j", (input, out) => expect(normalizeNyscCallUp(input)).toBe(out));
+
+  it.each(["UNILAG/2024/123456", "NYSC/UNILAG/24/123456", "NYSC//2024/1", "LA/24A/1234"])(
+    "rejects call-up number %j",
+    (input) => expect(normalizeNyscCallUp(input)).toBeNull(),
+  );
+
+  it("requires both codes when NYSC referred the applicant", () => {
+    const e = errs(nysc);
+    expect(e.nyscCallUpNumber).toMatch(/call-up number/);
+    expect(e.nyscStateCode).toMatch(/state code/);
+  });
+
+  it("explains the expected format when a code is malformed", () => {
+    const e = errs({ ...nysc, nyscCallUpNumber: "12345", nyscStateCode: "Lagos" });
+    expect(e.nyscCallUpNumber).toMatch(/NYSC\/UNILAG\/2024\/123456/);
+    expect(e.nyscStateCode).toMatch(/LA\/24A\/1234/);
+  });
+
+  it("accepts valid codes", () => {
+    expect(
+      errs({ ...nysc, nyscCallUpNumber: "NYSC/UNILAG/2024/123456", nyscStateCode: "LA/24A/1234" }),
+    ).toEqual({});
+  });
+
+  it("does not ask other referrals for NYSC codes", () => {
+    expect(errs(validSkills).nyscStateCode).toBeUndefined();
+  });
+
+  it("sends normalised codes for NYSC and blanks them for anyone else", () => {
+    const sent = prepare.talent({
+      ...nysc,
+      nyscCallUpNumber: "nysc/unilag/2024/123456",
+      nyscStateCode: "la/24a/1234",
+    });
+    expect(sent.ok).toBe(true);
+    if (!sent.ok) return;
+    expect(sent.fields.nyscCallUpNumber).toBe("NYSC/UNILAG/2024/123456");
+    expect(sent.fields.nyscStateCode).toBe("LA/24A/1234");
+
+    const other = prepare.talent({
+      ...validSkills,
+      nyscCallUpNumber: "NYSC/UNILAG/2024/1",
+      nyscStateCode: "LA/24A/1",
+    });
+    expect(other.ok && other.fields.nyscCallUpNumber).toBe("");
+    expect(other.ok && other.fields.nyscStateCode).toBe("");
+  });
+});
+
 describe("stripOtherTracks", () => {
   it("removes answers from tracks the applicant did not choose", () => {
     const d = parse({ ...validSkills, businessName: "leftover", portfolioUrl: "https://x.y" });
@@ -249,13 +324,43 @@ describe("stripOtherTracks", () => {
   });
 });
 
-describe("applicationWindow (1-30 Oct 2026, Lagos)", () => {
+describe("applicationWindow (1 Oct to 10 Nov 2026, Lagos; extended from 30 Oct)", () => {
   it.each([
     ["2026-09-30T22:59:59Z", "upcoming"],
     ["2026-09-30T23:00:00Z", "open"], // 00:00 WAT 1 Oct
-    ["2026-10-30T22:59:59Z", "open"], // 23:59:59 WAT 30 Oct
-    ["2026-10-30T23:00:00Z", "closed"],
+    ["2026-10-30T23:00:00Z", "open"], // 00:00 WAT 31 Oct: the old deadline no longer closes it
+    ["2026-11-10T22:59:59Z", "open"], // 23:59:59 WAT 10 Nov
+    ["2026-11-10T23:00:00Z", "closed"],
   ])("%s → %s", (iso, status) => expect(applicationWindow(Date.parse(iso))).toBe(status));
+
+  it("the published deadline is the window's last day", () => {
+    expect(talentApplication.deadlineIso).toBe(WINDOW.closesIso);
+    expect(talentApplication.deadline).toBe("10 November 2026");
+    expect(talentApplication.extension.body).toContain(
+      talentApplication.extension.previousDeadline.replace(" 2026", ""),
+    );
+    expect(talentApplication.extension.body).toContain(talentApplication.deadline);
+  });
+
+  const BACKEND_CONFIG = join(
+    __dirname,
+    "..",
+    "..",
+    "central-backend",
+    "services",
+    "api",
+    "config",
+    "central.php",
+  );
+  it.skipIf(!existsSync(BACKEND_CONFIG))("matches the window the central backend enforces", () => {
+    const php = readFileSync(BACKEND_CONFIG, "utf8");
+    const next = new Date(Date.parse(`${WINDOW.closesIso}T00:00:00Z`) + 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    expect(php).toContain(`'opens' => '${WINDOW.opensIso} 00:00:00'`);
+    expect(php).toContain(`'closes' => '${next} 00:00:00'`);
+    expect(php).toContain(`'deadline' => '${WINDOW.closesIso} 23:59:59'`);
+  });
 
   it("honours the override", () => {
     expect(applicationWindow(Date.parse("2026-01-01T00:00:00Z"), "open")).toBe("open");

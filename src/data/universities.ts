@@ -70,7 +70,7 @@ export const universityProgramme = {
   ],
   timeline: [
     { label: "Confirm participation", value: "By 15 October 2026" },
-    { label: "Student applications close", value: "30 October 2026" },
+    { label: "Student applications close", value: "10 November 2026 (extended)" },
     { label: "Screening", value: "November 2026" },
     { label: "Training starts", value: "January 2027" },
   ],

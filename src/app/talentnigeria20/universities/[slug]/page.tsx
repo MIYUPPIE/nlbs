@@ -51,7 +51,7 @@ export default async function UniversityPage({ params }: { params: Promise<{ slu
               </h2>
               <p className="mt-3 text-mist">
                 Students who apply through this link are counted for {u.short}. The form takes about 4 minutes
-                and closes on {t.deadline}.
+                and closes on {t.deadline} (extended from {t.extension.previousDeadline}).
               </p>
               <div className="mt-6">
                 <CopyLink url={link} label={`Talent Fund application link for ${u.short} students`} />

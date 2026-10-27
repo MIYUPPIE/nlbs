@@ -57,6 +57,8 @@ const EMPTY: Values = {
   referralPartner: "",
   university: "",
   universityOther: "",
+  nyscCallUpNumber: "",
+  nyscStateCode: "",
   track: "",
   skillLevel: "",
   problem: "",
@@ -89,6 +91,8 @@ const STEPS = [
       "referralPartner",
       "university",
       "universityOther",
+      "nyscCallUpNumber",
+      "nyscStateCode",
     ],
   },
   { title: "Which track?", fields: ["track"] },
@@ -579,6 +583,30 @@ export function TalentApplicationForm() {
                 error={errors.universityOther}
                 {...field}
               />
+            )}
+            {text("referral") === "NYSC" && (
+              <div className="grid gap-6 sm:grid-cols-2">
+                <TextField
+                  name="nyscCallUpNumber"
+                  label="NYSC call-up number"
+                  required
+                  autoComplete="off"
+                  hint="As printed on your call-up letter, e.g. NYSC/UNILAG/2024/123456."
+                  value={text("nyscCallUpNumber")}
+                  error={errors.nyscCallUpNumber}
+                  {...field}
+                />
+                <TextField
+                  name="nyscStateCode"
+                  label="NYSC state code"
+                  required
+                  autoComplete="off"
+                  hint="As shown on your NYSC ID card, e.g. LA/24A/1234."
+                  value={text("nyscStateCode")}
+                  error={errors.nyscStateCode}
+                  {...field}
+                />
+              </div>
             )}
           </>
         )}

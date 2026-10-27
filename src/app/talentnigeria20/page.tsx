@@ -1,6 +1,7 @@
 import { CircleCheck } from "lucide-react";
 import { talentApplication as t } from "@/data/talent-application";
 import { PageHero } from "@/components/layout/PageHero";
+import { DeadlineExtensionNotice } from "@/components/talent/DeadlineExtensionNotice";
 import { TalentWindowGate } from "@/components/talent/TalentWindowGate";
 import { Container } from "@/components/ui/Container";
 import { pageMetadata } from "@/lib/metadata";
@@ -8,7 +9,7 @@ import { pageMetadata } from "@/lib/metadata";
 export const metadata = pageMetadata({
   title: "Talent Fund 2026 Application",
   description:
-    "Apply to the Nigeria 2.0 Talent Fund 2026: skills, jobs and capital for 10,000 young Nigerians aged 18 to 35. No payment required. Deadline 30 October 2026.",
+    "Apply to the Nigeria 2.0 Talent Fund 2026: skills, jobs and capital for 10,000 young Nigerians aged 18 to 35. No payment required. Deadline extended to 10 November 2026.",
   path: "/talentnigeria20",
 });
 
@@ -26,7 +27,8 @@ export default function TalentApplicationPage() {
       >
         <Container>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-            <div className="min-w-0 lg:col-span-8">
+            <div className="min-w-0 space-y-6 lg:col-span-8">
+              <DeadlineExtensionNotice className="bg-white" />
               <TalentWindowGate />
             </div>
             <aside className="lg:col-span-4" aria-labelledby="apply-aside-title">

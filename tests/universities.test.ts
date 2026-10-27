@@ -97,7 +97,7 @@ describe("talent applicants referred by a university", () => {
       "Which university?",
     );
     expect(conditionalErrors({ referral: "University", university: "unilag" })).toEqual({});
-    expect(conditionalErrors({ referral: "NYSC" })).toEqual({});
+    expect(conditionalErrors({ referral: "NITDA" })).toEqual({});
   });
 
   it("only keeps university fields when a university referred them", () => {
@@ -108,6 +108,8 @@ describe("talent applicants referred by a university", () => {
       state: "Lagos",
       ageBand: "18-24",
       referral: "NYSC",
+      nyscCallUpNumber: "NYSC/UNILAG/2024/123456",
+      nyscStateCode: "LA/24A/1234",
       university: "unilag",
       universityOther: "x",
       track: "Skills",

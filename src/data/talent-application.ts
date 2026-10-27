@@ -5,15 +5,22 @@ import type { IconName } from "@/components/ui/Icon";
  * (tracks, requirements, deadline) and FAQ Q16-Q22, Q31. The form itself
  * lives at /talentnigeria20 (src/lib/talent-form.ts); its scoring is computed
  * server-side for reviewers and never shown to applicants. "From April
- * 2026" in the form contradicts the October deadline and is omitted.
+ * 2026" in the form contradicts the deadline and is omitted.
  */
 export const talentApplication = {
   heading: "Apply to the Nigeria 2.0 Talent Fund",
   lead: "We are selecting 10,000 young Nigerians for skills, jobs and capital. The application takes about 4 minutes and no payment is required.",
   portal: "/talentnigeria20",
   portalOpens: "1 October 2026",
-  deadline: "30 October 2026",
-  deadlineIso: "2026-10-30",
+  deadline: "10 November 2026",
+  deadlineIso: "2026-11-10",
+  /** Convener decision, 27 Oct 2026: the 30 October deadline moved to 10 November. */
+  extension: {
+    title: "Application deadline extended to 10 November 2026",
+    body: "In response to strong demand from our stakeholders, the Talent Fund application deadline has been extended from 30 October to 10 November 2026. The extension ensures that every eligible young Nigerian has a fair opportunity to apply. Applications submitted by 11:59 pm Lagos time on 10 November 2026 will be considered.",
+    previousDeadline: "30 October 2026",
+    announcedIso: "2026-10-27",
+  },
   eligibility: [
     "Nigerians aged 18 to 35, from all 36 states and the FCT",
     "Commit 5 hours per week for 12 weeks",

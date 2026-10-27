@@ -93,7 +93,7 @@ The site is a **static export** (`output: "export"`): plain files for cPanel `pu
 | `.env.production`     | `NEXT_PUBLIC_CENTRAL_API_URL` and `NEXT_PUBLIC_CENTRAL_SITE_KEY` (a `pk_` key, public by design: the backend accepts it only from `https://www.nlbs.com.ng` / `https://nlbs.com.ng`, rate-limited). Public values only; a test fails on any `sk_` key. |
 | `public/.htaccess`    | What a static export cannot do itself: HTTPS + `www` redirect, `/apply` and `/talent/apply` redirects, `noindex` on `/sponsors/`, caching, security headers, PNG type for `/icon` and `/opengraph-image`, the 404 page, no folder listings.            |
 
-The backend enforces the Talent Fund window (1 to 30 Oct 2026, Lagos) and validates everything again. The page checks the same window in the browser (`NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE=open|closed` forces it at build time).
+The backend enforces the Talent Fund window (1 Oct to 10 Nov 2026, Lagos; extended from 30 Oct at stakeholders' request, convener decision 27 Oct 2026) and validates everything again. `tests/talent-form.test.ts` fails if this window and the backend's `config/central.php` drift apart. The extension notice copy lives in `src/data/talent-application.ts` (`extension`) and renders on `/talentnigeria20`, `/talent` and the FAQ (Q31 override). The page checks the same window in the browser (`NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE=open|closed` forces it at build time).
 
 ### Deploy to cPanel
 
@@ -116,7 +116,7 @@ Sent to the central backend like the other forms; requests appear under _NLBS > 
 
 ## Talent Fund application
 
-`/talentnigeria20` (aliases `/talent/apply`, `/apply`) implements `youth_application_form_questions.pdf` as a three-step form: Who are you, Which track, and the 8 filter questions, with track-specific Q4 (Skills: skill; Jobs: PDF CV up to 2 MB + portfolio link; Capital: business name, CAC status, monthly revenue).
+`/talentnigeria20` (aliases `/talent/apply`, `/apply`) implements `youth_application_form_questions.pdf` as a three-step form: Who are you (NYSC referrals also give their NYSC call-up number and state code, validated and upper-cased), Which track, and the 8 filter questions, with track-specific Q4 (Skills: skill; Jobs: PDF CV up to 2 MB + portfolio link; Capital: business name, CAC status, monthly revenue).
 
 - **Auto-reject** (PDF rules): age 36+ or "No" to Q5 shows "Thank you, you are not eligible." and blocks submission; the API enforces the same.
 - **Window**: open 00:00 1 Oct to 23:59 30 Oct 2026, Lagos time, enforced on the page and API. `TALENT_APPLICATIONS_OVERRIDE=open|closed` to open early or extend.

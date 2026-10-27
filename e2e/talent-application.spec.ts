@@ -47,6 +47,37 @@ test.describe("talent fund application", () => {
     await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
   });
 
+  test("shows the deadline extension notice and the new deadline", async ({ page }) => {
+    const notice = page.getByTestId("deadline-extension");
+    await expect(notice).toContainText("Application deadline extended to 10 November 2026");
+    await expect(notice).toContainText("from 30 October to 10 November 2026");
+    await expect(page.getByRole("complementary", { name: "Key dates" })).toContainText("10 November 2026");
+  });
+
+  test("NYSC referral asks for the call-up number and state code before moving on", async ({ page }) => {
+    await fillStep1(page);
+    await expect(page.getByLabel(/NYSC call-up number/)).toHaveCount(0);
+    await page.getByLabel(/6\. Who referred you/).selectOption("NYSC");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText("Enter your NYSC call-up number.")).toBeVisible();
+    await expect(page.getByText("Enter your NYSC state code.")).toBeVisible();
+    await page.getByLabel(/NYSC call-up number/).fill("NYSC/UNILAG/2024/123456");
+    await page.getByLabel(/NYSC state code/).fill("Lagos");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(
+      page.getByText(/as shown on your NYSC ID card, e\.g\. LA\/24A\/1234/i).first(),
+    ).toBeVisible();
+    await page.getByLabel(/NYSC state code/).fill("la/24a/1234");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByRole("heading", { name: /Section 2/ })).toBeFocused();
+    await page.getByText("I want 12-week free training in tech").click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await fillCommon(page);
+    await page.getByLabel(/Which skill do you want/).selectOption("Data Analytics");
+    await page.getByRole("button", { name: "Submit application" }).click();
+    await expect(page.getByRole("heading", { name: "Application received" })).toBeVisible();
+  });
+
   test("regression: arriving at section 3 shows no errors before the applicant answers", async ({ page }) => {
     await fillStep1(page);
     await page.getByRole("button", { name: "Continue" }).click();

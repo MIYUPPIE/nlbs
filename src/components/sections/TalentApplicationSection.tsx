@@ -1,5 +1,6 @@
 import { CalendarClock, CircleCheck, MapPin } from "lucide-react";
 import { talentApplication as t } from "@/data/talent-application";
+import { DeadlineExtensionNotice } from "@/components/talent/DeadlineExtensionNotice";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Icon } from "@/components/ui/Icon";
@@ -81,6 +82,7 @@ export function TalentApplicationSection() {
                     </dd>
                   </div>
                 </dl>
+                <DeadlineExtensionNotice className="mt-3" compact />
                 <GoldButton href={t.portal} size="lg" className="mt-8">
                   Start your application
                 </GoldButton>

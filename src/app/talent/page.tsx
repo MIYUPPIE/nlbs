@@ -19,7 +19,7 @@ export const metadata = pageMetadata({
 const ways = [
   {
     title: "Young professionals",
-    body: "Apply for Skills, Jobs or Capital through the Talent Fund portal before 30 October 2026.",
+    body: "Apply for Skills, Jobs or Capital through the Talent Fund portal by 10 November 2026 (deadline extended).",
     href: "#apply",
     cta: "How to apply",
   },

@@ -8,11 +8,13 @@ import { universities, universityBySlug, UNIVERSITY_OTHER } from "@/data/univers
  *
  * Pure and shared by the client form and /api/talent-application.
  * Deviations from the PDF, each deliberate:
- *  - Q5 drops "from April 2026" (contradicts the October deadline).
+ *  - Q5 drops "from April 2026" (contradicts the application deadline).
  *  - Platinum partner names are not confirmed, so "Platinum Partner" takes a
  *    free-text company name.
  *  - Q3 video is a link: phone videos exceed what the site can accept
  *    without file storage. The PDF allows "video OR link".
+ *  - NYSC referrals give their call-up number and state code (convener
+ *    request, 27 Oct 2026) so staff can verify corps members.
  */
 
 export const NIGERIAN_STATES = [
@@ -122,6 +124,27 @@ export function normalizeNigerianMobile(input: string): string | null {
   return m ? `+234${m[1]}` : null;
 }
 
+/**
+ * NYSC identifiers, upper-cased with spaces removed, or null if malformed.
+ * State code: two-letter state, two-digit year + batch letter (and any stream
+ * suffix), serial: LA/24A/1234, FC/23B/0123, OY/25A2/56789.
+ * Call-up number: NYSC/<institution>/<year>/<serial>: NYSC/UNILAG/2024/123456.
+ */
+export const NYSC_STATE_CODE = /^[A-Z]{2}\/\d{2}[A-Z][A-Z0-9]{0,3}\/\d{1,6}$/;
+export const NYSC_CALL_UP = /^NYSC\/[A-Z0-9-]{2,20}\/\d{4}\/\d{1,8}$/;
+
+const compactUpper = (input: string) => input.replace(/\s+/g, "").toUpperCase();
+
+export function normalizeNyscStateCode(input: string): string | null {
+  const v = compactUpper(input);
+  return NYSC_STATE_CODE.test(v) ? v : null;
+}
+
+export function normalizeNyscCallUp(input: string): string | null {
+  const v = compactUpper(input);
+  return NYSC_CALL_UP.test(v) ? v : null;
+}
+
 /** Base64 of "%PDF-" starts with "JVBERi0". */
 export const looksLikePdf = (base64: string) => base64.startsWith("JVBERi0");
 
@@ -174,6 +197,9 @@ export const talentApplicationSchema = z
     // Referred by a university: its slug (src/data/universities.ts) or "other" plus its name.
     university: opt,
     universityOther: opt,
+    // Referred by NYSC: the corps member's call-up number and state code.
+    nyscCallUpNumber: opt,
+    nyscStateCode: opt,
     // Section 2: track
     track: z.enum(TRACKS, { error: "Choose one track." }),
     // Section 3: filter questions
@@ -231,6 +257,14 @@ export function conditionalErrors(d: Record<string, unknown>): Record<string, st
     else if (typeof d.universityOther === "string" && d.universityOther.length > 120)
       out.universityOther = "Keep the name to 120 characters or fewer.";
   }
+  if (d.referral === "NYSC") {
+    if (!has("nyscCallUpNumber")) out.nyscCallUpNumber = "Enter your NYSC call-up number.";
+    else if (normalizeNyscCallUp(d.nyscCallUpNumber as string) === null)
+      out.nyscCallUpNumber = "Enter it as printed on your call-up letter, e.g. NYSC/UNILAG/2024/123456.";
+    if (!has("nyscStateCode")) out.nyscStateCode = "Enter your NYSC state code.";
+    else if (normalizeNyscStateCode(d.nyscStateCode as string) === null)
+      out.nyscStateCode = "Enter it as shown on your NYSC ID card, e.g. LA/24A/1234.";
+  }
   if (d.priorSupport === "Yes" && !has("priorSupportFrom"))
     out.priorSupportFrom = "Who provided the grant or training?";
   if (d.track === "Skills" && !(SKILLS as readonly unknown[]).includes(d.skill))
@@ -263,8 +297,9 @@ export function eligibility(
   return { eligible: true, reason: null };
 }
 
-/** Fields that belong to a track other than the chosen one are cleared. */
+/** Fields that belong to a track or referral other than the chosen one are cleared; NYSC codes are normalised. */
 export function stripOtherTracks(d: TalentApplication): TalentApplication {
+  const nysc = d.referral === "NYSC";
   return {
     ...d,
     skill: d.track === "Skills" ? d.skill : "",
@@ -277,6 +312,8 @@ export function stripOtherTracks(d: TalentApplication): TalentApplication {
     university: d.referral === "University" ? d.university : "",
     universityOther:
       d.referral === "University" && d.university === UNIVERSITY_OTHER ? d.universityOther : "",
+    nyscCallUpNumber: nysc ? (normalizeNyscCallUp(d.nyscCallUpNumber) ?? d.nyscCallUpNumber) : "",
+    nyscStateCode: nysc ? (normalizeNyscStateCode(d.nyscStateCode) ?? d.nyscStateCode) : "",
     priorSupportFrom: d.priorSupport === "Yes" ? d.priorSupportFrom : "",
   };
 }
@@ -345,14 +382,15 @@ export function screen(d: TalentApplication): Screening {
 
 export const WINDOW = {
   opensIso: "2026-10-01",
-  closesIso: "2026-10-30",
+  // Extended from 30 Oct at stakeholders' request (convener, 27 Oct 2026).
+  closesIso: "2026-11-10",
   timeZone: "Africa/Lagos",
 } as const;
 
 export type WindowStatus = "upcoming" | "open" | "closed";
 
 /**
- * Open from 00:00 on 1 Oct to 23:59:59 on 30 Oct 2026, Lagos time.
+ * Open from 00:00 on 1 Oct to 23:59:59 on 10 Nov 2026, Lagos time.
  * `override` ("open" | "closed") comes from TALENT_APPLICATIONS_OVERRIDE for
  * early opening, extensions or testing.
  */
