@@ -5,14 +5,6 @@ import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
-const initials = (name: string) =>
-  name
-    .replace(/^(Dr\.|Mr\.|Mrs\.|Ms\.)\s+/, "")
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2);
-
 export function LeadershipSection() {
   return (
     <Section tone="light" labelledBy="leadership-title">
@@ -41,18 +33,15 @@ export function LeadershipSection() {
         </div>
         <ul className="mt-5 grid gap-5 md:grid-cols-2">
           {leadership.map((p) => (
-            <li
-              key={p.name}
-              data-reveal
-              className="flex items-center gap-6 rounded-3xl border border-line bg-white p-7 sm:p-8"
-            >
-              <span
-                aria-hidden="true"
-                className="flex size-20 shrink-0 items-center justify-center rounded-full bg-navy-950 font-display text-3xl text-gold ring-4 ring-gold/15"
-              >
-                {initials(p.name)}
-              </span>
-              <div>
+            <li key={p.name} data-reveal className="overflow-hidden rounded-3xl border border-line bg-white">
+              <Image
+                src={p.photo.src}
+                alt={`Portrait of ${p.name}, ${p.role}`}
+                width={p.photo.width}
+                height={p.photo.height}
+                className="aspect-[4/5] w-full object-cover object-top"
+              />
+              <div className="p-7 sm:p-8">
                 <p className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">{p.role}</p>
                 <h3 className="mt-1 font-display text-3xl text-navy-950">{p.name}</h3>
                 {p.credentials && <p className="mt-1 text-sm text-muted">{p.credentials}</p>}

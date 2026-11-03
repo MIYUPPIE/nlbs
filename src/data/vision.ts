@@ -141,7 +141,18 @@ export const summitExperience = [
   },
 ] satisfies { title: string; body: string; icon: IconName }[];
 
+/** Portraits are pre-cropped 4:5 WebP in public/people/ (scripts/optimize-people.mjs). */
 export const leadership = [
-  { role: "Convener", name: "Dr. Wale Busari", credentials: "FCA, FIMC, CMC" },
-  { role: "Youth Patron", name: "Mr. Seyi Tinubu", credentials: "" },
+  {
+    role: "Convener",
+    name: "Dr. Wale Busari",
+    credentials: "FCA, FIMC, CMC",
+    photo: { src: "/people/wale-busari.webp", width: 640, height: 800 },
+  },
+  {
+    role: "Youth Patron",
+    name: "Mr. Seyi Tinubu",
+    credentials: "",
+    photo: { src: "/people/seyi-tinubu.webp", width: 520, height: 650 },
+  },
 ];
