@@ -15,7 +15,7 @@ export function PartnersSection({ compact = false }: { compact?: boolean }) {
           id="partners-title"
           eyebrow="Partner Ecosystem"
           title="Partners in Nigeria's Next Phase"
-          lead="Partners will be announced as agreements are confirmed."
+          lead="Nigeria 2.0 is delivered with the partners below. Further partners will be announced as agreements are confirmed."
         />
 
         <div className="mt-12 space-y-10 lg:mt-16">
@@ -32,7 +32,13 @@ export function PartnersSection({ compact = false }: { compact?: boolean }) {
                         key={p.name}
                         className="relative flex h-20 items-center justify-center rounded-xl border border-line bg-white p-4 sm:h-24"
                       >
-                        <Image src={p.logo} alt={p.name} fill sizes="200px" className="object-contain p-5" />
+                        <Image
+                          src={p.logo}
+                          alt={p.name}
+                          fill
+                          sizes="200px"
+                          className="object-contain p-2 sm:p-3"
+                        />
                       </li>
                     ))
                   : Array.from({ length: cat.slots }, (_, i) => (

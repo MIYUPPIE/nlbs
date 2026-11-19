@@ -3,8 +3,9 @@ import type { IconName } from "@/components/ui/Icon";
 /**
  * Vision, roadmap and summit narrative. Source: latest/2.md (client-supplied
  * "About Nigeria Leadership Business Summit"). Items that contradict the
- * build brief are intentionally omitted: named keynote speakers (speakers are
- * "to be announced") and any claim that the President is confirmed.
+ * build brief are intentionally omitted: 2.md's named keynote speakers (the
+ * confirmed line-up comes from the convener's Nov 2026 flyer, in
+ * src/data/speakers.ts) and any claim that the President is confirmed.
  */
 
 export const bigIdea = {

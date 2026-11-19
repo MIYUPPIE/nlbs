@@ -22,6 +22,50 @@ test.describe("partners page", () => {
   });
 });
 
+test.describe("speakers and flyer partners", () => {
+  const loaded = (img: import("@playwright/test").Locator) =>
+    img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0);
+
+  test("speakers page shows all eight portraits, Chief Host first, with profiles", async ({ page }) => {
+    await page.goto("/speakers");
+    const cards = page.locator("#speakers [data-speaker]");
+    await expect(cards).toHaveCount(8);
+    await expect(cards.first()).toContainText("Chief Host");
+    await expect(cards.first()).toContainText("Babajide Sanwo-Olu");
+    for (const card of await cards.all()) {
+      const img = card.locator("img");
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => loaded(img)).toBe(true);
+    }
+    await page.getByRole("link", { name: "Read profile: Dr. Samson Ajayi" }).click();
+    await expect(page).toHaveURL(/#profile-samson-ajayi$/);
+    await expect(page.locator("#profile-samson-ajayi")).toContainText("Robert Bosch Nigeria");
+    await expect(page.locator("#profile-seye-olurotimi")).toContainText("MSME Africa");
+  });
+
+  test("homepage links a speaker card to the full profile", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#speakers [data-speaker]")).toHaveCount(8);
+    await page.getByRole("link", { name: "Read profile: Dr. Seye Olurotimi" }).click();
+    await expect(page).toHaveURL(/\/speakers\/#profile-seye-olurotimi$/);
+  });
+
+  test("partners page shows the five flyer partners' logos", async ({ page }) => {
+    await page.goto("/partners");
+    for (const name of [
+      "Keystone Bank",
+      "Dmax Media",
+      "allevents.ng",
+      "TA Media Communications",
+      "Praxis Medical Nigeria",
+    ]) {
+      const img = page.locator("#partners").getByRole("img", { name, exact: true });
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => loaded(img)).toBe(true);
+    }
+  });
+});
+
 test.describe("register page", () => {
   test("explains the invitation routes, the timeline and arrival", async ({ page }) => {
     await page.goto("/register");
@@ -52,7 +96,10 @@ test.describe("about page", () => {
     const logo = page.locator('main img[alt="HBC Business Help"]');
     await logo.scrollIntoViewIfNeeded();
     await expect(logo).toBeVisible();
-    expect(await logo.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
+    // Lazy image: poll, a single read can land before the request finishes under load.
+    await expect
+      .poll(() => logo.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0))
+      .toBe(true);
   });
 });
 

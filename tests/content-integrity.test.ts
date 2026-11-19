@@ -58,18 +58,33 @@ describe("statistics", () => {
 });
 
 describe("no fabricated content", () => {
-  it("has no confirmed speakers until real ones are supplied", () => {
-    for (const s of speakers) {
-      if (!s.confirmed) {
-        expect(s.name).toBe("Speaker Name");
-        expect(s.photo).toBeNull();
-      }
-    }
+  it("publishes only the speakers the convener supplied (Nov 2026 flyer and profiles)", () => {
+    // Adding a name here is a content decision: it needs the convener's source in assets-src/speakers/.
+    expect(speakers.map((s) => s.name)).toEqual([
+      "Babajide Sanwo-Olu",
+      "Taiwo Oyedele",
+      "Dr. Samson Ajayi",
+      "Dr. Bosun Tijani",
+      "Dr. Jumoke Oduwole",
+      "Dr. Olayemi Cardoso",
+      "Mr. Seyi Tinubu",
+      "Dr. Seye Olurotimi",
+    ]);
+    expect(sourceText).not.toContain("Speaker Name");
   });
 
-  it("has no partners or logos until real ones are supplied", () => {
-    expect(partnerCategories.flatMap((c) => c.partners)).toEqual([]);
-    expect(partnerCategories.map((c) => c.label)).toEqual([
+  it("publishes only the flyer's partners; every other category stays a placeholder", () => {
+    const [summit, ...rest] = partnerCategories;
+    expect(summit.label).toBe("In Partnership With");
+    expect(summit.partners.map((p) => p.name)).toEqual([
+      "Keystone Bank",
+      "Dmax Media",
+      "allevents.ng",
+      "TA Media Communications",
+      "Praxis Medical Nigeria",
+    ]);
+    expect(rest.flatMap((c) => c.partners)).toEqual([]);
+    expect(rest.map((c) => c.label)).toEqual([
       "Strategic Partners",
       "Government Partners",
       "Development Partners",
@@ -95,6 +110,8 @@ describe("no fabricated content", () => {
   // reach src/. Client-approved FAQ text lives in content/, outside this scan.
   // Approved from latest/1.md, 2.md and the flyer: Seyi Tinubu (Youth
   // Patron), $1 Trillion agenda, 9:00 AM start, info@ email and phone.
+  // Approved from the Nov 2026 flyer: the speakers and guests of honour in
+  // src/data/speakers.ts and the five "In partnership with" organisations.
   // Approved from the prospectus and briefs: the Stakeholder and Sponsor
   // tiers and benefits, without fees (tests/partnership.test.ts).
   it.each([

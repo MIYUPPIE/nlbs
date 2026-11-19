@@ -1,8 +1,14 @@
 /**
- * Partner ecosystem. No partner has been confirmed.
+ * Partner ecosystem.
  *
- * To publish a partner, add `{ name, logo: "/partners/<file>.svg", href? }`
- * to the category's `partners` array. Empty categories render neutral
+ * "In Partnership With" lists the five organisations on the convener's event
+ * flyer (Nov 2026, assets-src/partners/flyer-nov-2026.jpeg). The flyer names
+ * no category for them, so they are not sorted into the categories below.
+ * Their logos are cut from the flyer by scripts/optimize-people.mjs; replace
+ * them with the partners' own logo files when supplied.
+ *
+ * To publish a partner, add `{ name, logo: "/partners/<file>", href? }`
+ * to a category's `partners` array. Empty categories render neutral
  * placeholder slots labelled "Partner to be announced".
  */
 export type Partner = {
@@ -21,6 +27,19 @@ export type PartnerCategory = {
 };
 
 export const partnerCategories: PartnerCategory[] = [
+  {
+    id: "summit",
+    label: "In Partnership With",
+    description: "Organisations partnering with HBC Business Help to deliver Nigeria 2.0.",
+    partners: [
+      { name: "Keystone Bank", logo: "/partners/keystone-bank.png" },
+      { name: "Dmax Media", logo: "/partners/dmax-media.png" },
+      { name: "allevents.ng", logo: "/partners/allevents-ng.png" },
+      { name: "TA Media Communications", logo: "/partners/ta-media.png" },
+      { name: "Praxis Medical Nigeria", logo: "/partners/praxis-medical.png" },
+    ],
+    slots: 0,
+  },
   {
     id: "strategic",
     label: "Strategic Partners",

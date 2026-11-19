@@ -60,7 +60,7 @@ describe("AI-generated illustrations", () => {
   it("every homepage section shows an image, except Speakers and Partners", () => {
     const page = readFileSync(join(ROOT, "src/app/page.tsx"), "utf8");
     const sections = [...page.matchAll(/<([A-Z][A-Za-z]+Section)\b/g)].map((m) => m[1]);
-    // No real speakers or partners are confirmed; a picture of people or logos there would invent them.
+    // Speakers and Partners show real portraits and logos (or placeholders); an illustration there would read as invented people or brands.
     const exempt = new Set(["SpeakersSection", "PartnersSection"]);
     expect(sections.length).toBeGreaterThanOrEqual(17);
     for (const name of sections.filter((n) => !exempt.has(n))) {

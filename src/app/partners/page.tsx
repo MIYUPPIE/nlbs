@@ -20,7 +20,7 @@ export default function PartnersPage() {
       <PageHero
         eyebrow="Partners"
         title="Build Nigeria 2.0 with us."
-        lead="Two ways to partner: shape the policy and deal agenda as a Founding Stakeholder, or reach 800+ decision makers as an Official Sponsor. Confirmed partners will be announced here."
+        lead="Two ways to partner: shape the policy and deal agenda as a Founding Stakeholder, or reach 800+ decision makers as an Official Sponsor. Confirmed partners are listed below."
       >
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <GoldButton href="#tracks" size="lg">

@@ -22,8 +22,8 @@ Only facts confirmed in the build brief are published. They live in `src/data/`:
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `event.ts`                                   | Event facts, statistics (every figure is `expected` or `target`), contact details (`null` = placeholder) |
 | `programme.ts`                               | Six programme formats. `time: null` renders "Time to be announced"                                       |
-| `speakers.ts`                                | Placeholders. Set `confirmed: true` + real details + `/public/speakers/*.jpg` to publish                 |
-| `partners.ts`                                | Add `{ name, logo }` to a category to replace its placeholder slots                                      |
+| `speakers.ts`                                | Speakers and guests of honour from the convener (see **Speakers and partners**)                          |
+| `partners.ts`                                | Flyer partners under "In Partnership With"; add `{ name, logo }` to fill a placeholder category          |
 | `partnership.ts`, `registration-plan.ts`     | Partnership tracks and tiers; delegate routes, timeline and arrival details                              |
 | `content.ts`, `audience.ts`, `navigation.ts` | Section copy, audience groups, nav and routes                                                            |
 
@@ -129,8 +129,8 @@ Sent to the central backend like the other forms; requests appear under _NLBS > 
 
 | Lane                   | Command                             | What it covers                                                                                                                                                                                                                                                                                                  |
 | ---------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Gate (pre-commit, <2s) | `npm run check`                     | Types, lint, 108 unit tests: countdown/timezone math, schemas, API status contract, content integrity, WCAG contrast of design tokens, routes/sitemap/robots                                                                                                                                                    |
-| Eval (before ship)     | `npm run build && npm run test:e2e` | 128 Playwright checks: no horizontal overflow at 1440/1280/1024/768/640/390/375 on all 12 routes, axe WCAG 2.1 AA (zero serious/critical), registration + enquiry flows, mobile drawer, programme tabs keyboard nav, frozen-clock countdown, reduced motion, no-JS rendering, pre-hydration behaviour, SEO tags |
+| Gate (pre-commit, <2s) | `npm run check`                     | Types, lint, 423 unit tests: countdown/timezone math, schemas, API status contract, content integrity, WCAG contrast of design tokens, routes/sitemap/robots                                                                                                                                                    |
+| Eval (before ship)     | `npm run build && npm run test:e2e` | 265 Playwright checks: no horizontal overflow at 1440/1280/1024/768/640/390/375 on all 12 routes, axe WCAG 2.1 AA (zero serious/critical), registration + enquiry flows, mobile drawer, programme tabs keyboard nav, frozen-clock countdown, reduced motion, no-JS rendering, pre-hydration behaviour, SEO tags |
 
 Visual check: `node scripts/screenshot.mjs /path 390 out.png --segments --base=http://localhost:3000`.
 
@@ -157,6 +157,29 @@ link to each university.
 
 Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list must match central-backend
 `App\Talent\Universities`.
+
+## Speakers and partners
+
+Supplied by the convener in Nov 2026: the event flyer, named portraits and two written profiles. Originals live in
+`assets-src/speakers/` and `assets-src/partners/` (never `public/`, which bans raw JPEGs and documents).
+
+| Who                                       | Category                                        |
+| ----------------------------------------- | ----------------------------------------------- |
+| H.E. Babajide Sanwo-Olu                   | Chief Host                                      |
+| Taiwo Oyedele, Dr. Samson Ajayi (profile) | Keynote                                         |
+| Dr. Bosun Tijani, Dr. Jumoke Oduwole      | Special Guest of Honour                         |
+| Dr. Olayemi Cardoso                       | Special Invited Guest of Honour (no role given) |
+| Mr. Seyi Tinubu                           | Patron, Nigeria 2.0 Talent Fund                 |
+| Dr. Seye Olurotimi (profile)              | Speaker                                         |
+
+- `node scripts/optimize-people.mjs` builds `public/speakers/*.webp` (4:5, face-centred crops, never upscaled, metadata
+  stripped) and `public/partners/*.png` (the five "In partnership with" logos cut from the flyer at 2x).
+- `/speakers` shows every card plus full profiles (`#profile-<id>`); the homepage shows all eight cards. Speakers are also
+  `performer`s in the Event JSON-LD.
+- Partner logos are flyer crops (about 90x50 px). Replace them with the partners' own files when supplied; the flyer
+  gives no category, so they sit under "In Partnership With", not in the placeholder categories.
+- Tests: `tests/speakers.test.ts` (photos, data, logos), `tests/content-integrity.test.ts` (exact published names),
+  `e2e/content-pages.spec.ts` (portraits and logos load, profile links work).
 
 ## Logo
 

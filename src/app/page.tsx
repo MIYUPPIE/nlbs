@@ -39,7 +39,7 @@ export default function HomePage() {
       <DealMakingSection />
       <EditionSection />
       <RoadmapSection compact />
-      <SpeakersSection limit={4} />
+      <SpeakersSection />
       <PartnersSection compact />
       <FaqTeaserSection />
       <CTASection />

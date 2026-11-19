@@ -24,6 +24,8 @@ for (const width of [1440, 390]) {
 }
 
 test("page has one h1, a main landmark and a skip link", async ({ page }) => {
+  // Visits every route in turn (~8s alone); the 30s default flakes under full parallel load.
+  test.setTimeout(90_000);
   for (const route of ROUTES) {
     await page.goto(route);
     await expect(page.locator("h1"), route).toHaveCount(1);

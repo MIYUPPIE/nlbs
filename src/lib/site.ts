@@ -1,4 +1,5 @@
 import { event } from "@/data/event";
+import { speakers } from "@/data/speakers";
 
 /**
  * Canonical origin. Set NEXT_PUBLIC_SITE_URL in the deployment environment.
@@ -33,6 +34,12 @@ export function eventJsonLd() {
         addressCountry: "NG",
       },
     },
+    performer: speakers.map((s) => ({
+      "@type": "Person",
+      name: s.name,
+      ...(s.role ? { jobTitle: s.role } : {}),
+      ...(s.organisation ? { affiliation: { "@type": "Organization", name: s.organisation } } : {}),
+    })),
     organizer: {
       "@type": "Organization",
       name: event.convener,
