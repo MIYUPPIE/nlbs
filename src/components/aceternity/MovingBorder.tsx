@@ -1,14 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import {
-  motion,
-  useAnimationFrame,
-  useMotionTemplate,
-  useMotionValue,
-  useReducedMotion,
-  useTransform,
-} from "motion/react";
+import { motion, useAnimationFrame, useMotionTemplate, useMotionValue, useTransform } from "motion/react";
+import { usePrefersReducedMotion } from "@/components/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -30,7 +24,7 @@ export function MovingBorderFrame({
   radius?: string;
   duration?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   return (
     <div
       className={cn("relative overflow-hidden p-px", reduce && "bg-gold/40", className)}

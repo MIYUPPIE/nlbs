@@ -1,7 +1,8 @@
 "use client";
 
 import { memo, useSyncExternalStore } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion } from "@/components/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -42,7 +43,7 @@ export const BackgroundBeams = memo(function BackgroundBeams({
   className?: string;
   minWidth?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const wide = useSyncExternalStore(
     subscribeResize,
     () => window.innerWidth >= minWidth,

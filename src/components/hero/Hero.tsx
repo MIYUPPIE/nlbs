@@ -7,7 +7,8 @@ import { BackgroundBeams } from "@/components/aceternity/BackgroundBeams";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Countdown } from "@/components/hero/Countdown";
-import { NetworkGraphic } from "@/components/hero/NetworkGraphic";
+import { SpeakerOrbit } from "@/components/sections/SpeakerOrbit";
+import { orderedSpeakers } from "@/data/speakers";
 
 const backdrop = photo("lagos-victoria-island-aerial");
 
@@ -91,8 +92,11 @@ export function Hero() {
 
           <div className="lg:col-span-5">
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              <NetworkGraphic className="mx-auto block w-full max-w-[19rem] sm:max-w-[22rem] lg:max-w-[26rem]" />
-              <Countdown className="-mt-2 sm:-mt-4" />
+              <p className="mb-4 text-center text-[0.7rem] font-semibold tracking-[0.22em] text-gold uppercase">
+                Speakers &amp; Guests of Honour
+              </p>
+              <SpeakerOrbit speakers={orderedSpeakers()} compact />
+              <Countdown className="mt-6" />
             </div>
           </div>
         </div>

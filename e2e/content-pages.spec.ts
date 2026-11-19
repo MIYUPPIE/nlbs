@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { ROUTES } from "./helpers";
 
@@ -28,7 +29,7 @@ test.describe("speakers and flyer partners", () => {
 
   test("speakers page shows all eight portraits, Chief Host first, with profiles", async ({ page }) => {
     await page.goto("/speakers");
-    const cards = page.locator("#speakers [data-speaker]");
+    const cards = page.locator("#speaker-list [data-speaker]");
     await expect(cards).toHaveCount(8);
     await expect(cards.first()).toContainText("Chief Host");
     await expect(cards.first()).toContainText("Babajide Sanwo-Olu");
@@ -37,17 +38,22 @@ test.describe("speakers and flyer partners", () => {
       await img.scrollIntoViewIfNeeded();
       await expect.poll(() => loaded(img)).toBe(true);
     }
-    await page.getByRole("link", { name: "Read profile: Dr. Samson Ajayi" }).click();
-    await expect(page).toHaveURL(/#profile-samson-ajayi$/);
+    // Every speaker also has a full in-page profile (the no-JS fallback).
+    await expect(page.locator("#profiles article")).toHaveCount(8);
     await expect(page.locator("#profile-samson-ajayi")).toContainText("Robert Bosch Nigeria");
     await expect(page.locator("#profile-seye-olurotimi")).toContainText("MSME Africa");
+    await expect(page.locator("#profile-taiwo-oyedele")).toContainText("Sources");
   });
 
-  test("homepage links a speaker card to the full profile", async ({ page }) => {
+  test("homepage orbit: click a dot, read the caption", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("#speakers [data-speaker]")).toHaveCount(8);
-    await page.getByRole("link", { name: "Read profile: Dr. Seye Olurotimi" }).click();
-    await expect(page).toHaveURL(/\/speakers\/#profile-seye-olurotimi$/);
+    const orbit = page.locator("#speakers [data-speaker-orbit]");
+    await orbit.scrollIntoViewIfNeeded();
+    await expect(orbit).toHaveAttribute("data-active", "babajide-sanwo-olu");
+    await expect(orbit).toContainText("Executive Governor of Lagos State");
+    await orbit.getByRole("button", { name: "08: Dr. Seye Olurotimi" }).click();
+    await expect(orbit).toHaveAttribute("data-active", "seye-olurotimi");
+    await expect(orbit).toContainText("MSME Africa");
   });
 
   test("partners page shows the five flyer partners' logos", async ({ page }) => {
@@ -63,6 +69,173 @@ test.describe("speakers and flyer partners", () => {
       await img.scrollIntoViewIfNeeded();
       await expect.poll(() => loaded(img)).toBe(true);
     }
+  });
+});
+
+test.describe("reduced motion", () => {
+  // Regression: motion's useReducedMotion caused hydration error #418 on every page.
+  for (const route of ["/", "/about", "/partners", "/speakers"]) {
+    test(`${route} hydrates without errors`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(route);
+      await page.waitForLoadState("networkidle");
+      expect(errors).toEqual([]);
+    });
+  }
+});
+
+test.describe("speaker orbit", () => {
+  const orbit = (page: import("@playwright/test").Page) => page.locator("#speakers [data-speaker-orbit]");
+
+  test("autoplays every 5s while on screen", async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/");
+    await orbit(page).scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 0); // not hovering the orbit
+    await expect(orbit(page)).toHaveAttribute("data-active", "babajide-sanwo-olu");
+    await page.clock.runFor(5100);
+    await expect(orbit(page)).toHaveAttribute("data-active", "taiwo-oyedele");
+    await page.clock.runFor(5100);
+    await expect(orbit(page)).toHaveAttribute("data-active", "samson-ajayi");
+  });
+
+  test("the pause button stops it", async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/");
+    await orbit(page).scrollIntoViewIfNeeded();
+    await orbit(page).getByRole("button", { name: "Pause speaker rotation" }).click();
+    await page.mouse.move(0, 0);
+    await page.clock.runFor(16000);
+    await expect(orbit(page)).toHaveAttribute("data-active", "babajide-sanwo-olu");
+    await expect(orbit(page).getByRole("button", { name: "Play speaker rotation" })).toBeVisible();
+  });
+
+  test("reduced motion starts paused", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.clock.install();
+    await page.goto("/");
+    await orbit(page).scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 0);
+    await expect(orbit(page).getByRole("button", { name: "Play speaker rotation" })).toBeVisible();
+    await page.clock.runFor(16000);
+    await expect(orbit(page)).toHaveAttribute("data-active", "babajide-sanwo-olu");
+  });
+
+  test("dots work from the keyboard, wrapping both ways", async ({ page }) => {
+    await page.goto("/");
+    const first = orbit(page).getByRole("button", { name: "01: Babajide Sanwo-Olu" });
+    await first.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(orbit(page)).toHaveAttribute("data-active", "taiwo-oyedele");
+    await expect(orbit(page).getByRole("button", { name: "02: Taiwo Oyedele" })).toBeFocused();
+    await page.keyboard.press("End");
+    await expect(orbit(page)).toHaveAttribute("data-active", "seye-olurotimi");
+    await page.keyboard.press("ArrowRight");
+    await expect(orbit(page)).toHaveAttribute("data-active", "babajide-sanwo-olu");
+    await page.keyboard.press("ArrowLeft");
+    await expect(orbit(page)).toHaveAttribute("data-active", "seye-olurotimi");
+  });
+
+  test("every portrait loads", async ({ page }) => {
+    await page.goto("/");
+    await orbit(page).scrollIntoViewIfNeeded();
+    const imgs = orbit(page).locator("button img");
+    await expect(imgs).toHaveCount(8);
+    for (const img of await imgs.all()) {
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
+        .toBe(true);
+    }
+  });
+});
+
+test.describe("speaker profile modals", () => {
+  const dialog = (page: import("@playwright/test").Page, id: string) => page.locator(`#speaker-dialog-${id}`);
+
+  test("opens from the orbit, traps focus, closes on Escape and returns focus", async ({ page }) => {
+    await page.goto("/");
+    const orbit = page.locator("#speakers [data-speaker-orbit]");
+    await orbit.scrollIntoViewIfNeeded();
+    await orbit.getByRole("button", { name: "02: Taiwo Oyedele" }).click();
+    const trigger = orbit.getByRole("link", { name: "View profile: Taiwo Oyedele" });
+    await trigger.click();
+    const d = dialog(page, "taiwo-oyedele");
+    await expect(d).toBeVisible();
+    await expect(page).toHaveURL(/\/$/); // the modal opened instead of navigating
+    await expect(d.getByRole("heading", { level: 2, name: "Taiwo Oyedele" })).toBeVisible();
+    await expect(d).toContainText("Coordinating Minister of the Economy");
+    await expect(d.getByRole("link", { name: /Wikipedia/ })).toHaveAttribute("href", /^https:\/\//);
+    // Focus starts on the close button, so the profile opens scrolled to the top.
+    await expect(d.getByRole("button", { name: "Close profile of Taiwo Oyedele" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(d).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test("opens from a speaker card and closes with the close button", async ({ page }) => {
+    await page.goto("/speakers");
+    await page.locator('#speaker-list [data-speaker="jumoke-oduwole"]').click();
+    const d = dialog(page, "jumoke-oduwole");
+    await expect(d).toBeVisible();
+    await expect(d).toContainText("Stanford Law School");
+    await expect(d.getByRole("heading", { level: 2 })).toBeInViewport();
+    await d.getByRole("button", { name: "Close profile of Dr. Jumoke Oduwole" }).click();
+    await expect(d).toBeHidden();
+  });
+
+  test("on mobile the modal opens at the top with the close button in view", async ({ page }) => {
+    // Regression: the browser focused the first source link and opened the modal scrolled to the end.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/speakers");
+    await page.locator('#speaker-list [data-speaker="taiwo-oyedele"]').click();
+    const d = dialog(page, "taiwo-oyedele");
+    await expect(d.getByRole("button", { name: "Close profile of Taiwo Oyedele" })).toBeInViewport();
+    await expect(d.getByRole("heading", { level: 2 })).toBeInViewport();
+    await expect(d.getByRole("img", { name: "Portrait of Taiwo Oyedele" })).toBeInViewport();
+  });
+
+  test("closes on a backdrop click and locks page scroll while open", async ({ page }) => {
+    await page.goto("/speakers");
+    await page.locator('#speaker-list [data-speaker="seye-olurotimi"]').click();
+    const d = dialog(page, "seye-olurotimi");
+    await expect(d).toBeVisible();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe("hidden");
+    await page.mouse.click(5, 5); // backdrop
+    await expect(d).toBeHidden();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe("hidden");
+  });
+
+  test("clicking the active portrait in the hero orbit opens that profile", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator("section[aria-labelledby='hero-title'] [data-speaker-orbit]");
+    await hero.locator("button img").first().click({ force: true }); // speaker 0 is active
+    await expect(dialog(page, "babajide-sanwo-olu")).toBeVisible();
+    await expect(dialog(page, "babajide-sanwo-olu")).toContainText("University of Lagos");
+  });
+
+  test("an open modal has no serious accessibility violations", async ({ page }) => {
+    await page.goto("/speakers");
+    await page.locator('#speaker-list [data-speaker="olayemi-cardoso"]').click();
+    await expect(dialog(page, "olayemi-cardoso")).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include("#speaker-dialog-olayemi-cardoso")
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+  });
+});
+
+test.describe("speaker profiles without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("a profile link goes to the in-page profile on /speakers", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#speakers").getByRole("link", { name: "View profile: Babajide Sanwo-Olu" }).click();
+    await expect(page).toHaveURL(/\/speakers\/#profile-babajide-sanwo-olu$/);
+    await expect(page.locator("#profile-babajide-sanwo-olu")).toContainText(
+      "Lagos State Development and Property Corporation",
+    );
   });
 });
 

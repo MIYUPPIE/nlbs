@@ -2,6 +2,7 @@ import { Hero } from "@/components/hero/Hero";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { AudienceSection } from "@/components/sections/AudienceSection";
 import { CTASection } from "@/components/sections/CTASection";
+import { SpeakerDialogs } from "@/components/speakers/SpeakerDialogs";
 import { DealMakingSection } from "@/components/sections/DealMakingSection";
 import { EditionSection } from "@/components/sections/EditionSection";
 import { RoadmapSection } from "@/components/sections/RoadmapSection";
@@ -43,6 +44,7 @@ export default function HomePage() {
       <PartnersSection compact />
       <FaqTeaserSection />
       <CTASection />
+      <SpeakerDialogs />
     </>
   );
 }

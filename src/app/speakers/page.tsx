@@ -1,7 +1,8 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CTASection } from "@/components/sections/CTASection";
+import { SpeakerDialogs } from "@/components/speakers/SpeakerDialogs";
 import { SpeakerProfilesSection } from "@/components/sections/SpeakerProfilesSection";
-import { SpeakersSection } from "@/components/sections/SpeakersSection";
+import { SpeakerGridSection, SpeakersSection } from "@/components/sections/SpeakersSection";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { pageMetadata } from "@/lib/metadata";
@@ -22,6 +23,7 @@ export default function SpeakersPage() {
         lead="The Chief Host, keynote speakers, guests of honour and speakers at Nigeria 2.0. More speakers will be announced as they are confirmed."
       />
       <SpeakersSection showLink={false} />
+      <SpeakerGridSection />
       <SpeakerProfilesSection />
       <section aria-labelledby="speak-title" className="surface-light border-t border-line bg-ivory py-16">
         <Container className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -37,6 +39,7 @@ export default function SpeakersPage() {
         </Container>
       </section>
       <CTASection />
+      <SpeakerDialogs />
     </>
   );
 }

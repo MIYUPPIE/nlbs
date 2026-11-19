@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion } from "@/components/hooks/usePrefersReducedMotion";
 import { ChevronDown, Clock, Users } from "lucide-react";
 import type { ProgrammeItem } from "@/data/programme";
 import { Icon } from "@/components/ui/Icon";
@@ -14,7 +15,7 @@ import { cn } from "@/lib/utils";
 export function ProgrammeTabs({ items }: { items: ProgrammeItem[] }) {
   const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const current = items[active];
 
   const focusTab = (i: number) => {

@@ -2,12 +2,14 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { Speaker } from "@/data/speakers";
+import { profileHref } from "@/components/speakers/profile-link";
 
 /**
- * One speaker or guest of honour: portrait, category, name, role.
- * `profileHref` links to the full written profile when the speaker has one.
+ * One speaker or guest of honour: portrait, category, name, role. The whole
+ * card opens the speaker's profile modal (a stretched link; without JS it goes
+ * to the profile on /speakers).
  */
-export function SpeakerCard({ speaker, profileHref }: { speaker: Speaker; profileHref?: string }) {
+export function SpeakerCard({ speaker }: { speaker: Speaker }) {
   return (
     <article
       data-reveal
@@ -49,14 +51,18 @@ export function SpeakerCard({ speaker, profileHref }: { speaker: Speaker; profil
         {speaker.organisation && (
           <p className="mt-0.5 text-xs font-medium text-navy-700 sm:text-sm">{speaker.organisation}</p>
         )}
-        {profileHref && speaker.bio && (
+        {speaker.bio && (
           <a
-            href={profileHref}
-            aria-label={`Read profile: ${speaker.name}`}
-            className="mt-auto inline-flex items-center gap-1 pt-4 text-xs font-semibold text-gold-ink hover:text-navy-950 sm:text-sm"
+            href={profileHref(speaker.id)}
+            data-profile-id={speaker.id}
+            aria-label={`View profile: ${speaker.name}`}
+            className="mt-auto inline-flex items-center gap-1 pt-4 text-xs font-semibold text-gold-ink after:absolute after:inset-0 after:rounded-2xl hover:text-navy-950 focus-visible:after:outline-2 focus-visible:after:outline-gold sm:text-sm"
           >
-            Read profile
-            <ArrowRight aria-hidden="true" className="size-3.5" />
+            View profile
+            <ArrowRight
+              aria-hidden="true"
+              className="size-3.5 transition-transform group-hover:translate-x-0.5"
+            />
           </a>
         )}
       </div>

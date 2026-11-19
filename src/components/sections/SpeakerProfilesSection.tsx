@@ -1,11 +1,14 @@
 import Image from "next/image";
-import { displayName } from "@/data/speakers";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { orderedSpeakers } from "@/components/sections/SpeakersSection";
+import { orderedSpeakers } from "@/data/speakers";
+import { SpeakerProfileBody } from "@/components/speakers/SpeakerProfileBody";
 
-/** Full written profiles, for the speakers who supplied one. */
+/**
+ * Every speaker's full profile, in page. The modals show the same content;
+ * this is what links reach without JavaScript, and what search engines read.
+ */
 export function SpeakerProfilesSection() {
   const withBio = orderedSpeakers().filter((s) => s.bio && s.bio.length > 0);
   if (withBio.length === 0) return null;
@@ -33,22 +36,7 @@ export function SpeakerProfilesSection() {
                 />
               </div>
               <div className="md:col-span-8 lg:col-span-9">
-                <p className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">{s.category}</p>
-                <h3
-                  id={`profile-${s.id}-name`}
-                  className="mt-2 font-display text-3xl text-navy-950 sm:text-4xl"
-                >
-                  {displayName(s)}
-                </h3>
-                <p className="mt-2 font-medium text-navy-700">
-                  {[s.role, s.organisation].filter(Boolean).join(", ")}
-                </p>
-                {s.tagline && <p className="mt-1 text-sm text-muted">{s.tagline}</p>}
-                <div className="mt-6 space-y-4 leading-relaxed text-ink">
-                  {(s.bio ?? []).map((p) => (
-                    <p key={p.slice(0, 40)}>{p}</p>
-                  ))}
-                </div>
+                <SpeakerProfileBody speaker={s} headingId={`profile-${s.id}-name`} />
               </div>
             </article>
           ))}

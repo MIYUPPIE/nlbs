@@ -26,20 +26,6 @@
 
   --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
   --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
-  /* Hero network: one revolution per minute, starting once the spotlight settles. */
-  --animate-orbit: orbit 60s linear 1.2s infinite;
-  --animate-orbit-counter: orbit 60s linear 1.2s infinite reverse;
-  --animate-drift: orbit 120s linear 1.2s infinite reverse;
-
-  @keyframes orbit {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   @keyframes spotlight {
     0% {
       opacity: 0;
@@ -246,4 +232,45 @@
   background: var(--color-ivory);
   font-weight: 600;
   color: var(--color-navy-950);
+}
+
+/*
+ * Speaker profile modals (src/components/speakers/SpeakerDialogs.tsx).
+ * Native <dialog>: Escape, focus trap and focus return are the browser's.
+ * Fades and lifts in; the global reduced-motion rule makes it instant.
+ */
+.speaker-dialog {
+  width: min(64rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  overflow: visible;
+  opacity: 0;
+  transform: translateY(16px) scale(0.98);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    overlay 0.25s allow-discrete,
+    display 0.25s allow-discrete;
+}
+.speaker-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .speaker-dialog[open] {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+.speaker-dialog::backdrop {
+  background: rgb(7 26 51 / 0.78);
+  backdrop-filter: blur(6px);
+}
+html:has(.speaker-dialog[open]) {
+  overflow: hidden;
 }

@@ -104,48 +104,43 @@ test.describe("countdown", () => {
   });
 });
 
-test.describe("hero network graphic", () => {
-  test("shows on mobile and rotates with counter-rotating labels", async ({ page }) => {
+test.describe("hero speaker orbit", () => {
+  test("shows at the top of the homepage on mobile, with all eight portraits", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
-    const svg = page.locator('svg[aria-label^="Capital, Talent"]');
-    await expect(svg).toBeVisible();
-    const anims = await page.evaluate(() =>
-      document
-        .getAnimations()
-        .map((a) => a as CSSAnimation)
-        .filter((a) => a.animationName === "orbit")
-        .map((a) => ({
-          duration: (a.effect?.getTiming().duration as number) ?? 0,
-          delay: a.effect?.getTiming().delay ?? 0,
-          direction: a.effect?.getTiming().direction,
-        })),
-    );
-    // Triangle + 3 labels + dot field.
-    expect(anims.filter((a) => a.duration === 60_000 && a.direction === "normal")).toHaveLength(1);
-    expect(anims.filter((a) => a.duration === 60_000 && a.direction === "reverse")).toHaveLength(3);
-    expect(anims.filter((a) => a.duration === 120_000)).toHaveLength(1);
-    expect(anims.every((a) => a.delay === 1200)).toBe(true);
+    const orbit = page
+      .locator("#hero-title")
+      .locator("xpath=ancestor::section")
+      .locator("[data-speaker-orbit]");
+    await expect(orbit).toHaveCount(1);
+    await orbit.scrollIntoViewIfNeeded();
+    await expect(orbit).toBeVisible();
+    await expect(orbit.locator("button img")).toHaveCount(8);
+    await expect(orbit).toHaveAttribute("data-active", "babajide-sanwo-olu");
   });
 
-  test("labels stay upright mid-rotation", async ({ page }) => {
+  test("portraits stay upright mid-rotation", async ({ page }) => {
     await page.goto("/");
-    await page.evaluate(() =>
-      document.getAnimations().forEach((a) => {
-        a.pause();
-        a.currentTime = 1200 + 17_000;
+    const orbit = page.locator("[data-speaker-orbit]").first();
+    await orbit.getByRole("button", { name: "04: Dr. Bosun Tijani" }).click();
+    await page.waitForTimeout(1200); // past the 900ms turn
+    // Net rotation of each portrait = ring (+θ) then counter-rotation (−θ) → upright.
+    const angles = await orbit.locator("button img").evaluateAll((imgs) =>
+      imgs.map((img) => {
+        let el: Element | null = img;
+        let deg = 0;
+        while (el && !el.hasAttribute("data-speaker-orbit")) {
+          const t = getComputedStyle(el).transform;
+          if (t && t !== "none") {
+            const m = new DOMMatrix(t);
+            deg += (Math.atan2(m.b, m.a) * 180) / Math.PI;
+          }
+          el = el.parentElement;
+        }
+        return Math.round((((deg % 360) + 540) % 360) - 180);
       }),
     );
-    // Net transform of each label = orbit (+θ) then counter (−θ) → no rotation.
-    const angles = await page.evaluate(() =>
-      [...document.querySelectorAll('svg[aria-label^="Capital, Talent"] text')]
-        .filter((t) => t.textContent !== "2.0")
-        .map((t) => {
-          const m = (t as SVGGraphicsElement).getScreenCTM()!;
-          return Math.round((Math.atan2(m.b, m.a) * 180) / Math.PI);
-        }),
-    );
-    expect(angles).toEqual([0, 0, 0]);
+    expect(angles).toEqual(Array(8).fill(0));
   });
 });
 

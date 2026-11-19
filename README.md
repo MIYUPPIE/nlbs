@@ -130,7 +130,7 @@ Sent to the central backend like the other forms; requests appear under _NLBS > 
 | Lane                   | Command                             | What it covers                                                                                                                                                                                                                                                                                                  |
 | ---------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Gate (pre-commit, <2s) | `npm run check`                     | Types, lint, 423 unit tests: countdown/timezone math, schemas, API status contract, content integrity, WCAG contrast of design tokens, routes/sitemap/robots                                                                                                                                                    |
-| Eval (before ship)     | `npm run build && npm run test:e2e` | 265 Playwright checks: no horizontal overflow at 1440/1280/1024/768/640/390/375 on all 12 routes, axe WCAG 2.1 AA (zero serious/critical), registration + enquiry flows, mobile drawer, programme tabs keyboard nav, frozen-clock countdown, reduced motion, no-JS rendering, pre-hydration behaviour, SEO tags |
+| Eval (before ship)     | `npm run build && npm run test:e2e` | 281 Playwright checks: no horizontal overflow at 1440/1280/1024/768/640/390/375 on all 12 routes, axe WCAG 2.1 AA (zero serious/critical), registration + enquiry flows, mobile drawer, programme tabs keyboard nav, frozen-clock countdown, reduced motion, no-JS rendering, pre-hydration behaviour, SEO tags |
 
 Visual check: `node scripts/screenshot.mjs /path 390 out.png --segments --base=http://localhost:3000`.
 
@@ -160,26 +160,36 @@ Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list m
 
 ## Speakers and partners
 
-Supplied by the convener in Nov 2026: the event flyer, named portraits and two written profiles. Originals live in
-`assets-src/speakers/` and `assets-src/partners/` (never `public/`, which bans raw JPEGs and documents).
+Supplied by the convener in Nov 2026: the event flyer, named portraits and two written profiles (Dr. Samson Ajayi,
+Dr. Seye Olurotimi). Originals live in `assets-src/speakers/` and `assets-src/partners/` (never `public/`, which bans raw
+JPEGs and documents). The other six profiles were researched online on 19 Nov 2026 from official government pages,
+Wikipedia and Nigerian press; each lists its `sources` in `src/data/speakers.ts`, and the modal shows them.
 
-| Who                                       | Category                                        |
-| ----------------------------------------- | ----------------------------------------------- |
-| H.E. Babajide Sanwo-Olu                   | Chief Host                                      |
-| Taiwo Oyedele, Dr. Samson Ajayi (profile) | Keynote                                         |
-| Dr. Bosun Tijani, Dr. Jumoke Oduwole      | Special Guest of Honour                         |
-| Dr. Olayemi Cardoso                       | Special Invited Guest of Honour (no role given) |
-| Mr. Seyi Tinubu                           | Patron, Nigeria 2.0 Talent Fund                 |
-| Dr. Seye Olurotimi (profile)              | Speaker                                         |
+| Who                                  | Category                        | Profile    |
+| ------------------------------------ | ------------------------------- | ---------- |
+| H.E. Babajide Sanwo-Olu              | Chief Host                      | researched |
+| Taiwo Oyedele                        | Keynote                         | researched |
+| Dr. Samson Ajayi                     | Keynote                         | supplied   |
+| Dr. Bosun Tijani, Dr. Jumoke Oduwole | Special Guest of Honour         | researched |
+| Dr. Olayemi Cardoso                  | Special Invited Guest of Honour | researched |
+| Mr. Seyi Tinubu                      | Patron, Nigeria 2.0 Talent Fund | researched |
+| Dr. Seye Olurotimi                   | Speaker                         | supplied   |
 
-- `node scripts/optimize-people.mjs` builds `public/speakers/*.webp` (4:5, face-centred crops, never upscaled, metadata
-  stripped) and `public/partners/*.png` (the five "In partnership with" logos cut from the flyer at 2x).
-- `/speakers` shows every card plus full profiles (`#profile-<id>`); the homepage shows all eight cards. Speakers are also
-  `performer`s in the Event JSON-LD.
-- Partner logos are flyer crops (about 90x50 px). Replace them with the partners' own files when supplied; the flyer
-  gives no category, so they sit under "In Partnership With", not in the placeholder categories.
-- Tests: `tests/speakers.test.ts` (photos, data, logos), `tests/content-integrity.test.ts` (exact published names),
-  `e2e/content-pages.spec.ts` (portraits and logos load, profile links work).
+- **Speaker orbit** (`src/components/sections/SpeakerOrbit.tsx`): portraits on a ring around the NLBS mark; the active
+  speaker turns to the bottom, enlarged and numbered, with name, role and "View profile" underneath. It sits in the
+  homepage hero and in the Speakers section (homepage and `/speakers`). Autoplays every 5s; pauses on hover, focus,
+  off-screen, hidden tab and the pause button; starts paused under reduced motion. Dots are the keyboard control
+  (arrows, Home, End). Rotation maths: `src/lib/orbit.ts` (`tests/orbit.test.ts`).
+- **Profile modals** (`src/components/speakers/`): one native `<dialog>` per speaker on `/` and `/speakers`. Any
+  `a[data-profile-id]` opens it (`SpeakerDialogController`, one delegated listener); without JS the same link goes to the
+  in-page profile on `/speakers`. Escape, close button and backdrop close it; focus starts on the close button.
+- `node scripts/optimize-people.mjs` builds `public/speakers/*.webp` (4:5, never upscaled, metadata stripped) and
+  `public/partners/*.png` (the five "In partnership with" logos cut from the flyer at 2x; replace with the partners' own
+  files when supplied).
+- Reduced motion: use `usePrefersReducedMotion` (hydration-safe), never `useReducedMotion` from motion, which caused
+  hydration error #418 on every page for reduced-motion visitors (`tests/reduced-motion.test.ts`, e2e "reduced motion").
+- Tests: `tests/speakers.test.ts`, `tests/orbit.test.ts`, `tests/content-integrity.test.ts`; e2e "speaker orbit",
+  "speaker profile modals", "hero speaker orbit".
 
 ## Logo
 

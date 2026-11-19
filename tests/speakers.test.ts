@@ -76,16 +76,42 @@ describe("speaker data", () => {
     expect(by["seyi-tinubu"].role).toContain("Nigeria 2.0 Talent Fund");
   });
 
-  it("leaves a role empty only where no source gave one", () => {
-    expect(speakers.filter((s) => !s.role).map((s) => s.id)).toEqual(["olayemi-cardoso"]);
+  it("gives every speaker a role, with the titles verified online (19 Nov 2026)", () => {
+    const by = Object.fromEntries(speakers.map((s) => [s.id, s]));
+    for (const s of speakers) expect(s.role.length).toBeGreaterThan(0);
+    expect(by["taiwo-oyedele"].role).toBe(
+      "Honourable Minister of Finance and Coordinating Minister of the Economy",
+    );
+    expect([by["olayemi-cardoso"].role, by["olayemi-cardoso"].organisation]).toEqual([
+      "Governor",
+      "Central Bank of Nigeria",
+    ]);
   });
 
-  it("has full profiles only for the two speakers who supplied one", () => {
-    expect(speakers.filter((s) => s.bio).map((s) => s.id)).toEqual(["samson-ajayi", "seye-olurotimi"]);
-    for (const s of speakers.filter((x) => x.bio)) {
-      expect(s.bio!.length).toBeGreaterThan(2);
-      for (const p of s.bio!) expect(p.length).toBeGreaterThan(60);
+  it("gives every speaker a full profile", () => {
+    for (const s of speakers) {
+      expect(s.bio, s.id).toBeDefined();
+      expect(s.bio!.length).toBeGreaterThanOrEqual(3);
+      for (const p of s.bio!) {
+        expect(p.length).toBeGreaterThan(60);
+        expect(p).not.toMatch(/\u2014/); // house style: no em dashes
+      }
       expect(new Set(s.bio!.map((p) => p.slice(0, 40))).size).toBe(s.bio!.length); // React keys
+    }
+  });
+
+  it("supplied profiles carry no sources; researched ones cite at least one https source", () => {
+    const supplied = ["samson-ajayi", "seye-olurotimi"];
+    for (const s of speakers) {
+      if (supplied.includes(s.id)) {
+        expect(s.sources, s.id).toBeUndefined();
+      } else {
+        expect(s.sources?.length, s.id).toBeGreaterThan(0);
+        for (const src of s.sources!) {
+          expect(src.url).toMatch(/^https:\/\//);
+          expect(src.title.length).toBeGreaterThan(5);
+        }
+      }
     }
   });
 
