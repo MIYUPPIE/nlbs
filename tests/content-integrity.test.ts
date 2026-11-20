@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { contact, event, formatStat, stats } from "@/data/event";
 import { programme } from "@/data/programme";
 import { speakers } from "@/data/speakers";
-import { partnerCategories } from "@/data/partners";
+import { partners } from "@/data/partners";
 import { eventJsonLd } from "@/lib/site";
 
 const SRC = join(__dirname, "..", "src");
@@ -73,25 +73,26 @@ describe("no fabricated content", () => {
     expect(sourceText).not.toContain("Speaker Name");
   });
 
-  it("publishes only the flyer's partners; every other category stays a placeholder", () => {
-    const [summit, ...rest] = partnerCategories;
-    expect(summit.label).toBe("In Partnership With");
-    expect(summit.partners.map((p) => p.name)).toEqual([
+  it("publishes only the flyer's five partners, with no placeholder categories", () => {
+    expect(partners.map((p) => p.name)).toEqual([
       "Keystone Bank",
       "Dmax Media",
       "allevents.ng",
       "TA Media Communications",
       "Praxis Medical Nigeria",
     ]);
-    expect(rest.flatMap((c) => c.partners)).toEqual([]);
-    expect(rest.map((c) => c.label)).toEqual([
+    const section = readFileSync(join(process.cwd(), "src/components/sections/PartnersSection.tsx"), "utf8");
+    expect(section).not.toContain("Partner to be announced");
+    for (const label of [
       "Strategic Partners",
       "Government Partners",
       "Development Partners",
       "Investment Partners",
       "Technology Partners",
       "Media Partners",
-    ]);
+    ]) {
+      expect(sourceText).not.toContain(label);
+    }
   });
 
   it("has no programme times", () => {

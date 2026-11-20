@@ -1,10 +1,10 @@
-// Builds the site's people and partner images from the convener's originals in assets-src/
+// Builds the site's people images from the convener's originals in assets-src/
 // (kept out of public/, which bans raw JPEGs). Static export has no image server, so photos
 // must be pre-sized. Run: node scripts/optimize-people.mjs
 //
 // - public/people/*.webp    leadership portraits, 4:5
 // - public/speakers/*.webp  speaker and guest-of-honour portraits, 4:5, never upscaled
-// - public/partners/*.png   partner logos cut from the convener's flyer (2x, lossless)
+// Partner logos: scripts/build-partner-logos.mjs
 //
 // Crops are hand-placed on each face. tests/speakers.test.ts checks every output's
 // size and 4:5 ratio, so a bad crop fails the gate.
@@ -79,20 +79,8 @@ const people = [
   },
 ];
 
-// Partner tiles from the flyer's bottom (inset 3 px to drop the flyer's tile border) "In partnership with" row (854x1279 original).
-// The convener supplied no separate logo files; replace these with vector logos when they do.
-const flyer = "assets-src/partners/flyer-nov-2026.jpeg";
-const logos = [
-  { out: "keystone-bank.png", crop: { left: 345, top: 1209, width: 91, height: 48 } },
-  { out: "dmax-media.png", crop: { left: 451, top: 1209, width: 92, height: 48 } },
-  { out: "allevents-ng.png", crop: { left: 557, top: 1209, width: 80, height: 48 } },
-  { out: "ta-media.png", crop: { left: 651, top: 1209, width: 80, height: 48 } },
-  { out: "praxis-medical.png", crop: { left: 747, top: 1209, width: 80, height: 48 } },
-];
-
 mkdirSync("public/people", { recursive: true });
 mkdirSync("public/speakers", { recursive: true });
-mkdirSync("public/partners", { recursive: true });
 
 for (const j of people) {
   await sharp(join("assets-src", j.in))
@@ -102,13 +90,4 @@ for (const j of people) {
     .webp({ quality: 82 })
     .toFile(join("public", j.out));
   console.log("wrote", j.out);
-}
-
-for (const l of logos) {
-  await sharp(flyer)
-    .extract(l.crop)
-    .resize(l.crop.width * 2, l.crop.height * 2, { kernel: "lanczos3" })
-    .png({ compressionLevel: 9 })
-    .toFile(join("public/partners", l.out));
-  console.log("wrote partners/" + l.out);
 }

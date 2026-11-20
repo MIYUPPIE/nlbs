@@ -70,6 +70,18 @@ test.describe("speakers and flyer partners", () => {
       await expect.poll(() => loaded(img)).toBe(true);
     }
   });
+
+  for (const route of ["/", "/partners"]) {
+    test(`${route} partners section has exactly the five logos and no placeholder categories`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+      const section = page.locator("#partners");
+      await expect(section.locator("ul").first().locator("li img")).toHaveCount(5);
+      await expect(section).not.toContainText("Partner to be announced");
+      await expect(section).not.toContainText(/Strategic Partners|Government Partners|Media Partners/);
+    });
+  }
 });
 
 test.describe("reduced motion", () => {

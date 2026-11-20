@@ -23,7 +23,7 @@ Only facts confirmed in the build brief are published. They live in `src/data/`:
 | `event.ts`                                   | Event facts, statistics (every figure is `expected` or `target`), contact details (`null` = placeholder) |
 | `programme.ts`                               | Six programme formats. `time: null` renders "Time to be announced"                                       |
 | `speakers.ts`                                | Speakers and guests of honour from the convener (see **Speakers and partners**)                          |
-| `partners.ts`                                | Flyer partners under "In Partnership With"; add `{ name, logo }` to fill a placeholder category          |
+| `partners.ts`                                | The five flyer partners, shown as one "In partnership with" logo row (no categories)                     |
 | `partnership.ts`, `registration-plan.ts`     | Partnership tracks and tiers; delegate routes, timeline and arrival details                              |
 | `content.ts`, `audience.ts`, `navigation.ts` | Section copy, audience groups, nav and routes                                                            |
 
@@ -183,9 +183,13 @@ Wikipedia and Nigerian press; each lists its `sources` in `src/data/speakers.ts`
 - **Profile modals** (`src/components/speakers/`): one native `<dialog>` per speaker on `/` and `/speakers`. Any
   `a[data-profile-id]` opens it (`SpeakerDialogController`, one delegated listener); without JS the same link goes to the
   in-page profile on `/speakers`. Escape, close button and backdrop close it; focus starts on the close button.
-- `node scripts/optimize-people.mjs` builds `public/speakers/*.webp` (4:5, never upscaled, metadata stripped) and
-  `public/partners/*.png` (the five "In partnership with" logos cut from the flyer at 2x; replace with the partners' own
-  files when supplied).
+- `node scripts/optimize-people.mjs` builds `public/speakers/*.webp` (4:5, never upscaled, metadata stripped).
+- `node scripts/build-partner-logos.mjs` builds `public/partners/*.png`: one 480x240 tile per partner, artwork trimmed,
+  fitted with equal padding and laid on its own brand background. Keystone Bank (official lockup from Wikimedia Commons)
+  and allevents.ng (official file from allevents.ng) use the partners' real logo files. Dmax Media, TA Media
+  Communications and Praxis Medical Nigeria publish no logo file anywhere online (checked 20 Nov 2026), so they are cut
+  from the flyer and upscaled; ask the convener for their originals, drop them in `assets-src/partners/` and set `src`.
+  The partners section has no placeholder categories (`tests/content-integrity.test.ts`).
 - Reduced motion: use `usePrefersReducedMotion` (hydration-safe), never `useReducedMotion` from motion, which caused
   hydration error #418 on every page for reduced-motion visitors (`tests/reduced-motion.test.ts`, e2e "reduced motion").
 - Tests: `tests/speakers.test.ts`, `tests/orbit.test.ts`, `tests/content-integrity.test.ts`; e2e "speaker orbit",

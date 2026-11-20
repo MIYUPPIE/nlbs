@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import { displayName, speakerGroups, speakers, speakersIn } from "@/data/speakers";
-import { partnerCategories } from "@/data/partners";
+import { PARTNER_LOGO_SIZE, partners } from "@/data/partners";
 import { eventJsonLd } from "@/lib/site";
 
 const PUBLIC = join(process.cwd(), "public");
@@ -123,14 +123,51 @@ describe("speaker data", () => {
 });
 
 describe("partner logos", () => {
-  const partners = partnerCategories.flatMap((c) => c.partners);
-  it.each(partners)("$name has a PNG logo at 2x the flyer crop", async (p) => {
+  it.each(partners)("$name has a 480x240 PNG logo tile", async (p) => {
     const file = join(PUBLIC, p.logo);
     expect(existsSync(file)).toBe(true);
     const meta = await sharp(file).metadata();
     expect(meta.format).toBe("png");
-    expect(meta.height).toBe(96);
-    expect(meta.width).toBeGreaterThanOrEqual(150);
+    expect([meta.width, meta.height]).toEqual([PARTNER_LOGO_SIZE.width, PARTNER_LOGO_SIZE.height]);
+  });
+
+  it.each(partners)("$name's logo has artwork on a flat brand background", async (p) => {
+    // Regression: the old flyer crops cut "Keystone" to "Keyston" and kept the flyer's
+    // grey tile behind allevents.ng and Praxis. A tile's four corners must match (one flat
+    // background) and the artwork must stay clear of every edge (nothing cut off).
+    const { data, info } = await sharp(join(PUBLIC, p.logo))
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const px = (x: number, y: number) => [
+      ...data.subarray((y * info.width + x) * 3, (y * info.width + x) * 3 + 3),
+    ];
+    const bg = px(0, 0);
+    const near = (c: number[]) => c.every((v, i) => Math.abs(v - bg[i]) <= 6);
+    for (const c of [px(info.width - 1, 0), px(0, info.height - 1), px(info.width - 1, info.height - 1)]) {
+      expect(near(c)).toBe(true);
+    }
+    for (let x = 0; x < info.width; x++) {
+      for (const y of [0, 1, 2, info.height - 3, info.height - 2, info.height - 1])
+        expect(near(px(x, y))).toBe(true);
+    }
+    for (let y = 0; y < info.height; y++) {
+      for (const x of [0, 1, 2, info.width - 3, info.width - 2, info.width - 1])
+        expect(near(px(x, y))).toBe(true);
+    }
+    let ink = 0;
+    for (let i = 0; i < data.length; i += 3) if (!near([data[i], data[i + 1], data[i + 2]])) ink++;
+    expect(ink / (info.width * info.height)).toBeGreaterThan(0.04);
+  });
+
+  it("the white tiles are pure white, not the flyer's off-white", async () => {
+    for (const f of ["dmax-media.png", "allevents-ng.png", "praxis-medical.png"]) {
+      const { data } = await sharp(join(PUBLIC, "partners", f))
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      expect([...data.subarray(0, 3)]).toEqual([255, 255, 255]);
+    }
   });
 
   it("every file in public/partners is used", () => {
