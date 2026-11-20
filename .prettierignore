@@ -10,3 +10,6 @@ content/*.md
 
 # Generated from central-backend/contracts/privacy (tests/legal.test.ts checks it byte for byte)
 src/data/legal.json
+
+# Generated from the shortlist PDF by scripts/extract-shortlist.mjs (tests/shortlist.test.ts checks it)
+src/data/talent-shortlist.generated.json

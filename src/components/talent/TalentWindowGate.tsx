@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { CalendarClock, Lock } from "lucide-react";
 import { talentApplication as t } from "@/data/talent-application";
+import { shortlistPath } from "@/data/navigation";
 import { TalentApplicationForm } from "@/components/talent/TalentApplicationForm";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { applicationWindow, type WindowStatus } from "@/lib/talent-form";
@@ -52,12 +53,18 @@ export function TalentWindowGate() {
       <p className="mt-3 max-w-lg text-muted">
         {status === "upcoming"
           ? `The form will be available here from ${t.portalOpens} until ${t.deadline}. Prepare your 1-minute video and your answers now.`
-          : `The deadline was ${t.deadline}. Shortlisted applicants are being contacted on WhatsApp.`}
+          : `The deadline was ${t.deadline}. The final shortlist is out: find your name, confirm your details and join the shortlisted applicants' WhatsApp group.`}
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Link href="/talent#apply" className={buttonClasses("gold")}>
-          How to prepare
-        </Link>
+        {status === "closed" ? (
+          <Link href={shortlistPath} className={buttonClasses("gold")}>
+            Check the shortlist
+          </Link>
+        ) : (
+          <Link href="/talent#apply" className={buttonClasses("gold")}>
+            How to prepare
+          </Link>
+        )}
         <Link href="/faq#talent-fund-core-product" className={buttonClasses("outline-dark")}>
           Talent Fund FAQs
         </Link>

@@ -1,5 +1,8 @@
 export type NavLink = { label: string; href: string };
 
+/** Talent Fund final shortlist. Linked from /talent, /talentnigeria20 (once closed), the drawer and the footer; noindex. */
+export const shortlistPath = "/talentnigeria20/shortlist";
+
 /** Desktop header links, in the order given by the brief, then FAQ (it was mobile-only until Oct 2026). */
 export const primaryNav: NavLink[] = [
   { label: "About", href: "/about" },
@@ -18,6 +21,7 @@ export const mobileNav: NavLink[] = [
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
   { label: "Talent Fund Application", href: "/talentnigeria20" },
+  { label: "Talent Fund Shortlist", href: shortlistPath },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -36,6 +40,7 @@ export const footerNav: NavLink[] = [
 
 export const footerSecondaryNav: NavLink[] = [
   { label: "Talent Fund Application", href: "/talentnigeria20" },
+  { label: "Talent Fund Shortlist", href: shortlistPath },
   { label: "Startup Pitch Arena", href: "/startup-pitch" },
   { label: "Innovation Exhibition", href: "/exhibition" },
 ];

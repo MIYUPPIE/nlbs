@@ -37,6 +37,11 @@ AddType text/plain .txt
     Header always set Cache-Control "private, no-store"
   </If>
 
+  # Talent Fund shortlist names young applicants: linked from the site, kept out of search results.
+  <If "%{REQUEST_URI} =~ m#^/talentnigeria20/shortlist(/|$)#">
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  </If>
+
   # Hashed build assets never change: cache for a year. Pages revalidate.
   <If "%{REQUEST_URI} =~ m#^/_next/static/#">
     Header set Cache-Control "public, max-age=31536000, immutable"

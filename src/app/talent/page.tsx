@@ -1,4 +1,5 @@
 import { talent } from "@/data/content";
+import { shortlistPath } from "@/data/navigation";
 import { PageHero } from "@/components/layout/PageHero";
 import { CTASection } from "@/components/sections/CTASection";
 import { TalentApplicationSection } from "@/components/sections/TalentApplicationSection";
@@ -19,9 +20,9 @@ export const metadata = pageMetadata({
 const ways = [
   {
     title: "Young professionals",
-    body: "Apply for Skills, Jobs or Capital through the Talent Fund portal by 10 November 2026 (deadline extended).",
-    href: "#apply",
-    cta: "How to apply",
+    body: "Applications closed on 10 November 2026. The final shortlist is out: find your name, confirm your details and join the shortlisted applicants' WhatsApp group.",
+    href: shortlistPath,
+    cta: "Check the shortlist",
   },
   {
     title: "Employers and partners",

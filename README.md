@@ -158,6 +158,33 @@ link to each university.
 Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list must match central-backend
 `App\Talent\Universities`.
 
+## Talent Fund final shortlist
+
+`/talentnigeria20/shortlist/`: the convener's final shortlist (16 November 2026, 1,867 records), with a three-step
+finder that leads each shortlisted applicant to the WhatsApp group.
+
+1. **Find your name**: any part of the name, any word order ("chidera okonkwo" finds "Okonkwo Chidera Gift").
+   Results show names only.
+2. **Confirm your details**: the applicant picks their talent option (Skills, Jobs, Capital) and state, and ticks
+   "I am …". All three must match a shortlist record. Applicants who share a name are told apart here.
+3. **Join the WhatsApp group**: the link appears only after a match.
+
+Below the finder, the full list renders by state (37 accordions, names by track). It works without JavaScript.
+
+- **Data**: the PDF lives in `assets-src/talent/` (never `public/`). `node scripts/extract-shortlist.mjs` writes
+  `src/data/talent-shortlist.generated.json` and refuses to write if the row count differs from the PDF's
+  "N UNIQUE RECORDS", or if any state, track or line fails to parse. Needs `pdftotext` (poppler-utils). For a new
+  list, replace the PDF, rerun the script and update the counts in `tests/shortlist.test.ts`.
+- **Duplicates**: 5 applicants appear twice in the PDF with different capitalisation (same state and track). They
+  are shown as supplied, so totals match the convener's 1,867.
+- **WhatsApp link**: in `src/data/talent-shortlist.ts`, base64-encoded so it is not plain text in the page or bundle.
+  This keeps out scrapers; it is not access control, since the list itself is public.
+- **Visibility**: linked from `/talent`, the closed `/talentnigeria20` page, the mobile drawer and the footer. It
+  names young applicants, so it is `noindex` (meta tag and `X-Robots-Tag` in `.htaccess`) and not in the sitemap.
+- Tests: `tests/shortlist.test.ts` (data matches the PDF, search finds all 1,867 by their own name, confirmation,
+  link, noindex), `e2e/shortlist.spec.ts` (full flow, wrong details rejected, no-JS list, link absent from HTML,
+  no overflow at 1440/768/390/375, axe at each step).
+
 ## Speakers and partners
 
 Supplied by the convener in Nov 2026: the event flyer, named portraits and two written profiles (Dr. Samson Ajayi,
