@@ -47,3 +47,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /dist/
+
+# Rendered carousel images (npm run carousel:render)
+/social/*/out/
