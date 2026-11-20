@@ -33,7 +33,7 @@ export const footerNav: NavLink[] = [
   { label: "Talent", href: "/talent" },
   { label: "Technology", href: "/technology" },
   { label: "Partners", href: "/partners" },
-  { label: "Register", href: "/register" },
+  { label: "Registration", href: "/register" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];

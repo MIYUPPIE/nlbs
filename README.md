@@ -158,6 +158,27 @@ link to each university.
 Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list must match central-backend
 `App\Talent\Universities`.
 
+## Registration closed (20 Nov 2026)
+
+Convener decision: all registration stopped three days before the summit. One switch, `src/lib/registration-window.ts`:
+
+- `/register` shows "Registration is closed" (no form), a link to the shortlist and the contact details, and keeps
+  "Before and on the day" for confirmed delegates.
+- Every "Register" button (header, mobile drawer, hero, closing CTA band, footer, 404) reads `summitCta()` and now
+  says "Check the Talent Fund shortlist". The investment and pitch "Register as…" cards point to
+  `/contact?topic=investment` instead.
+- The central backend refuses the `registration` form from 00:00 on 20 Nov, Lagos time (`config/central.php`
+  `nlbs_registration`, 403 "Registration for Nigeria 2.0 closed on 20 November 2026."), so the form cannot be
+  bypassed. The Talent Fund application has been closed since 10 Nov and stays closed.
+- To reopen: `NEXT_PUBLIC_REGISTRATION_OVERRIDE=open` in `.env.production` and `CENTRAL_NLBS_REGISTRATION=open` on
+  the backend. `build-cpanel.sh` refuses to ship an open `/register` unless that line is in `.env.production`.
+- `npm run test:e2e` runs twice: the main suite on a build with both forms forced open (so the forms stay tested),
+  then the `@closed` specs (`e2e/registration-closed.spec.ts`) on a build with no overrides, which is what ships.
+  Unit tests: `tests/registration-closed.test.ts`.
+
+The homepage shows the shortlist straight after the hero (`ShortlistSection`: track totals, the full finder, a link
+to the list by state); the hero button scrolls to it.
+
 ## Talent Fund final shortlist
 
 `/talentnigeria20/shortlist/`: the convener's final shortlist (16 November 2026, 1,867 records), with a three-step

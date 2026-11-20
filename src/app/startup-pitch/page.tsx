@@ -8,6 +8,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { pageMetadata } from "@/lib/metadata";
+import { registrationOpen } from "@/lib/registration-window";
 
 export const metadata = pageMetadata({
   title: "Startup Pitch Arena",
@@ -25,17 +26,19 @@ const tracks = [
       "Selected founders pitch on the summit stage",
     ],
     href: "/contact?topic=pitch",
-    cta: "Register startup interest",
+    cta: registrationOpen ? "Register startup interest" : "Ask about the Pitch Arena",
   },
   {
     title: "Investors",
     points: [
       "See scalable Nigerian solutions presented live",
       "Meet founders during structured networking",
-      "Register as a delegate to attend the Pitch Arena",
+      registrationOpen
+        ? "Register as a delegate to attend the Pitch Arena"
+        : "Attend the Pitch Arena as a confirmed delegate",
     ],
-    href: "/register?type=Investor",
-    cta: "Register as an investor",
+    href: registrationOpen ? "/register?type=Investor" : "/contact?topic=investment",
+    cta: registrationOpen ? "Register as an investor" : "Contact the investment team",
   },
 ];
 

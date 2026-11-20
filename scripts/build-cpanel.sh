@@ -12,7 +12,7 @@ VERSION="$(git describe --tags --always --dirty 2>/dev/null || date +%Y%m%d%H%M%
 ZIP="dist/nlbs-site-$VERSION.zip"
 
 # Never let a developer's shell or .env.local leak into production.
-unset NEXT_PUBLIC_CENTRAL_API_URL NEXT_PUBLIC_CENTRAL_SITE_KEY NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE
+unset NEXT_PUBLIC_CENTRAL_API_URL NEXT_PUBLIC_CENTRAL_SITE_KEY NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_TALENT_APPLICATIONS_OVERRIDE NEXT_PUBLIC_REGISTRATION_OVERRIDE
 if [ -f .env.local ]; then mv .env.local .env.local.build-hold; trap 'mv .env.local.build-hold .env.local' EXIT; fi
 
 rm -rf out
@@ -27,6 +27,12 @@ grep -rqF "$API" out/_next/static || fail "build does not contain the backend UR
 grep -rqF "$KEY" out/_next/static || fail "build does not contain the site's public key"
 ! grep -rqE "localhost:3299|pk_e2e_nlbs" out || fail "test settings found in the build"
 ! grep -rqE "sk_[A-Za-z0-9]{20,}" out || fail "a secret key is in the build"
+# Registration closed 20 Nov 2026 (src/lib/registration-window.ts). Reopening means setting
+# NEXT_PUBLIC_REGISTRATION_OVERRIDE=open in .env.production on purpose.
+if ! grep -q '^NEXT_PUBLIC_REGISTRATION_OVERRIDE=open' .env.production; then
+  grep -q 'data-registration="closed"' out/register/index.html || fail "/register is not showing 'Registration is closed'"
+  ! grep -q 'Request Invitation' out/register/index.html || fail "/register still has the registration form"
+fi
 
 mkdir -p dist
 rm -f "$ZIP"

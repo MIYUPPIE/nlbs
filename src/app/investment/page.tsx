@@ -8,6 +8,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { pageMetadata } from "@/lib/metadata";
+import { registrationOpen } from "@/lib/registration-window";
 
 export const metadata = pageMetadata({
   title: "Investment",
@@ -20,14 +21,14 @@ const paths = [
   {
     title: "For businesses and startups",
     body: "Meet capital providers whose mandates fit your stage and sector through qualified, pre-arranged meetings.",
-    href: "/register?type=Business",
-    cta: "Register as a business",
+    href: registrationOpen ? "/register?type=Business" : "/contact?topic=investment",
+    cta: registrationOpen ? "Register as a business" : "Contact the investment team",
   },
   {
     title: "For investors and DFIs",
     body: "Access a curated pipeline of Nigerian businesses and startups, and the leaders shaping the operating environment.",
-    href: "/register?type=Investor",
-    cta: "Register as an investor",
+    href: registrationOpen ? "/register?type=Investor" : "/contact?topic=investment",
+    cta: registrationOpen ? "Register as an investor" : "Contact the investment team",
   },
   {
     title: "For strategic partners",

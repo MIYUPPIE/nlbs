@@ -13,6 +13,7 @@ import { InTheRoomSection } from "@/components/sections/InTheRoomSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PillarsSection } from "@/components/sections/PillarsSection";
 import { ProgrammeSection } from "@/components/sections/ProgrammeSection";
+import { ShortlistSection } from "@/components/sections/ShortlistSection";
 import { SpeakersSection } from "@/components/sections/SpeakersSection";
 import { StartupPitchSection } from "@/components/sections/StartupPitchSection";
 import { StatisticsSection } from "@/components/sections/StatisticsSection";
@@ -26,6 +27,7 @@ export default function HomePage() {
     <>
       <JsonLd data={eventJsonLd()} />
       <Hero />
+      <ShortlistSection />
       <StatisticsSection />
       <AboutSection />
       <InTheRoomSection />

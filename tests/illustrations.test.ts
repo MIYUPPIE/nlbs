@@ -57,11 +57,12 @@ describe("AI-generated illustrations", () => {
     expect(() => illustration("nope" as never)).toThrow(/missing/);
   });
 
-  it("every homepage section shows an image, except Speakers and Partners", () => {
+  it("every homepage section shows an image, except Speakers, Partners and the Talent Fund shortlist", () => {
     const page = readFileSync(join(ROOT, "src/app/page.tsx"), "utf8");
     const sections = [...page.matchAll(/<([A-Z][A-Za-z]+Section)\b/g)].map((m) => m[1]);
     // Speakers and Partners show real portraits and logos (or placeholders); an illustration there would read as invented people or brands.
-    const exempt = new Set(["SpeakersSection", "PartnersSection"]);
+    // The shortlist is a search tool over real applicants' names; an illustration beside it would read as them.
+    const exempt = new Set(["SpeakersSection", "PartnersSection", "ShortlistSection"]);
     expect(sections.length).toBeGreaterThanOrEqual(17);
     for (const name of sections.filter((n) => !exempt.has(n))) {
       const src = readFileSync(join(ROOT, "src/components/sections", `${name}.tsx`), "utf8");

@@ -116,9 +116,9 @@ test.describe("talent fund shortlist", () => {
     // The closed /talentnigeria20 page links here too; e2e builds force the form open, so that is unit-tested.
     await page.goto("/talent/");
     await expect(
-      page.getByRole("contentinfo").getByRole("link", { name: "Talent Fund Shortlist" }),
+      page.getByRole("contentinfo").getByRole("link", { name: "Talent Fund Shortlist", exact: true }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Check the shortlist" }).click();
+    await page.getByRole("main").getByRole("link", { name: "Check the shortlist" }).click();
     await expect(page).toHaveURL(/\/talentnigeria20\/shortlist\/?$/);
   });
 

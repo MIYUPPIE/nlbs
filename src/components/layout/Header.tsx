@@ -9,6 +9,7 @@ import { event } from "@/data/event";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { cn } from "@/lib/utils";
+import { summitCta } from "@/lib/registration-window";
 
 /**
  * Invoker Commands (HTML `commandfor` / `command`) open and close the drawer
@@ -30,6 +31,7 @@ const isActive = (pathname: string, href: string) =>
  */
 export function Header() {
   const pathname = usePathname();
+  const cta = summitCta();
   const [scrolled, setScrolled] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -112,11 +114,11 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/register"
+            href={cta.href}
             className={buttonClasses("gold", "md", "hidden sm:inline-flex")}
-            aria-current={pathname === "/register" ? "page" : undefined}
+            aria-current={pathname === cta.href ? "page" : undefined}
           >
-            Register
+            {cta.shortLabel}
           </Link>
           <button
             ref={toggleRef}
@@ -188,11 +190,11 @@ export function Header() {
             <p className="text-xs tracking-[0.18em] text-mist uppercase">{event.date.display}</p>
             <p className="mt-1 text-sm text-white/80">{event.venue.display}</p>
             <Link
-              href="/register"
+              href={cta.href}
               onClick={closeDrawer}
               className={buttonClasses("gold", "lg", "mt-5 w-full")}
             >
-              Register for the Summit
+              {cta.label}
             </Link>
           </div>
         </div>

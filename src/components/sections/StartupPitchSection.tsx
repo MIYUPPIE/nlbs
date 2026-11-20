@@ -7,6 +7,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionImage } from "@/components/ui/SectionImage";
+import { registrationOpen } from "@/lib/registration-window";
 
 export function StartupPitchSection({ cta = true }: { cta?: boolean }) {
   return (
@@ -31,9 +32,14 @@ export function StartupPitchSection({ cta = true }: { cta?: boolean }) {
             />
             {cta && (
               <div className="mt-10 flex flex-col gap-3 sm:flex-row" data-reveal>
-                <GoldButton href="/contact?topic=pitch">Register startup interest</GoldButton>
-                <GoldButton href="/register?type=Investor" variant="outline-light">
-                  Attend as an investor
+                <GoldButton href="/contact?topic=pitch">
+                  {registrationOpen ? "Register startup interest" : "Ask about the Pitch Arena"}
+                </GoldButton>
+                <GoldButton
+                  href={registrationOpen ? "/register?type=Investor" : "/contact?topic=investment"}
+                  variant="outline-light"
+                >
+                  {registrationOpen ? "Attend as an investor" : "Investor enquiries"}
                 </GoldButton>
               </div>
             )}

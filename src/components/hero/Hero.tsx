@@ -9,6 +9,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Countdown } from "@/components/hero/Countdown";
 import { SpeakerOrbit } from "@/components/sections/SpeakerOrbit";
 import { orderedSpeakers } from "@/data/speakers";
+import { registrationOpen, summitCta } from "@/lib/registration-window";
 
 const backdrop = photo("lagos-victoria-island-aerial");
 
@@ -81,8 +82,8 @@ export function Hero() {
             </ul>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <GoldButton href="/register" size="lg">
-                Register for the Summit
+              <GoldButton href={registrationOpen ? "/register" : "#shortlist"} size="lg">
+                {summitCta().label}
               </GoldButton>
               <GoldButton href="/programme" variant="outline-light" size="lg" arrow={false}>
                 Explore the Programme

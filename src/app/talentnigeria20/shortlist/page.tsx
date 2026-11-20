@@ -111,7 +111,11 @@ export default function ShortlistPage() {
         </Container>
       </section>
 
-      <section aria-labelledby="list-title" className="bg-white py-12 sm:py-16 lg:py-20">
+      <section
+        id="full-list"
+        aria-labelledby="list-title"
+        className="scroll-mt-24 bg-white py-12 sm:py-16 lg:py-20"
+      >
         <Container>
           <p className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.24em] text-gold-ink uppercase">
             <span aria-hidden="true" className="h-px w-8 bg-gold" />

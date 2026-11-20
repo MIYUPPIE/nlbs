@@ -6,6 +6,7 @@ import { MovingBorderFrame } from "@/components/aceternity/MovingBorder";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { summitCta } from "@/lib/registration-window";
 
 const backdrop = photo("lagos-business-district");
 
@@ -53,8 +54,8 @@ export function CTASection({
               </li>
             </ul>
             <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-              <GoldButton href="/register" size="lg">
-                Register for the Summit
+              <GoldButton href={summitCta().href} size="lg">
+                {summitCta().label}
               </GoldButton>
               <GoldButton href="/partners" variant="outline-light" size="lg" arrow={false}>
                 Partner with us

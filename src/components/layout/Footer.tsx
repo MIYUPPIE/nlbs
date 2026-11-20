@@ -5,6 +5,7 @@ import { footerNav, footerSecondaryNav, legalNav } from "@/data/navigation";
 import { Container } from "@/components/ui/Container";
 import { LOGO } from "@/lib/logo";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { summitCta } from "@/lib/registration-window";
 
 export function Footer() {
   return (
@@ -27,8 +28,8 @@ export function Footer() {
               <br />
               <span className="text-gold">Invest in Possibilities.</span>
             </p>
-            <GoldButton href="/register" className="mt-8">
-              Register for the Summit
+            <GoldButton href={summitCta().href} className="mt-8">
+              {summitCta().label}
             </GoldButton>
           </div>
 

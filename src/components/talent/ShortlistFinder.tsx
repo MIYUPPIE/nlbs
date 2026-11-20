@@ -12,6 +12,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { contact } from "@/data/event";
+import { shortlistPath } from "@/data/navigation";
 import {
   shortlist,
   shortlistStates,
@@ -258,8 +259,11 @@ export function ShortlistFinder() {
             {!result.tooShort && result.total === 0 && (
               <div className="mt-4 rounded-2xl bg-ivory p-5">
                 <p className="text-sm text-navy-950">
-                  Try your surname alone, or the spelling you used on the form. You can also browse the full
-                  list by state below.
+                  Try your surname alone, or the spelling you used on the form. You can also{" "}
+                  <a href={`${shortlistPath}/#full-list`} className="font-semibold text-navy-700 underline">
+                    browse the full list by state
+                  </a>
+                  .
                 </p>
                 <div className="mt-3">{helpLine}</div>
               </div>
