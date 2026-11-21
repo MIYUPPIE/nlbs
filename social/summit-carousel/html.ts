@@ -31,6 +31,8 @@ const ICONS: Record<string, string> = {
   cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>',
   bookmark: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
   send: '<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
+  repost:
+    '<path d="m2 9 3-3 3 3"/><path d="M13 18H7a2 2 0 0 1-2-2V6"/><path d="m22 15-3 3-3-3"/><path d="M11 6h6a2 2 0 0 1 2 2v10"/>',
   at: '<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>',
   globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
 };
@@ -179,7 +181,7 @@ const slide1 = (c: Carousel, r: Resolve) =>
       `<p class="meta">${icon("calendar", 30)}<span>${esc(c.cover.date)}</span><span class="dot"></span>${icon("clock", 30)}<span>${esc(c.cover.time)}</span></p>
        <p class="meta">${icon("pin", 30)}<span>${esc(c.cover.venue)}</span></p>`,
     ),
-    `<p class="swipe" style="right:76px;top:1104px">${esc(c.cover.swipe)}</p>`,
+    c.cover.swipe ? `<p class="swipe" style="right:76px;top:1104px">${esc(c.cover.swipe)}</p>` : "",
   ].join("");
 
 const slide2 = (c: Carousel) =>
@@ -322,7 +324,7 @@ const slide7 = (c: Carousel, r: Resolve) => {
       196,
       1018,
       700,
-      `<div class="actions"><span class="btn gold">${icon("bookmark", 30, "#071a33")}${esc(c.cta.save)}</span><span class="btn">${icon("send", 30)}${esc(c.cta.share)}</span></div>`,
+      `<div class="actions"><span class="btn gold">${icon("bookmark", 30, "#071a33")}${esc(c.cta.save)}</span><span class="btn">${icon(c.cta.shareIcon, 30)}${esc(c.cta.share)}</span></div>`,
     ),
   ].join("");
 };

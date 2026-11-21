@@ -113,10 +113,21 @@ export const carousel = {
     partners: partners.map((p) => ({ name: p.name, logo: p.logo })),
     save: "Save",
     share: "Share",
+    shareIcon: "send" as "send" | "repost",
   },
-} as const;
+};
 
 export type Carousel = typeof carousel;
+
+/**
+ * The same copy adapted for X (Twitter) video: no "Swipe" (the camera moves
+ * by itself) and X's own verbs, Bookmark and Repost.
+ */
+export const forX = (c: Carousel = carousel): Carousel => ({
+  ...c,
+  cover: { ...c.cover, swipe: "" },
+  cta: { ...c.cta, save: "Bookmark", share: "Repost", shareIcon: "repost" },
+});
 
 /** Every visible string, for content checks. */
 export const allCopy = (c: Carousel = carousel): string[] => {

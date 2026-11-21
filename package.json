@@ -19,7 +19,8 @@
     "build:e2e:closed": "NEXT_PUBLIC_CENTRAL_API_URL=http://localhost:3299 NEXT_PUBLIC_CENTRAL_SITE_KEY=pk_e2e_nlbs NEXT_PUBLIC_SITE_URL=http://localhost:3200 next build",
     "build:cpanel": "bash scripts/build-cpanel.sh",
     "photos:sync": "node scripts/sync-photos.mjs",
-    "carousel:render": "playwright test -c social/summit-carousel"
+    "carousel:render": "playwright test -c social/summit-carousel",
+    "video:render": "playwright test -c social/summit-video"
   },
   "dependencies": {
     "clsx": "^2.1.1",
