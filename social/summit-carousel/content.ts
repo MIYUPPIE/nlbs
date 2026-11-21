@@ -47,7 +47,7 @@ export const carousel = {
   cover: {
     kicker: event.name,
     wordmark: { lead: "Nigeria", accent: "2.0" },
-    hook: "The agenda for Nigeria’s next decade is set on Monday.",
+    hook: `The agenda for Nigeria’s next decade is set on ${event.date.display.split(",")[0]}.`,
     date: event.date.display,
     time: event.date.startDisplay,
     venue: event.venue.display,

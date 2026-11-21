@@ -26,16 +26,51 @@ describe("verified event facts", () => {
     expect(event.fullName).toBe("Nigeria 2.0 Nigerian Leadership Business Summit 2026");
     expect(event.theme).toBe("Nigeria 2.0: Unlocking Capital, Talent & Technology for a Resilient Economy");
     expect(event.tagline).toBe("Invest in People. Invest in Possibilities.");
-    expect(event.date.display).toBe("Monday, 23 November 2026");
+    expect(event.date.display).toBe("Thursday, 10 December 2026");
     expect(event.venue.display).toBe("Eko Convention Centre, Lagos");
     expect(event.convener).toBe("HBC Business Help");
     expect(event.previousEdition).toEqual({ year: 2025, theme: "Leadership Beyond the Norm" });
   });
 
-  it("23 November 2026 is a Monday, and display, short and ISO agree", () => {
-    expect(event.date.iso).toBe("2026-11-23");
-    expect(new Date(`${event.date.iso}T12:00:00Z`).getUTCDay()).toBe(1);
-    expect(event.date.short).toBe("23 Nov 2026");
+  it("10 December 2026 is a Thursday, and display, short and ISO agree", () => {
+    expect(event.date.iso).toBe("2026-12-10");
+    expect(new Date(`${event.date.iso}T12:00:00Z`).getUTCDay()).toBe(4);
+    expect(event.date.short).toBe("10 Dec 2026");
+  });
+
+  it("runs 9:00 AM to 5:00 PM WAT, as the new-date flyer says", () => {
+    expect([event.date.startTime, event.date.endTime]).toEqual(["09:00", "17:00"]);
+    expect(event.date.hoursDisplay).toBe(
+      `${event.date.startDisplay.replace(" WAT", "")} to ${event.date.endDisplay}`,
+    );
+  });
+
+  it("records the move from Monday 23 November, and the old date is earlier", () => {
+    const r = event.reschedule;
+    expect(r.previousIso).toBe("2026-11-23");
+    expect(new Date(`${r.previousIso}T12:00:00Z`).getUTCDay()).toBe(1);
+    expect(r.previousDisplay).toBe("Monday, 23 November 2026");
+    expect(r.previousShort).toBe("23 Nov 2026");
+    expect(r.previousIso < event.date.iso).toBe(true);
+    expect(r.tagline).toBe("Same vision. Bigger stage. Better experience.");
+    expect(r.validity).toMatch(/remains valid/);
+  });
+});
+
+describe("the old date never leaks back", () => {
+  // Only event.ts may name the previous date (in `reschedule`); everything else derives from it.
+  const eventFile = join(SRC, "data", "event.ts");
+  const stale = /23(rd)?\s*Nov|November\s*23|2026-11-23|\bMonday\b|\bMon\b/;
+  it("no source file outside event.ts mentions 23 November or Monday", () => {
+    const hits = walk(SRC).filter((p) => p !== eventFile && stale.test(readFileSync(p, "utf8")));
+    expect(hits).toEqual([]);
+  });
+
+  it("FAQ Q4 gives the new date and hours, and Q13 no longer pins the summit to November", () => {
+    const o = JSON.parse(readFileSync(join(__dirname, "..", "content", "faq-overrides.json"), "utf8"));
+    expect(o["4"]).toMatch(/^Thursday, 10th December 2026, Eko Convention Centre/);
+    expect(o["4"]).toMatch(/9AM - 5PM/);
+    expect(o["13"]).not.toMatch(/November/);
   });
 });
 
@@ -173,10 +208,15 @@ describe("structured data", () => {
     const ld = eventJsonLd();
     expect(ld["@type"]).toBe("Event");
     expect(ld.name).toBe(event.fullName);
-    expect(ld.startDate).toBe("2026-11-23T09:00:00+01:00");
-    expect(ld.endDate).toBe("2026-11-23");
+    expect(ld.startDate).toBe("2026-12-10T09:00:00+01:00");
+    expect(ld.endDate).toBe("2026-12-10T17:00:00+01:00");
     expect(ld.location.name).toBe("Eko Convention Centre");
     expect(ld.location.address.addressLocality).toBe("Lagos");
     expect(ld.location.address.addressCountry).toBe("NG");
+  });
+  it("is marked rescheduled, with the old start as previousStartDate", () => {
+    const ld = eventJsonLd();
+    expect(ld.eventStatus).toBe("https://schema.org/EventRescheduled");
+    expect(ld.previousStartDate).toBe("2026-11-23T09:00:00+01:00");
   });
 });

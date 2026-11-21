@@ -5,8 +5,7 @@ import { ImageResponse } from "next/og";
 import { event } from "@/data/event";
 import { brandDataUri } from "@/lib/logo-image";
 
-export const alt =
-  "Nigeria 2.0: Nigerian Leadership Business Summit 2026, 23 November 2026, Eko Convention Centre, Lagos";
+export const alt = `Nigeria 2.0: Nigerian Leadership Business Summit 2026, new date ${event.date.display}, ${event.venue.display}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -40,7 +39,10 @@ export default function OpenGraphImage() {
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 26, color: "#A8B3C7" }}>
-        <span>{event.date.display}</span>
+        <span style={{ display: "flex", gap: 14 }}>
+          <span style={{ color: "#D4AF37", fontWeight: 700 }}>{event.reschedule.label}</span>
+          <span>{event.date.display}</span>
+        </span>
         <span>{event.venue.display}</span>
       </div>
     </div>,

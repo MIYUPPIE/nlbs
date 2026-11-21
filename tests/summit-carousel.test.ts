@@ -41,9 +41,9 @@ describe("carousel facts come from src/data", () => {
     expect(carousel.cover.swipe).toBe("Swipe →");
   });
 
-  it("23 November 2026 is a Monday, so the 'on Monday' hook is true", () => {
-    expect(carousel.cover.hook).toMatch(/Monday/);
-    expect(new Date(`${event.date.iso}T12:00:00Z`).getUTCDay()).toBe(1);
+  it("the hook names the event's real weekday (10 December 2026 is a Thursday)", () => {
+    expect(carousel.cover.hook).toBe("The agenda for Nigeria’s next decade is set on Thursday.");
+    expect(new Date(`${event.date.iso}T12:00:00Z`).getUTCDay()).toBe(4);
   });
 
   it("uses all four figures, each still labelled Expected or Target", () => {

@@ -7,6 +7,7 @@ import { BackgroundBeams } from "@/components/aceternity/BackgroundBeams";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Countdown } from "@/components/hero/Countdown";
+import { NewDateBadge, NewDateNotice } from "@/components/ui/NewDateNotice";
 import { SpeakerOrbit } from "@/components/sections/SpeakerOrbit";
 import { orderedSpeakers } from "@/data/speakers";
 import { registrationOpen, summitCta } from "@/lib/registration-window";
@@ -72,14 +73,17 @@ export function Hero() {
               <li className="flex items-center gap-3">
                 <CalendarDays aria-hidden="true" className="size-5 shrink-0 text-gold" />
                 <time dateTime={event.date.iso} className="font-medium text-white">
-                  {event.date.display} · {event.date.startDisplay}
+                  {event.date.display} · {event.date.hoursDisplay}
                 </time>
+                <NewDateBadge />
               </li>
               <li className="flex items-center gap-3">
                 <MapPin aria-hidden="true" className="size-5 shrink-0 text-gold" />
                 <span className="font-medium text-white">{event.venue.display}</span>
               </li>
             </ul>
+
+            <NewDateNotice className="mt-8 max-w-xl" />
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <GoldButton href={registrationOpen ? "/register" : "#shortlist"} size="lg">

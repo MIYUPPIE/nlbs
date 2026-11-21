@@ -6,6 +6,7 @@ import { MovingBorderFrame } from "@/components/aceternity/MovingBorder";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { NewDateBadge } from "@/components/ui/NewDateNotice";
 import { summitCta } from "@/lib/registration-window";
 
 const backdrop = photo("lagos-business-district");
@@ -47,6 +48,7 @@ export function CTASection({
               <li className="flex items-center gap-2">
                 <CalendarDays aria-hidden="true" className="size-4 text-gold" />
                 <time dateTime={event.date.iso}>{event.date.display}</time>
+                <NewDateBadge />
               </li>
               <li className="flex items-center gap-2">
                 <MapPin aria-hidden="true" className="size-4 text-gold" />

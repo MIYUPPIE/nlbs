@@ -2,18 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { event } from "@/data/event";
-import {
-  getCountdown,
-  pad2,
-  startOfDayInZone,
-  zonedTimeToUtc,
-  type Countdown as CountdownValue,
-} from "@/lib/countdown";
+import { getCountdown, pad2, zonedTimeToUtc, type Countdown as CountdownValue } from "@/lib/countdown";
 import { cn } from "@/lib/utils";
 
 const TARGET_MS = zonedTimeToUtc(event.date.iso, event.date.startTime, event.date.timeZone);
-/** "Happening today" until local midnight after the event. */
-const END_MS = startOfDayInZone(event.date.iso, event.date.timeZone) + 86_400_000;
+/** "Happening today" until the published 5:00 PM WAT close. */
+const END_MS = zonedTimeToUtc(event.date.iso, event.date.endTime, event.date.timeZone);
 
 const units: { key: keyof Omit<CountdownValue, "status">; label: string }[] = [
   { key: "days", label: "Days" },

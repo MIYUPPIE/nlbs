@@ -18,14 +18,12 @@ import { eventJsonLd } from "@/lib/site";
 export const metadata = registrationOpen
   ? pageMetadata({
       title: "Request an Invitation",
-      description:
-        "Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. Monday 23 November 2026, Eko Convention Centre, Lagos.",
+      description: `Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. ${event.date.display.replace(",", "")}, ${event.venue.display}.`,
       path: "/register",
     })
   : pageMetadata({
       title: "Registration Closed",
-      description:
-        "Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, has closed. Monday 23 November 2026, Eko Convention Centre, Lagos.",
+      description: `Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, has closed. New date: ${event.date.display.replace(",", "")}, ${event.venue.display}. ${event.reschedule.validity}`,
       path: "/register",
     });
 

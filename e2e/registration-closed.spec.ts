@@ -38,6 +38,8 @@ test.describe("registration closed @closed", () => {
   });
 
   test("no page links to the registration form any more", async ({ page }) => {
+    // Walks every route; under a full parallel run it needs more than the 30s default.
+    test.slow();
     for (const route of ROUTES) {
       await page.goto(route);
       // Only the footer's "Registration" link to the closed page remains.

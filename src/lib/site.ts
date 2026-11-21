@@ -11,8 +11,11 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nlbs.co
 export const siteTitle = "Nigeria 2.0 | Nigerian Leadership Business Summit 2026";
 
 /**
- * Schema.org Event. Start time from the convener's flyer and FAQ (9:00 AM WAT).
- * No end time is published (evening programme varies), so endDate is date-only.
+ * Schema.org Event. Start and end from the convener's "New date" flyer
+ * (9:00 AM to 5:00 PM WAT). The summit was moved (event.reschedule), so it is
+ * marked EventRescheduled with previousStartDate, as schema.org and Google's
+ * event guidelines ask for a moved event (search results show the new date
+ * and that it changed).
  */
 export function eventJsonLd() {
   return {
@@ -21,8 +24,9 @@ export function eventJsonLd() {
     name: event.fullName,
     description: event.description,
     startDate: `${event.date.iso}T${event.date.startTime}:00+01:00`,
-    endDate: event.date.iso,
-    eventStatus: "https://schema.org/EventScheduled",
+    endDate: `${event.date.iso}T${event.date.endTime}:00+01:00`,
+    eventStatus: "https://schema.org/EventRescheduled",
+    previousStartDate: `${event.reschedule.previousIso}T${event.date.startTime}:00+01:00`,
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: {
       "@type": "Place",

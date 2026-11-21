@@ -89,7 +89,7 @@ export function Footer() {
                 <div>
                   <dt className="text-mist">Date</dt>
                   <dd className="mt-1 text-white/90">
-                    {event.date.display}, {event.date.startDisplay}
+                    {event.date.display}, {event.date.hoursDisplay}
                   </dd>
                 </div>
                 <div>

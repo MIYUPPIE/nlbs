@@ -10,7 +10,7 @@ describe("startOfDayInZone", () => {
   });
 
   it("uses the event's configured date and timezone", () => {
-    expect(event.date.iso).toBe("2026-11-23");
+    expect(event.date.iso).toBe("2026-12-10");
     expect(event.date.timeZone).toBe(LAGOS);
   });
 
@@ -83,8 +83,16 @@ describe("pad2", () => {
 describe("zonedTimeToUtc", () => {
   it("resolves the 9:00 AM WAT start to 08:00 UTC", () => {
     expect(new Date(zonedTimeToUtc(event.date.iso, event.date.startTime, LAGOS)).toISOString()).toBe(
-      "2026-11-23T08:00:00.000Z",
+      "2026-12-10T08:00:00.000Z",
     );
+  });
+
+  it("resolves the 5:00 PM WAT close to 16:00 UTC, after the start", () => {
+    const start = zonedTimeToUtc(event.date.iso, event.date.startTime, LAGOS);
+    const end = zonedTimeToUtc(event.date.iso, event.date.endTime, LAGOS);
+    expect(new Date(end).toISOString()).toBe("2026-12-10T16:00:00.000Z");
+    expect(getCountdown(end - 1, start, end).status).toBe("live");
+    expect(getCountdown(end, start, end).status).toBe("past");
   });
 
   it("rejects malformed times", () => {

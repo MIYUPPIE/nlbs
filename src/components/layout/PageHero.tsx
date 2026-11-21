@@ -2,6 +2,7 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { event } from "@/data/event";
 import { Spotlight } from "@/components/aceternity/Spotlight";
 import { Container } from "@/components/ui/Container";
+import { NewDateBadge, NewDateNotice } from "@/components/ui/NewDateNotice";
 
 /** Inner-page hero. Same authority surface as the homepage, compact height. */
 export function PageHero({
@@ -39,16 +40,20 @@ export function PageHero({
         {lead && <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-mist">{lead}</p>}
         {children}
         {showEvent && (
-          <ul className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/85 sm:flex-row sm:gap-8">
-            <li className="flex items-center gap-2">
-              <CalendarDays aria-hidden="true" className="size-4 text-gold" />
-              <time dateTime={event.date.iso}>{event.date.display}</time>
-            </li>
-            <li className="flex items-center gap-2">
-              <MapPin aria-hidden="true" className="size-4 text-gold" />
-              {event.venue.display}
-            </li>
-          </ul>
+          <div className="mt-10 border-t border-white/10 pt-6">
+            <ul className="flex flex-col gap-3 text-sm text-white/85 sm:flex-row sm:gap-8">
+              <li className="flex items-center gap-2">
+                <CalendarDays aria-hidden="true" className="size-4 text-gold" />
+                <time dateTime={event.date.iso}>{event.date.display}</time>
+                <NewDateBadge />
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin aria-hidden="true" className="size-4 text-gold" />
+                {event.venue.display}
+              </li>
+            </ul>
+            <NewDateNotice variant="inline" className="mt-3 max-w-3xl" />
+          </div>
         )}
       </Container>
     </section>

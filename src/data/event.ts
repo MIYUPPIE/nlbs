@@ -17,14 +17,31 @@ export const event = {
   tagline: "Invest in People. Invest in Possibilities.",
   convener: "HBC Business Help",
   date: {
-    /** ISO calendar date. */
-    iso: "2026-11-23",
-    display: "Monday, 23 November 2026",
-    short: "23 Nov 2026",
+    /** ISO calendar date. Moved from Monday 23 November 2026 (see `reschedule`). */
+    iso: "2026-12-10",
+    display: "Thursday, 10 December 2026",
+    short: "10 Dec 2026",
     timeZone: "Africa/Lagos",
-    /** Start time, local (flyer: "9:00 AM prompt"; FAQ: "9AM Plenary"). */
+    /** Start and end, local. "New date" flyer (21 Nov 2026): "9AM - 5PM". */
     startTime: "09:00",
     startDisplay: "9:00 AM WAT",
+    endTime: "17:00",
+    endDisplay: "5:00 PM WAT",
+    hoursDisplay: "9:00 AM to 5:00 PM WAT",
+  },
+  /**
+   * Convener's "New date alert" flyer (assets-src/announcements/new-date-10-dec-2026.jpeg, received 21 Nov 2026):
+   * the summit moved from Monday 23 November to Thursday 10 December 2026, same
+   * venue. Tickets and Talent Fund selections stay valid. The site says
+   * "invitation" for ticket because the summit is invitation-only.
+   */
+  reschedule: {
+    previousIso: "2026-11-23",
+    previousDisplay: "Monday, 23 November 2026",
+    previousShort: "23 Nov 2026",
+    label: "New date",
+    tagline: "Same vision. Bigger stage. Better experience.",
+    validity: "Your invitation or Talent Fund selection remains valid. Save the new date.",
   },
   venue: {
     name: "Eko Convention Centre",

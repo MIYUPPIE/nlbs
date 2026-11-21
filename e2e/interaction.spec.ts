@@ -89,18 +89,89 @@ test.describe("programme tabs", () => {
 });
 
 test.describe("countdown", () => {
-  test("counts down to 23 Nov 2026 09:00 WAT from a frozen clock", async ({ page }) => {
-    // 28 Sep 2026 12:00 WAT → 23 Nov 09:00 WAT is 55 days, 21 hours.
-    await page.clock.setFixedTime(new Date("2026-09-28T11:00:00Z"));
+  test("counts down to 10 Dec 2026 09:00 WAT from a frozen clock", async ({ page }) => {
+    // 21 Nov 2026 12:00 WAT → 10 Dec 09:00 WAT is 18 days, 21 hours.
+    await page.clock.setFixedTime(new Date("2026-11-21T11:00:00Z"));
     await page.goto("/");
     const timer = page.getByRole("timer");
-    await expect(timer).toHaveAttribute("aria-label", "55 days, 21 hours, 0 minutes until the summit");
+    await expect(timer).toHaveAttribute("aria-label", "18 days, 21 hours, 0 minutes until the summit");
   });
 
-  test("shows the event-day state on the day", async ({ page }) => {
+  test("is still counting on the old date, 23 Nov", async ({ page }) => {
     await page.clock.setFixedTime(new Date("2026-11-23T09:00:00Z"));
     await page.goto("/");
+    await expect(page.getByRole("timer")).toHaveAttribute("aria-label", /^16 days, 23 hours/);
+    await expect(page.getByText("Happening today")).toHaveCount(0);
+  });
+
+  test("shows the event-day state on the day, until the 5:00 PM close", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-12-10T15:59:00Z"));
+    await page.goto("/");
     await expect(page.getByText("Happening today")).toBeVisible();
+  });
+
+  test("shows the summit as over after 5:00 PM WAT", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-12-10T16:00:00Z"));
+    await page.goto("/");
+    await expect(page.getByText("The 2026 summit has taken place")).toBeVisible();
+  });
+});
+
+test.describe("new date announcement", () => {
+  test("homepage hero announces 10 December, the old date, and that invitations stay valid", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const hero = page.locator("#hero-title").locator("xpath=ancestor::section");
+    const notice = hero.getByTestId("new-date-notice");
+    await expect(notice).toBeVisible();
+    await expect(notice.getByRole("heading")).toHaveText("New date: Thursday, 10 December 2026");
+    await expect(notice).toContainText("Moved from Monday, 23 November 2026.");
+    await expect(notice).toContainText("Same vision. Bigger stage. Better experience.");
+    await expect(notice).toContainText("Your invitation or Talent Fund selection remains valid.");
+    await expect(hero.getByText("Thursday, 10 December 2026 · 9:00 AM to 5:00 PM WAT")).toBeVisible();
+  });
+
+  test("every inner page with the date strip carries the badge and the note", async ({ page }) => {
+    for (const path of ["/about", "/programme", "/talentnigeria20/shortlist"]) {
+      await page.goto(path);
+      const strip = page.locator("#page-title").locator("xpath=ancestor::section");
+      await expect(strip.getByTestId("new-date-badge")).toBeVisible();
+      await expect(strip.getByTestId("new-date-notice")).toContainText(
+        "Moved from Monday, 23 November 2026.",
+      );
+    }
+  });
+
+  test("at 375px the badge stays on one line and the notice never overflows", async ({ page }, info) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    for (const path of ["/", "/about"]) {
+      await page.goto(path);
+      const badge = page.getByTestId("new-date-badge").first();
+      await badge.scrollIntoViewIfNeeded();
+      const box = await badge.boundingBox();
+      expect(box!.height, path).toBeLessThan(22);
+      const notice = page.getByTestId("new-date-notice").first();
+      const n = await notice.boundingBox();
+      expect(n!.x, path).toBeGreaterThanOrEqual(0);
+      expect(n!.x + n!.width, path).toBeLessThanOrEqual(375);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), path).toBeLessThanOrEqual(375);
+      await notice.scrollIntoViewIfNeeded();
+      await info.attach(`new-date${path.replace(/\//g, "-") || "-home"}`, {
+        body: await page.screenshot(),
+        contentType: "image/png",
+      });
+    }
+  });
+
+  test("no page still states 23 November as the summit date", async ({ page }) => {
+    for (const path of ["/", "/about", "/programme", "/register", "/faq", "/contact"]) {
+      await page.goto(path);
+      const text = (await page.locator("body").innerText())
+        .replace(/Moved from Monday, 23 November 2026\./g, "")
+        .replace(/moved from Monday, 23rd November 2026\./gi, "");
+      expect(text, path).not.toMatch(/23(rd)? Nov/);
+    }
   });
 });
 
@@ -190,7 +261,9 @@ test.describe("seo", () => {
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? "{}");
     expect(ld["@type"]).toBe("Event");
-    expect(ld.startDate).toBe("2026-11-23T09:00:00+01:00");
+    expect(ld.startDate).toBe("2026-12-10T09:00:00+01:00");
+    expect(ld.eventStatus).toBe("https://schema.org/EventRescheduled");
+    expect(ld.previousStartDate).toBe("2026-11-23T09:00:00+01:00");
   });
 
   test("sitemap and robots are served", async ({ request }) => {

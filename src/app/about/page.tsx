@@ -26,7 +26,7 @@ export const metadata = pageMetadata({
 const facts = [
   { label: "Theme", value: event.theme },
   { label: "Tagline", value: event.tagline },
-  { label: "Date", value: `${event.date.display}, ${event.date.startDisplay}` },
+  { label: "Date", value: `${event.date.display}, ${event.date.hoursDisplay}` },
   { label: "Venue", value: `${event.venue.display}, ${event.venue.address}` },
   { label: "Convener", value: `${event.convener}. Convened by Dr. Wale Busari FCA, FIMC, CMC` },
   { label: "Previous edition", value: `${event.previousEdition.year}: ${event.previousEdition.theme}` },
