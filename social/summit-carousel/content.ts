@@ -47,7 +47,8 @@ export const carousel = {
   cover: {
     kicker: event.name,
     wordmark: { lead: "Nigeria", accent: "2.0" },
-    hook: `The agenda for Nigeria’s next decade is set on ${event.date.display.split(",")[0]}.`,
+    // "on Thursday" would read as this week; the summit is weeks away, so name the date.
+    hook: `The agenda for Nigeria’s next decade is set on ${event.date.display.split(", ")[1].replace(/ \d{4}$/, "")}.`,
     date: event.date.display,
     time: event.date.startDisplay,
     venue: event.venue.display,
