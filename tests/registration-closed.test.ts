@@ -11,7 +11,14 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { event } from "@/data/event";
 import { shortlistPath } from "@/data/navigation";
-import { closesAtMs, isRegistrationOpen, registrationClosure, summitCta } from "@/lib/registration-window";
+import {
+  closesAtMs,
+  daysLeftLabel,
+  isRegistrationOpen,
+  registrationClosure,
+  registrationDaysLeft,
+  summitCta,
+} from "@/lib/registration-window";
 import { applicationWindow } from "@/lib/talent-form";
 
 const ROOT = join(__dirname, "..");
@@ -145,10 +152,48 @@ describe("talent fund application", () => {
   });
 });
 
+describe("days left to register (Lagos days, counting today)", () => {
+  it.each([
+    ["2026-11-23T12:00:00", 14, "14 days left"],
+    ["2026-11-23T00:00:00", 14, "14 days left"],
+    ["2026-12-05T23:59:59", 2, "2 days left"],
+    ["2026-12-06T00:00:00", 1, "Last day to register"],
+    ["2026-12-06T23:59:59", 1, "Last day to register"],
+    ["2026-12-07T00:00:00", 0, null],
+    ["2026-12-10T09:00:00", 0, null],
+  ])("%s Lagos -> %i (%s)", (at, days, label) => {
+    expect(registrationDaysLeft(lagos(at))).toBe(days);
+    expect(daysLeftLabel(days)).toBe(label);
+  });
+});
+
 describe("homepage", () => {
-  it("shows the shortlist straight after the hero, and the hero button scrolls to it", () => {
+  it("puts registration straight after the hero, then the shortlist", () => {
     const page = read("src/app/page.tsx");
-    expect(page).toMatch(/<Hero \/>\s*<ShortlistSection \/>/);
+    expect(page).toMatch(/<Hero \/>\s*<RegistrationSection \/>\s*<ShortlistSection \/>/);
+  });
+
+  it("the registration section only renders while registration is open", () => {
+    const section = read("src/components/sections/RegistrationSection.tsx");
+    expect(section).toContain("if (!registrationOpen) return null;");
+    expect(section).toContain('id="register"');
+    expect(section).toContain("<RegistrationDaysLeft");
+    expect(section).toContain("/register?type=");
+  });
+
+  it("the hero shows the deadline under its buttons while open, above the new-date notice", () => {
+    const hero = read("src/components/hero/Hero.tsx");
+    expect(hero).toMatch(/registrationOpen && \(/);
+    expect(hero.indexOf("hero-registration-deadline")).toBeLessThan(hero.indexOf("<NewDateNotice"));
+    expect(hero.indexOf("summitCta().label")).toBeLessThan(hero.indexOf("<NewDateNotice"));
+  });
+
+  it("days-left renders nothing on the server, so the static HTML never shows a stale count", () => {
+    const c = read("src/components/sections/RegistrationDaysLeft.tsx");
+    expect(c).toMatch(/useSyncExternalStore\([\s\S]*\(\) => null,\s*\)/);
+  });
+
+  it("shows the shortlist, and once closed the hero button scrolls to it", () => {
     const section = read("src/components/sections/ShortlistSection.tsx");
     expect(section).toContain('id="shortlist"');
     expect(section).toContain("<ShortlistFinder />");

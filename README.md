@@ -167,9 +167,16 @@ Lagos time**. One switch, `src/lib/registration-window.ts` (`closesAt`):
 - Open (build made before the deadline): `/register` shows the form with "Registration is open until
   6 December 2026"; every site-wide button (header, mobile drawer, hero, closing CTA band, footer, 404) reads
   `summitCta()` and says "Register for the Summit"; the investment and pitch cards link to `/register?type=...`.
+- Homepage while open: `RegistrationSection` sits straight after the hero (`#register`): "Delegate registration is
+  open", the deadline with a live "N days left" (visitor's clock, `RegistrationDaysLeft`; blank in the static HTML),
+  how it works (request, vetting, QR code by email 2 days before), and "Register as" shortcuts that open
+  `/register?type=...#request` with the delegate type preselected. The hero repeats the deadline under its buttons,
+  which sit above the new-date notice so "Register for the Summit" is above the fold at 1440x900 and 390x844.
+  Tests: `e2e/home-registration.spec.ts`.
 - Closed (build made after the deadline): `/register` shows "Registration is closed" (no form), a link to the
   shortlist and the contact details, and keeps "Before and on the day" for confirmed delegates. The buttons say
-  "Check the Talent Fund shortlist" and the investment/pitch cards point to `/contact?topic=investment`.
+  "Check the Talent Fund shortlist" and the investment/pitch cards point to `/contact?topic=investment`. The homepage
+  registration section and the hero's deadline line disappear, leaving the shortlist first after the hero.
 - The site is static, so the state is fixed at build time (`next.config.ts` pins `NEXT_PUBLIC_BUILD_TIME`). An
   open build still served after the deadline swaps the form for the closed notice on the visitor's clock
   (`RegistrationForm`), and the backend refuses it anyway. **Rebuild and redeploy on or after 7 Dec** so the

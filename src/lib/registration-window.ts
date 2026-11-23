@@ -59,3 +59,21 @@ export function summitCta(open: boolean = registrationOpen): Cta {
     ? { label: "Register for the Summit", shortLabel: "Register", href: "/register" }
     : { label: "Check the Talent Fund shortlist", shortLabel: "Check the shortlist", href: shortlistPath };
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Whole Lagos days left to register, counting today: 14 two weeks out, 1 on
+ * 6 Dec (the last day), 0 from 00:00 on 7 Dec.
+ */
+export function registrationDaysLeft(now: number): number {
+  if (now >= closesAtMs) return 0;
+  return Math.ceil((closesAtMs - now) / DAY_MS);
+}
+
+/** "14 days left", "2 days left", "Last day to register", or null once closed. */
+export function daysLeftLabel(days: number): string | null {
+  if (days <= 0) return null;
+  if (days === 1) return "Last day to register";
+  return `${days} days left`;
+}

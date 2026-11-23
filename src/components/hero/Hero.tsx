@@ -10,7 +10,8 @@ import { Countdown } from "@/components/hero/Countdown";
 import { NewDateBadge, NewDateNotice } from "@/components/ui/NewDateNotice";
 import { SpeakerOrbit } from "@/components/sections/SpeakerOrbit";
 import { orderedSpeakers } from "@/data/speakers";
-import { registrationOpen, summitCta } from "@/lib/registration-window";
+import { registrationClosure, registrationOpen, summitCta } from "@/lib/registration-window";
+import { RegistrationDaysLeft } from "@/components/sections/RegistrationDaysLeft";
 
 const backdrop = photo("lagos-victoria-island-aerial");
 
@@ -83,9 +84,7 @@ export function Hero() {
               </li>
             </ul>
 
-            <NewDateNotice className="mt-8 max-w-xl" />
-
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <GoldButton href={registrationOpen ? "/register" : "#shortlist"} size="lg">
                 {summitCta().label}
               </GoldButton>
@@ -93,6 +92,23 @@ export function Hero() {
                 Explore the Programme
               </GoldButton>
             </div>
+            {registrationOpen && (
+              <p
+                data-testid="hero-registration-deadline"
+                className="mt-5 flex flex-wrap items-center gap-x-2 text-sm text-mist"
+              >
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-gold" />
+                <span>
+                  Delegate registration open until{" "}
+                  <time dateTime={registrationClosure.lastDayIso} className="font-semibold text-white">
+                    {registrationClosure.lastDay}
+                  </time>
+                </span>
+                <RegistrationDaysLeft className="font-semibold text-gold before:mr-2 before:text-mist before:content-['·'] empty:hidden" />
+              </p>
+            )}
+
+            <NewDateNotice className="mt-8 max-w-xl" />
           </div>
 
           <div className="lg:col-span-5">

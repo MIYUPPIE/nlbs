@@ -78,6 +78,9 @@ test.describe("homepage shortlist @closed", () => {
         .map((s) => s.id || s.getAttribute("aria-labelledby")),
     );
     expect(order).toEqual(["hero-title", "shortlist"]);
+    // The registration section and the hero's deadline line are gone once closed.
+    await expect(page.locator("#register")).toHaveCount(0);
+    await expect(page.getByTestId("hero-registration-deadline")).toHaveCount(0);
     await expect(page.getByTestId("home-shortlist-tracks")).toContainText("794");
     await page.getByRole("link", { name: "Check the Talent Fund shortlist" }).first().click();
     await expect(page).toHaveURL(/#shortlist$/);
