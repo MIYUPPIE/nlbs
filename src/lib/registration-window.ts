@@ -1,33 +1,55 @@
 import { shortlistPath } from "@/data/navigation";
 
 /**
- * Summit registration (/register, the delegate invitation request) is closed.
- * Convener decision, 20 November 2026: stop all registration three days
- * before the summit, and send visitors to the Talent Fund shortlist instead.
+ * Summit registration (/register, the delegate invitation request).
+ *
+ * History: closed on 20 November 2026, three days before the original summit
+ * date (event.reschedule). The summit moved to Thursday 10 December 2026, so
+ * registration reopened under the same rule: it closes three days before the
+ * summit, at 00:00 on 7 December 2026, Lagos time.
  *
  * One switch for the whole site. The central backend refuses the
- * `registration` form from the same date (central-backend
- * config/central.php `nlbs_registration`), so a closed page cannot be
+ * `registration` form from the same instant (central-backend
+ * config/central.php `nlbs_registration.closes`), so a stale page cannot be
  * bypassed by posting directly. The Talent Fund application closed on
  * 10 November (src/lib/talent-form.ts) and stays closed.
  *
- * NEXT_PUBLIC_REGISTRATION_OVERRIDE=open reopens the form at build time
- * (the e2e build uses it to keep testing the form). build-cpanel.sh unsets it
- * and refuses to ship a build whose /register page is not closed.
+ * The site is a static export, so the open/closed state is fixed when it is
+ * built (next.config.ts inlines the build time). RegistrationForm also checks
+ * the visitor's clock, so a build made before the deadline swaps the form for
+ * the closed notice once the deadline passes. build-cpanel.sh refuses to ship
+ * a build whose /register state does not match the deadline.
+ *
+ * NEXT_PUBLIC_REGISTRATION_OVERRIDE=open|closed forces the state (e2e only;
+ * build-cpanel.sh unsets it).
  */
 export const registrationClosure = {
-  closedIso: "2026-11-20",
-  closed: "20 November 2026",
+  /** 00:00 on 7 December 2026 in Lagos (WAT, UTC+1). Mirrors central-backend `nlbs_registration.closes`. */
+  closesAt: "2026-12-07T00:00:00+01:00",
+  lastDayIso: "2026-12-06",
+  lastDay: "6 December 2026",
+  closedIso: "2026-12-07",
+  closed: "7 December 2026",
   title: "Registration is closed",
-  body: "Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, closed on 20 November 2026. Thank you to everyone who requested an invitation.",
-};
+  body: "Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, closed on 7 December 2026. Thank you to everyone who requested an invitation.",
+} as const;
 
-export function isRegistrationOpen(override: string | undefined): boolean {
-  return override === "open";
+export const closesAtMs = Date.parse(registrationClosure.closesAt);
+
+export function isRegistrationOpen(override: string | undefined, now: number): boolean {
+  if (override === "open") return true;
+  if (override === "closed") return false;
+  return now < closesAtMs;
 }
 
-/** Baked in at build time (NEXT_PUBLIC_* is inlined in server and client code alike). */
-export const registrationOpen = isRegistrationOpen(process.env.NEXT_PUBLIC_REGISTRATION_OVERRIDE);
+/**
+ * Baked in at build time: NEXT_PUBLIC_* and the build time (next.config.ts)
+ * are inlined in server and client code alike, so server HTML and hydration agree.
+ */
+export const registrationOpen = isRegistrationOpen(
+  process.env.NEXT_PUBLIC_REGISTRATION_OVERRIDE,
+  Number(process.env.NEXT_PUBLIC_BUILD_TIME ?? Date.now()),
+);
 
 export type Cta = { label: string; shortLabel: string; href: string };
 

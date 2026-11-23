@@ -18,7 +18,7 @@ import { eventJsonLd } from "@/lib/site";
 export const metadata = registrationOpen
   ? pageMetadata({
       title: "Request an Invitation",
-      description: `Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. ${event.date.display.replace(",", "")}, ${event.venue.display}.`,
+      description: `Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. ${event.date.display.replace(",", "")}, ${event.venue.display}. Open until ${c.lastDay}.`,
       path: "/register",
     })
   : pageMetadata({
@@ -132,9 +132,17 @@ function OpenRegistration() {
       <section
         id="request"
         aria-label="Invitation request form"
+        data-registration="open"
         className="surface-light bg-ivory py-16 sm:py-20 lg:py-24"
       >
         <Container>
+          <p className="mb-8 flex items-center gap-3 rounded-xl border border-gold/50 bg-white p-4 text-sm font-semibold text-navy-950">
+            <CalendarDays aria-hidden="true" className="size-5 shrink-0 text-gold-ink" />
+            <span>
+              Registration is open until <time dateTime={c.lastDayIso}>{c.lastDay}</time>, three days before
+              the summit.
+            </span>
+          </p>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">
               <RegistrationForm />

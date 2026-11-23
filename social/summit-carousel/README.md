@@ -11,15 +11,15 @@ Output (gitignored): `slide_1.jpg` .. `slide_7.jpg`, `panorama.jpg`, `panorama.h
 
 ## Slides
 
-| #   | Purpose                                                                                           | Copy source                                                                              |
-| --- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| 1   | Cover: NIGERIA 2.0, hook, date, time, venue, Swipe →                                              | `event.ts`                                                                               |
-| 2   | Why: from dialogue to deals, three levers                                                         | `content.ts` pillars, intro                                                              |
-| 3   | Goals: 800+, $50M+, 10,000, 200+, each badged Expected or Target                                  | `event.ts` stats                                                                         |
-| 4   | Chief Host + two Keynotes                                                                         | `speakers.ts`                                                                            |
-| 5   | Guests of honour, Patron, Speaker                                                                 | `speakers.ts`                                                                            |
-| 6   | What to expect on the day (6 items)                                                               | `content.ts` whatToExpect                                                                |
-| 7   | Tagline, registration closed + QR by email, convener, handle, site, logos, partners, Save / Share | `event.ts`, `vision.ts`, `partners.ts`, `registration-window.ts`, `registration-plan.ts` |
+| #   | Purpose                                                                                                                           | Copy source                                                                              |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1   | Cover: NIGERIA 2.0, hook, date, time, venue, Swipe →                                                                              | `event.ts`                                                                               |
+| 2   | Why: from dialogue to deals, three levers                                                                                         | `content.ts` pillars, intro                                                              |
+| 3   | Goals: 800+, $50M+, 10,000, 200+, each badged Expected or Target                                                                  | `event.ts` stats                                                                         |
+| 4   | Chief Host + two Keynotes                                                                                                         | `speakers.ts`                                                                            |
+| 5   | Guests of honour, Patron, Speaker                                                                                                 | `speakers.ts`                                                                            |
+| 6   | What to expect on the day (6 items)                                                                                               | `content.ts` whatToExpect                                                                |
+| 7   | Tagline, registration open until 6 Dec (or closed, after it) + QR by email, convener, handle, site, logos, partners, Save / Share | `event.ts`, `vision.ts`, `partners.ts`, `registration-window.ts`, `registration-plan.ts` |
 
 Only the connective lines (headings, the hook) are written in `content.ts`. Every fact is imported from `src/data`, so the carousel cannot drift from the website.
 

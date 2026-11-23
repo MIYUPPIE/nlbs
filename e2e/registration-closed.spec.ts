@@ -3,9 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { ROUTES, trackErrors } from "./helpers";
 
 /**
- * @closed: runs against `npm run build:e2e:closed`, a build with no
- * overrides, which is what ships (registration closed 20 Nov 2026, Talent
- * Fund closed 10 Nov). `npm run test:e2e` runs these after the main suite.
+ * @closed: runs against `npm run build:e2e:closed`, a build with registration
+ * forced closed (what ships from 7 Dec 2026, when registration closes; the
+ * Talent Fund closed 10 Nov). `npm run test:e2e` runs these after the main suite.
  */
 
 const WHATSAPP = "https://chat.whatsapp.com/Lf7XCgLgJbD3wS886uthYO?s=cl&p=a&mlu=4&ilr=4&iam=2";
@@ -26,7 +26,7 @@ test.describe("registration closed @closed", () => {
     await expect(page.locator('[data-registration="closed"]')).toBeVisible();
     await expect(page.locator("form")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Request Invitation" })).toHaveCount(0);
-    await expect(page.getByText("20 November 2026").first()).toBeVisible();
+    await expect(page.getByText("7 December 2026").first()).toBeVisible();
     // Confirmed delegates still get the arrival details.
     await expect(page.getByText(/no on-site registration/i).first()).toBeVisible();
     await page

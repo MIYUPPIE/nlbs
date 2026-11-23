@@ -158,23 +158,30 @@ link to each university.
 Tests: `tests/universities.test.ts`, `e2e/universities.spec.ts`. The slug list must match central-backend
 `App\Talent\Universities`.
 
-## Registration closed (20 Nov 2026)
+## Delegate registration window (open until 6 Dec 2026)
 
-Convener decision: all registration stopped three days before the summit. One switch, `src/lib/registration-window.ts`:
+Convener rule: registration closes three days before the summit. It first closed on 20 Nov 2026 (three days
+before the original date); when the summit moved to 10 Dec it reopened, and now closes at **00:00 on 7 Dec 2026,
+Lagos time**. One switch, `src/lib/registration-window.ts` (`closesAt`):
 
-- `/register` shows "Registration is closed" (no form), a link to the shortlist and the contact details, and keeps
-  "Before and on the day" for confirmed delegates.
-- Every "Register" button (header, mobile drawer, hero, closing CTA band, footer, 404) reads `summitCta()` and now
-  says "Check the Talent Fund shortlist". The investment and pitch "Register as…" cards point to
-  `/contact?topic=investment` instead.
-- The central backend refuses the `registration` form from 00:00 on 20 Nov, Lagos time (`config/central.php`
-  `nlbs_registration`, 403 "Registration for Nigeria 2.0 closed on 20 November 2026."), so the form cannot be
-  bypassed. The Talent Fund application has been closed since 10 Nov and stays closed.
-- To reopen: `NEXT_PUBLIC_REGISTRATION_OVERRIDE=open` in `.env.production` and `CENTRAL_NLBS_REGISTRATION=open` on
-  the backend. `build-cpanel.sh` refuses to ship an open `/register` unless that line is in `.env.production`.
-- `npm run test:e2e` runs twice: the main suite on a build with both forms forced open (so the forms stay tested),
-  then the `@closed` specs (`e2e/registration-closed.spec.ts`) on a build with no overrides, which is what ships.
-  Unit tests: `tests/registration-closed.test.ts`.
+- Open (build made before the deadline): `/register` shows the form with "Registration is open until
+  6 December 2026"; every site-wide button (header, mobile drawer, hero, closing CTA band, footer, 404) reads
+  `summitCta()` and says "Register for the Summit"; the investment and pitch cards link to `/register?type=...`.
+- Closed (build made after the deadline): `/register` shows "Registration is closed" (no form), a link to the
+  shortlist and the contact details, and keeps "Before and on the day" for confirmed delegates. The buttons say
+  "Check the Talent Fund shortlist" and the investment/pitch cards point to `/contact?topic=investment`.
+- The site is static, so the state is fixed at build time (`next.config.ts` pins `NEXT_PUBLIC_BUILD_TIME`). An
+  open build still served after the deadline swaps the form for the closed notice on the visitor's clock
+  (`RegistrationForm`), and the backend refuses it anyway. **Rebuild and redeploy on or after 7 Dec** so the
+  buttons switch to the shortlist too.
+- The central backend refuses the `registration` form from the same instant (`config/central.php`
+  `nlbs_registration.closes`, 403 "Registration for Nigeria 2.0 closed on 7 December 2026."). Keep the two dates
+  equal; `tests/registration-closed.test.ts` compares them when `../central-backend` is checked out.
+- `build-cpanel.sh` unsets `NEXT_PUBLIC_REGISTRATION_OVERRIDE` and refuses a zip whose `/register` does not match
+  the deadline (form before, closed notice after). `.env.production` never carries the override.
+- `npm run test:e2e` runs twice: the main suite on a build forced open (`NEXT_PUBLIC_REGISTRATION_OVERRIDE=open`),
+  then the `@closed` specs (`e2e/registration-closed.spec.ts`) on a build forced closed. Unit tests:
+  `tests/registration-closed.test.ts`. The Talent Fund application has been closed since 10 Nov and stays closed.
 
 The homepage shows the shortlist straight after the hero (`ShortlistSection`: track totals, the full finder, a link
 to the list by state); the hero button scrolls to it.

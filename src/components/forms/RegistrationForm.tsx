@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
 import { event } from "@/data/event";
@@ -12,6 +12,23 @@ import { sendForm } from "@/lib/outgoing";
 import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
 import { PrivacyNotice } from "@/components/legal/PrivacyNotice";
+import { closesAtMs, registrationClosure } from "@/lib/registration-window";
+
+const noopSubscribe = () => () => {};
+
+const forcedOpen = process.env.NEXT_PUBLIC_REGISTRATION_OVERRIDE === "open";
+
+/**
+ * False on the server and during hydration; afterwards, whether the visitor's
+ * clock is past the deadline. A build forced open (e2e) ignores the clock.
+ */
+function usePastRegistrationDeadline(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => !forcedOpen && Date.now() >= closesAtMs,
+    () => false,
+  );
+}
 
 const emptyValues = {
   fullName: "",
@@ -41,9 +58,29 @@ export function RegistrationForm() {
   // Submit stays disabled until hydrated so a pre-hydration submit cannot fire natively.
   const hydrated = useHydrated();
 
+  // A build made before the deadline is still served after it: the visitor's clock decides.
+  const pastDeadline = usePastRegistrationDeadline();
+
   useEffect(() => {
     if (form.status === "success") successRef.current?.focus();
   }, [form.status]);
+
+  if (pastDeadline && form.status !== "success") {
+    return (
+      <div
+        role="status"
+        data-registration="closed"
+        className="rounded-3xl border border-line bg-white p-8 sm:p-12"
+      >
+        <h2 className="font-display text-4xl text-navy-950">{registrationClosure.title}</h2>
+        <p className="mt-3 max-w-lg text-muted">
+          Registration closed on{" "}
+          <time dateTime={registrationClosure.closedIso}>{registrationClosure.closed}</time>. Seats are by
+          confirmed invitation only, and there is no on-site registration.
+        </p>
+      </div>
+    );
+  }
 
   if (form.status === "success") {
     return (

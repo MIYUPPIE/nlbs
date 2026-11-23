@@ -10,7 +10,7 @@ import { whatToExpect } from "@/data/content";
 import { partners } from "@/data/partners";
 import { preEventTimeline } from "@/data/registration-plan";
 import { speakers } from "@/data/speakers";
-import { registrationClosure } from "@/lib/registration-window";
+import { registrationClosure, registrationOpen } from "@/lib/registration-window";
 import { allCopy, carousel } from "../social/summit-carousel/content";
 import { buildHtml, GUEST_ROWS, threadPoints } from "../social/summit-carousel/html";
 import {
@@ -78,7 +78,9 @@ describe("carousel facts come from src/data", () => {
   });
 
   it("CTA tells the truth about registration and the QR email", () => {
-    expect(carousel.cta.body).toContain(registrationClosure.closed);
+    expect(carousel.cta.body).toContain(
+      registrationOpen ? registrationClosure.lastDay : registrationClosure.closed,
+    );
     const qr = preEventTimeline.find((t) => /QR code/.test(t.what));
     expect(qr?.channel).toBe("Email");
     expect(carousel.cta.body).toMatch(/QR code and the venue map come by email/);

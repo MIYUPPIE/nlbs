@@ -12,7 +12,7 @@ import { pillars, whatToExpect } from "@/data/content";
 import { partners } from "@/data/partners";
 import { displayName, speakers, type Speaker } from "@/data/speakers";
 import { leadership } from "@/data/vision";
-import { registrationClosure } from "@/lib/registration-window";
+import { registrationClosure, registrationOpen } from "@/lib/registration-window";
 
 const speaker = (id: string): Speaker => {
   const s = speakers.find((x) => x.id === id);
@@ -101,7 +101,9 @@ export const carousel = {
   },
   cta: {
     closing: event.tagline,
-    body: `Registration closed on ${registrationClosure.closed}. Registered delegates: your QR code and the venue map come by email.`,
+    body: registrationOpen
+      ? `Registration is open until ${registrationClosure.lastDay}. Registered delegates: your QR code and the venue map come by email.`
+      : `Registration closed on ${registrationClosure.closed}. Registered delegates: your QR code and the venue map come by email.`,
     follow: contact.socialHandle ?? "",
     site: SITE_DISPLAY,
     convener: {

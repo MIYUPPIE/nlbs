@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   poweredByHeader: false,
+  // Fixes "now" for the build so server HTML and client hydration agree on
+  // whether registration is open (src/lib/registration-window.ts).
+  // Set once on process.env so every build worker inherits the same value.
+  env: {
+    NEXT_PUBLIC_BUILD_TIME: (process.env.NEXT_PUBLIC_BUILD_TIME ??= String(Date.now())),
+  },
 };
 
 export default nextConfig;

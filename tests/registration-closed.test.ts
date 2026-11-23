@@ -1,35 +1,65 @@
 /**
- * Registration closed (convener, 20 Nov 2026). Guards: one switch, closed by
- * default; every site-wide "Register" button follows it; the deploy script
- * refuses a build with an open /register; the Talent Fund application stays
- * closed; the homepage carries the shortlist straight after the hero.
+ * Delegate registration window. Closed 20 Nov 2026; reopened 23 Nov 2026 when
+ * the summit moved to 10 Dec, closing three days before it (00:00 on 7 Dec,
+ * Lagos). Guards: one switch with one deadline; every site-wide "Register"
+ * button follows it; the deploy script refuses a /register that does not
+ * match the deadline; the Talent Fund application stays closed; the homepage
+ * carries the shortlist straight after the hero.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { event } from "@/data/event";
 import { shortlistPath } from "@/data/navigation";
-import { isRegistrationOpen, registrationClosure, summitCta } from "@/lib/registration-window";
+import { closesAtMs, isRegistrationOpen, registrationClosure, summitCta } from "@/lib/registration-window";
 import { applicationWindow } from "@/lib/talent-form";
 
 const ROOT = join(__dirname, "..");
 const read = (f: string) => readFileSync(join(ROOT, f), "utf8");
+const lagos = (iso: string) => Date.parse(`${iso}+01:00`);
+const DAY = 24 * 60 * 60 * 1000;
 
-describe("registration switch", () => {
-  it("is closed unless the build explicitly reopens it", () => {
-    expect(isRegistrationOpen(undefined)).toBe(false);
-    expect(isRegistrationOpen("")).toBe(false);
-    expect(isRegistrationOpen("closed")).toBe(false);
-    expect(isRegistrationOpen("OPEN")).toBe(false);
-    expect(isRegistrationOpen("open")).toBe(true);
+describe("registration window", () => {
+  it("is open now (reopened 23 Nov 2026) and up to the last second of 6 Dec in Lagos", () => {
+    expect(isRegistrationOpen(undefined, lagos("2026-11-23T12:00:00"))).toBe(true);
+    expect(isRegistrationOpen(undefined, lagos("2026-12-06T23:59:59"))).toBe(true);
   });
 
-  it("says when it closed", () => {
-    expect(registrationClosure.closedIso).toBe("2026-11-20");
-    expect(registrationClosure.closed).toBe("20 November 2026");
-    expect(registrationClosure.body).toContain("20 November 2026");
+  it("closes at 00:00 on 7 Dec 2026 in Lagos (23:00 UTC on 6 Dec) and stays closed", () => {
+    expect(closesAtMs).toBe(Date.parse("2026-12-06T23:00:00Z"));
+    expect(isRegistrationOpen(undefined, lagos("2026-12-07T00:00:00"))).toBe(false);
+    expect(isRegistrationOpen(undefined, lagos("2026-12-10T09:00:00"))).toBe(false);
+    expect(isRegistrationOpen("", lagos("2027-01-01T00:00:00"))).toBe(false);
   });
 
-  it("points the site-wide button at the shortlist once closed", () => {
+  it("closes three days before the summit (event.ts)", () => {
+    expect(lagos(`${event.date.iso}T00:00:00`) - closesAtMs).toBe(3 * DAY);
+  });
+
+  it("only the exact override values force it", () => {
+    const after = lagos("2026-12-08T12:00:00");
+    const before = lagos("2026-11-25T12:00:00");
+    expect(isRegistrationOpen("open", after)).toBe(true);
+    expect(isRegistrationOpen("closed", before)).toBe(false);
+    expect(isRegistrationOpen("OPEN", after)).toBe(false);
+    expect(isRegistrationOpen("CLOSED", before)).toBe(true);
+  });
+
+  it("states the dates the pages print", () => {
+    expect(registrationClosure.lastDayIso).toBe("2026-12-06");
+    expect(registrationClosure.lastDay).toBe("6 December 2026");
+    expect(registrationClosure.closedIso).toBe("2026-12-07");
+    expect(registrationClosure.closed).toBe("7 December 2026");
+    expect(registrationClosure.body).toContain("7 December 2026");
+  });
+
+  const PHP = "../central-backend/services/api/config/central.php";
+  it.skipIf(!existsSync(join(ROOT, PHP)))("matches the central backend deadline", () => {
+    const php = read(PHP);
+    expect(php).toMatch(/'nlbs_registration' => \[\s*'closes' => '2026-12-07 00:00:00'/);
+  });
+
+  it("points the site-wide button at the form while open and the shortlist once closed", () => {
     expect(summitCta(false)).toEqual({
       label: "Check the Talent Fund shortlist",
       shortLabel: "Check the shortlist",
@@ -38,10 +68,33 @@ describe("registration switch", () => {
     expect(summitCta(true).href).toBe("/register");
   });
 
-  it("production builds never carry the override", () => {
+  it("the build pins 'now' so server HTML and hydration agree", () => {
+    expect(read("next.config.ts")).toMatch(
+      /NEXT_PUBLIC_BUILD_TIME: \(process\.env\.NEXT_PUBLIC_BUILD_TIME \?\?= String\(Date\.now\(\)\)\)/,
+    );
+    expect(read("src/lib/registration-window.ts")).toContain("process.env.NEXT_PUBLIC_BUILD_TIME");
+  });
+
+  it("a stale open build swaps the form for the closed notice on the visitor's clock", () => {
+    const form = read("src/components/forms/RegistrationForm.tsx");
+    expect(form).toContain("Date.now() >= closesAtMs");
+    expect(form).toContain('data-registration="closed"');
+  });
+
+  it("production builds never carry the override and must match the deadline", () => {
     expect(read(".env.production")).not.toMatch(/REGISTRATION_OVERRIDE/);
-    expect(read("scripts/build-cpanel.sh")).toMatch(/unset [^\n]*NEXT_PUBLIC_REGISTRATION_OVERRIDE/);
-    expect(read("scripts/build-cpanel.sh")).toContain('data-registration="closed"');
+    const sh = read("scripts/build-cpanel.sh");
+    expect(sh).toMatch(/unset [^\n]*NEXT_PUBLIC_REGISTRATION_OVERRIDE/);
+    expect(sh).toContain('data-registration="closed"');
+    expect(sh).toContain('data-registration="open"');
+    // The script reads closesAt with this sed pattern; keep the source line in that shape.
+    expect(read("src/lib/registration-window.ts")).toMatch(/^ *closesAt: "2026-12-07T00:00:00\+01:00",$/m);
+  });
+
+  it("the e2e closed build forces it closed", () => {
+    const pkg = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
+    expect(pkg.scripts["build:e2e:closed"]).toContain("NEXT_PUBLIC_REGISTRATION_OVERRIDE=closed");
+    expect(pkg.scripts["build:e2e"]).toContain("NEXT_PUBLIC_REGISTRATION_OVERRIDE=open");
   });
 });
 
@@ -75,6 +128,7 @@ describe("every Register button follows the switch", () => {
     const page = read("src/app/register/page.tsx");
     expect(page).toMatch(/registrationOpen \? <OpenRegistration \/> : <ClosedRegistration \/>/);
     expect(page).toContain('data-registration="closed"');
+    expect(page).toContain('data-registration="open"');
     // The form lives only in the open branch.
     const closed = page.slice(
       page.indexOf("function ClosedRegistration"),
