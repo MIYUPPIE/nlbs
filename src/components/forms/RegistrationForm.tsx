@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
+import { CircleAlert, CircleCheck, CreditCard, LoaderCircle, Lock, Minus, Plus } from "lucide-react";
 import { event } from "@/data/event";
-import { delegateTypes, registrationSchema, sectors } from "@/lib/registration";
+import { seatPayment, seatTotalDisplay } from "@/data/registration-plan";
+import {
+  delegateTypes,
+  guestEmailKey,
+  guestNameKey,
+  registrationSchema,
+  seatCount,
+  sectors,
+} from "@/lib/registration";
+import { startSeatPayment } from "@/lib/central";
+import type { Checkout } from "@/lib/forms";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Honeypot, SelectField, TextField } from "@/components/forms/Field";
 import { useSubmissionForm } from "@/components/forms/useSubmissionForm";
@@ -12,23 +22,8 @@ import { sendForm } from "@/lib/outgoing";
 import { useQueryPrefill } from "@/components/hooks/useQueryPrefill";
 import { useHydrated } from "@/components/hooks/useHydrated";
 import { PrivacyNotice } from "@/components/legal/PrivacyNotice";
-import { closesAtMs, registrationClosure } from "@/lib/registration-window";
-
-const noopSubscribe = () => () => {};
-
-const forcedOpen = process.env.NEXT_PUBLIC_REGISTRATION_OVERRIDE === "open";
-
-/**
- * False on the server and during hydration; afterwards, whether the visitor's
- * clock is past the deadline. A build forced open (e2e) ignores the clock.
- */
-function usePastRegistrationDeadline(): boolean {
-  return useSyncExternalStore(
-    noopSubscribe,
-    () => !forcedOpen && Date.now() >= closesAtMs,
-    () => false,
-  );
-}
+import { registrationClosure } from "@/lib/registration-window";
+import { usePastRegistrationDeadline } from "@/components/hooks/usePastRegistrationDeadline";
 
 const emptyValues = {
   fullName: "",
@@ -43,15 +38,50 @@ const emptyValues = {
   nominatedBy: "",
   accessNeeds: "",
   accessNeedsConsent: "",
+  seats: "1",
+  ...Object.fromEntries(
+    Array.from({ length: seatPayment.maxSeats - 1 }, (_, i) => [
+      [guestNameKey(i + 1), ""],
+      [guestEmailKey(i + 1), ""],
+    ]).flat(),
+  ),
   website: "",
 };
+
+/** Sends the browser to Paystack. Separate so e2e can stub navigation. */
+function goToCheckout(checkout: Checkout) {
+  window.location.assign(checkout.url);
+}
 
 const pickDelegateType = (raw: string) => ((delegateTypes as readonly string[]).includes(raw) ? raw : null);
 
 export function RegistrationForm() {
-  const { formRef, ...form } = useSubmissionForm(registrationSchema, emptyValues, (v) =>
-    sendForm("registration", v),
-  );
+  // After a successful registration: the checkout we are sending them to, or why it did not open.
+  const [pay, setPay] = useState<{ checkout: Checkout | null; error: string | null } | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const { formRef, ...form } = useSubmissionForm(registrationSchema, emptyValues, async (v) => {
+    const res = await sendForm("registration", v);
+    if (res.ok) {
+      setPay({ checkout: res.payment ?? null, error: res.payment ? null : (res.paymentError ?? null) });
+      if (res.payment) goToCheckout(res.payment);
+    }
+    return res;
+  });
+  const seats = seatCount(form.values.seats);
+  const setSeats = (n: number) =>
+    form.setField("seats", String(Math.min(seatPayment.maxSeats, Math.max(1, n))));
+
+  const retryPayment = async () => {
+    if (!form.reference) return;
+    setRetrying(true);
+    const res = await startSeatPayment(form.reference);
+    if (res.ok) {
+      goToCheckout(res.checkout);
+      return;
+    }
+    setRetrying(false);
+    setPay({ checkout: null, error: res.error });
+  };
   // /register?type=Investor preselects the delegate type.
   useQueryPrefill("type", pickDelegateType, (v) => form.setField("delegateType", v));
   const successRef = useRef<HTMLHeadingElement>(null);
@@ -75,49 +105,91 @@ export function RegistrationForm() {
         <h2 className="font-display text-4xl text-navy-950">{registrationClosure.title}</h2>
         <p className="mt-3 max-w-lg text-muted">
           Registration closed on{" "}
-          <time dateTime={registrationClosure.closedIso}>{registrationClosure.closed}</time>. Seats are by
-          confirmed invitation only, and there is no on-site registration.
+          <time dateTime={registrationClosure.closedIso}>{registrationClosure.closed}</time>. Only delegates
+          with a paid seat are admitted, and there is no on-site registration.
         </p>
       </div>
     );
   }
 
   if (form.status === "success") {
+    const payUrl = `${seatPayment.payPath}?ref=${encodeURIComponent(form.reference ?? "")}`;
+    const total = seatTotalDisplay(seats);
+    if (pay?.checkout) {
+      return (
+        <div role="status" className="rounded-3xl border border-gold/50 bg-white p-8 text-center sm:p-12">
+          <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-navy-950 text-gold">
+            <LoaderCircle aria-hidden="true" className="size-8 animate-spin" />
+          </span>
+          <h2
+            ref={successRef}
+            tabIndex={-1}
+            className="mt-6 font-display text-4xl text-navy-950 outline-none"
+          >
+            Taking you to payment
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-muted">
+            Your registration is saved (reference{" "}
+            <span className="font-mono font-semibold text-navy-950">{form.reference}</span>). Pay {total} with{" "}
+            {seatPayment.provider} to confirm {seats === 1 ? "your seat" : `all ${seats} seats`}.
+          </p>
+          <a href={pay.checkout.url} className={buttonClasses("gold", "lg", "mt-8")}>
+            <CreditCard aria-hidden="true" className="size-4" />
+            Continue to payment
+          </a>
+        </div>
+      );
+    }
     return (
       <div role="status" className="rounded-3xl border border-gold/50 bg-white p-8 text-center sm:p-12">
         <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-navy-950 text-gold">
           <CircleCheck aria-hidden="true" className="size-8" />
         </span>
         <h2 ref={successRef} tabIndex={-1} className="mt-6 font-display text-4xl text-navy-950 outline-none">
-          Request received
+          Registration saved. One step left.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-muted">
-          Thank you, {form.values.fullName.split(" ")[0]}. Your invitation request for {event.shortName} has
-          been received. Once it is vetted, the summit team will confirm your seat at{" "}
-          <strong className="text-navy-950">{form.values.email}</strong>, where your QR entry code will also
-          be sent.
+          Thank you, {form.values.fullName.split(" ")[0]}. Your seat is not confirmed until you pay {total}.
         </p>
+        {pay?.error && (
+          <p className="mx-auto mt-4 flex max-w-md items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-left text-sm text-red-800">
+            <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            {pay.error}
+          </p>
+        )}
         <dl className="mx-auto mt-8 grid max-w-sm gap-3 rounded-2xl bg-ivory p-5 text-left text-sm">
           <div className="flex justify-between gap-4">
             <dt className="text-muted">Reference</dt>
             <dd className="font-mono font-semibold text-navy-950">{form.reference}</dd>
           </div>
           <div className="flex justify-between gap-4">
+            <dt className="text-muted">Seats</dt>
+            <dd className="text-right text-navy-950">
+              {seats} × {seatPayment.priceDisplay} = <strong>{total}</strong>
+            </dd>
+          </div>
+          <div className="flex justify-between gap-4">
             <dt className="text-muted">Date</dt>
             <dd className="text-right text-navy-950">{event.date.display}</dd>
           </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-muted">Venue</dt>
-            <dd className="text-right text-navy-950">{event.venue.display}</dd>
-          </div>
         </dl>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/programme" className={buttonClasses("gold")}>
-            Explore the programme
-          </Link>
-          <button type="button" onClick={form.reset} className={buttonClasses("outline-dark")}>
-            Request for another delegate
+          <button
+            type="button"
+            onClick={retryPayment}
+            disabled={retrying}
+            className={buttonClasses("gold", "lg", "disabled:cursor-wait disabled:opacity-80")}
+          >
+            {retrying ? (
+              <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+            ) : (
+              <CreditCard aria-hidden="true" className="size-4" />
+            )}
+            Pay {total} now
           </button>
+          <Link href={payUrl} className={buttonClasses("outline-dark", "lg")}>
+            Pay later with my reference
+          </Link>
         </div>
       </div>
     );
@@ -258,10 +330,83 @@ export function RegistrationForm() {
         </div>
       </fieldset>
 
+      <fieldset className="mt-10 border-t border-line pt-8" aria-describedby="seats-help">
+        <legend className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">Seats</legend>
+        <div className="mt-6 flex flex-col gap-5 rounded-2xl bg-ivory p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold text-navy-950">How many seats?</p>
+            <p id="seats-help" className="mt-1 text-sm text-muted">
+              {seatPayment.priceDisplay} per delegate. You are seat 1; add colleagues and pay for everyone in
+              one go (up to {seatPayment.maxSeats}).
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSeats(seats - 1)}
+              disabled={seats <= 1}
+              aria-label="One seat fewer"
+              className="flex size-11 items-center justify-center rounded-full border border-line bg-white text-navy-950 disabled:opacity-40"
+            >
+              <Minus aria-hidden="true" className="size-4" />
+            </button>
+            <output
+              aria-live="polite"
+              aria-label={`${seats} ${seats === 1 ? "seat" : "seats"}`}
+              data-testid="seat-count"
+              className="w-10 text-center font-display text-3xl text-navy-950"
+            >
+              {seats}
+            </output>
+            <button
+              type="button"
+              onClick={() => setSeats(seats + 1)}
+              disabled={seats >= seatPayment.maxSeats}
+              aria-label="One seat more"
+              className="flex size-11 items-center justify-center rounded-full border border-line bg-white text-navy-950 disabled:opacity-40"
+            >
+              <Plus aria-hidden="true" className="size-4" />
+            </button>
+          </div>
+        </div>
+        {seats > 1 && (
+          <ol className="mt-6 space-y-5" aria-label="Your guests">
+            {Array.from({ length: seats - 1 }, (_, i) => i + 1).map((n) => (
+              <li key={n} className="grid gap-4 rounded-2xl border border-line p-5 sm:grid-cols-2">
+                <p className="text-xs font-semibold tracking-[0.18em] text-gold-ink uppercase sm:col-span-2">
+                  Seat {n + 1}
+                </p>
+                <TextField
+                  name={guestNameKey(n)}
+                  label={`Guest ${n} full name`}
+                  autoComplete="off"
+                  required
+                  value={form.values[guestNameKey(n)]}
+                  error={form.errors[guestNameKey(n)]}
+                  {...field}
+                />
+                <TextField
+                  name={guestEmailKey(n)}
+                  label={`Guest ${n} email`}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="off"
+                  required
+                  hint="Their seat confirmation goes here."
+                  value={form.values[guestEmailKey(n)]}
+                  error={form.errors[guestEmailKey(n)]}
+                  {...field}
+                />
+              </li>
+            ))}
+          </ol>
+        )}
+      </fieldset>
+
       <fieldset className="mt-10 border-t border-line pt-8">
-        <legend className="sr-only">Invitation details</legend>
+        <legend className="sr-only">A few more details</legend>
         <p aria-hidden="true" className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">
-          Invitation details
+          A few more details
         </p>
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           <TextField
@@ -316,10 +461,26 @@ export function RegistrationForm() {
 
       <Honeypot value={form.values.website} onChange={(v) => form.setField("website", v)} />
 
-      <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        data-testid="order-total"
+        className="mt-10 flex items-center justify-between gap-4 rounded-2xl bg-navy-950 p-5 text-white"
+      >
+        <div>
+          <p className="text-sm text-mist">
+            {seats} {seats === 1 ? "seat" : "seats"} × {seatPayment.priceDisplay}
+          </p>
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-mist">
+            <Lock aria-hidden="true" className="size-3.5 text-gold" />
+            Secure payment by {seatPayment.provider}
+          </p>
+        </div>
+        <p className="font-display text-3xl text-gold">{seatTotalDisplay(seats)}</p>
+      </div>
+
+      <div className="mt-8 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
         <PrivacyNotice
           id="registration-note"
-          purpose="Fields marked * are required. Your details are used only to manage your participation in the summit."
+          purpose="Fields marked * are required. Your details (and your guests') are used only to take payment for your seats and manage your participation in the summit."
         />
         <button
           type="submit"
@@ -329,15 +490,18 @@ export function RegistrationForm() {
           {submitting ? (
             <>
               <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-              Submitting…
+              Saving your seats…
             </>
           ) : (
-            "Request Invitation"
+            <>
+              <CreditCard aria-hidden="true" className="size-4" />
+              Continue to payment · {seatTotalDisplay(seats)}
+            </>
           )}
         </button>
       </div>
       <p aria-live="polite" className="sr-only">
-        {submitting ? "Submitting your request" : ""}
+        {submitting ? "Saving your registration" : ""}
       </p>
     </form>
   );

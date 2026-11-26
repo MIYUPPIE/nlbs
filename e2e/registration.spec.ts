@@ -1,11 +1,12 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { stubPaystack } from "./helpers";
 
 const CENTRAL = "http://localhost:3299";
 
 test.describe("registration", () => {
   test("shows inline validation and focuses the first invalid field", async ({ page }) => {
     await page.goto("/register");
-    await page.getByRole("button", { name: "Request Invitation" }).click();
+    await page.getByRole("button", { name: /Continue to payment/ }).click();
     await expect(page.locator("form").getByRole("alert")).toContainText(
       "Please correct the highlighted fields.",
     );
@@ -16,7 +17,8 @@ test.describe("registration", () => {
     ).toBeVisible();
   });
 
-  test("submits and shows a confirmation with a reference", async ({ page }) => {
+  test("one seat: registers, then goes straight to Paystack for ₦15,000", async ({ page }) => {
+    await stubPaystack(page);
     await page.goto("/register");
     await page.getByLabel(/Full Name/).fill("Ada Obi");
     await page.getByLabel(/Email Address/).fill("ada@example.com");
@@ -25,18 +27,81 @@ test.describe("registration", () => {
     await page.getByLabel(/Job Title/).fill("Managing Director");
     await page.getByLabel(/Sector/).selectOption("Technology & Telecommunications");
     await page.getByLabel(/Delegate Type/).selectOption("Investor");
-    await page.getByRole("button", { name: "Request Invitation" }).click();
+    await expect(page.getByTestId("order-total")).toContainText("₦15,000");
+    await page.getByRole("button", { name: "Continue to payment · ₦15,000" }).click();
 
-    const heading = page.getByRole("heading", { name: "Request received" });
-    await expect(heading).toBeVisible();
-    await expect(heading).toBeFocused();
-    await expect(page.getByText(/^N2-[A-Z2-9]{4}-[A-Z2-9]{4}$/)).toBeVisible();
+    await expect(page).toHaveURL(/^https:\/\/checkout\.paystack\.com\/n2-[a-z2-9]{4}-[a-z2-9]{4}-p1$/);
 
-    // It really went to the central backend, from the browser, with the form name.
+    // It really went to the central backend, from the browser, with the form name and no price.
     const sent = await (
       await page.request.get(`${CENTRAL}/__last/registration?email=ada@example.com`)
     ).json();
-    expect(sent).toMatchObject({ form: "registration", delegateType: "Investor", email: "ada@example.com" });
+    expect(sent).toMatchObject({
+      form: "registration",
+      delegateType: "Investor",
+      email: "ada@example.com",
+      guests: [],
+    });
+    expect(sent).not.toHaveProperty("amount");
+    expect(sent).not.toHaveProperty("seats");
+  });
+
+  test("a team of three: one order, one payment, each guest named", async ({ page }) => {
+    await stubPaystack(page);
+    await fillYou(page, "lead@example.com");
+    await page.getByRole("button", { name: "One seat more" }).click();
+    await page.getByRole("button", { name: "One seat more" }).click();
+    await expect(page.getByTestId("seat-count")).toHaveText("3");
+    await expect(page.getByTestId("order-total")).toContainText("₦45,000");
+
+    // Guests are required, and need their own emails.
+    await page.getByRole("button", { name: "Continue to payment · ₦45,000" }).click();
+    await expect(page.getByText("Enter guest 1's full name.")).toBeVisible();
+    await page.getByLabel(/Guest 1 full name/).fill("Ifeoma Nwosu");
+    await page.getByLabel(/Guest 1 email/).fill("lead@example.com");
+    await page.getByLabel(/Guest 2 full name/).fill("Bayo Lawal");
+    await page.getByLabel(/Guest 2 email/).fill("bayo@example.com");
+    await page.getByRole("button", { name: "Continue to payment · ₦45,000" }).click();
+    await expect(page.getByText("Each person needs their own email address.")).toBeVisible();
+    await page.getByLabel(/Guest 1 email/).fill("ifeoma@example.com");
+    await page.getByRole("button", { name: "Continue to payment · ₦45,000" }).click();
+
+    await expect(page).toHaveURL(/^https:\/\/checkout\.paystack\.com\//);
+    const sent = await (
+      await page.request.get(`${CENTRAL}/__last/registration?email=lead@example.com`)
+    ).json();
+    expect(sent.guests).toEqual([
+      { fullName: "Ifeoma Nwosu", email: "ifeoma@example.com" },
+      { fullName: "Bayo Lawal", email: "bayo@example.com" },
+    ]);
+  });
+
+  test("when checkout cannot open, the registration is kept and they can pay later", async ({ page }) => {
+    await page.route("**/api/v1/submissions", (route) =>
+      route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({
+          ok: true,
+          reference: "N2-SAVE-D001",
+          payment: null,
+          paymentError:
+            "Only 1 seat is left, and this registration is for 3. Please contact us to change it.",
+        }),
+      }),
+    );
+    await fillYou(page, "later@example.com");
+    await page.getByRole("button", { name: /Continue to payment/ }).click();
+    const heading = page.getByRole("heading", { name: "Registration saved. One step left." });
+    await expect(heading).toBeVisible();
+    await expect(heading).toBeFocused();
+    await expect(page.getByText("Only 1 seat is left")).toBeVisible();
+    await expect(page.getByText("N2-SAVE-D001")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Pay later with my reference" })).toHaveAttribute(
+      "href",
+      /\/register\/pay\/?\?ref=N2-SAVE-D001$/,
+    );
   });
 
   test("preselects the delegate type from ?type=", async ({ page }) => {
@@ -63,9 +128,52 @@ test.describe("registration", () => {
     await page.getByLabel(/Job Title/).fill("MD");
     await page.getByLabel(/Sector/).selectOption("Other");
     await page.getByLabel(/Delegate Type/).selectOption("Other");
-    await page.getByRole("button", { name: "Request Invitation" }).click();
+    await page.getByRole("button", { name: /Continue to payment/ }).click();
     await expect(page.locator("form").getByRole("alert")).toContainText("not open yet");
-    await expect(page.getByRole("heading", { name: "Request received" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Taking you to payment" })).toHaveCount(0);
+  });
+});
+
+async function fillYou(page: Page, email: string) {
+  await page.goto("/register");
+  await page.getByLabel(/Full Name/).fill("Ada Obi");
+  await page.getByLabel(/Email Address/).fill(email);
+  await page.getByLabel(/Phone Number/).fill("+234 801 234 5678");
+  await page.getByLabel(/^Organisation/).fill("Example Ltd");
+  await page.getByLabel(/Job Title/).fill("Managing Director");
+  await page.getByLabel(/Sector/).selectOption("Technology & Telecommunications");
+  await page.getByLabel(/Delegate Type/).selectOption("Business");
+}
+
+test.describe("paying for a seat later (/register/pay)", () => {
+  test("an earlier, free registrant pays with their reference", async ({ page }) => {
+    await stubPaystack(page);
+    await page.goto("/register/pay");
+    await page.getByLabel("Your registration reference").fill("n2-oldr-eg01");
+    await page.getByRole("button", { name: "Find my registration" }).click();
+    await expect(page).toHaveURL(/\?ref=N2-OLDR-EG01$/);
+    const heading = page.getByRole("heading", { name: "Confirm your seat", level: 2 });
+    await expect(heading).toBeVisible();
+    await expect(heading).toBeFocused();
+    await expect(page.getByText("1 × ₦15,000 = ₦15,000")).toBeVisible();
+    await expect(page.getByText("Only 37 seats left.")).toBeVisible();
+    await page.getByRole("button", { name: "Pay ₦15,000 with Paystack" }).click();
+    await expect(page).toHaveURL("https://checkout.paystack.com/n2-oldr-eg01-p1");
+  });
+
+  test("back from Paystack: confirms the seat once the payment lands", async ({ page }) => {
+    await page.goto("/register/pay/?ref=N2-OLDR-EG02&trxref=N2-OLDR-EG02-P1&reference=N2-OLDR-EG02-P1");
+    await expect(page.getByRole("heading", { name: "Confirming your payment" })).toBeVisible();
+    await page.request.post(`${CENTRAL}/__pay/N2-OLDR-EG02`);
+    const done = page.getByRole("heading", { name: "Your seat is confirmed" });
+    await expect(done).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/photo ID/i)).toBeVisible();
+  });
+
+  test("an unknown reference says so and offers registration", async ({ page }) => {
+    await page.goto("/register/pay/?ref=N2-ZZZZ-ZZZZ");
+    await expect(page.locator("#pay-ref-error")).toContainText("could not find a registration");
+    await expect(page.getByRole("link", { name: "Register and pay in one step" })).toBeVisible();
   });
 });
 

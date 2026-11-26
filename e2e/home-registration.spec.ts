@@ -30,7 +30,12 @@ test.describe("homepage registration", () => {
     expect(order).toEqual(["hero-title", "register", "shortlist"]);
 
     const section = page.locator("#register");
-    await expect(section.getByRole("heading", { level: 2, name: "Request your invitation" })).toBeVisible();
+    await expect(section.getByRole("heading", { level: 2, name: "Secure your seat" })).toBeVisible();
+    await expect(section.getByText("Pay ₦15,000 per seat")).toBeVisible();
+    await expect(section.getByRole("link", { name: "Already registered? Pay here" })).toHaveAttribute(
+      "href",
+      /\/register\/pay\/?$/,
+    );
     await expect(section.getByText("Delegate registration is open")).toBeVisible();
     await expect(section.locator('time[datetime="2026-12-06"]')).toHaveText("6 December 2026");
     await expect(section.getByTestId("registration-days-left")).toHaveText("14 days left");
@@ -68,9 +73,9 @@ test.describe("homepage registration", () => {
 
   test("the main button opens the form", async ({ page }) => {
     await page.goto("/");
-    await page.locator("#register").getByRole("link", { name: "Request your invitation" }).click();
+    await page.locator("#register").getByRole("link", { name: "Register · ₦15,000" }).click();
     await expect(page).toHaveURL(/\/register\/?#request$/);
-    await expect(page.getByRole("button", { name: "Request Invitation" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Continue to payment/ })).toBeVisible();
   });
 
   test("a 'Register as' shortcut preselects the delegate type", async ({ page }) => {

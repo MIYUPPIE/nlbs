@@ -1,5 +1,16 @@
 import type { Page } from "@playwright/test";
 
+/** Stand-in for Paystack's hosted checkout: e2e never leaves for the real one. */
+export async function stubPaystack(page: Page) {
+  await page.route("https://checkout.paystack.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<title>Paystack (test)</title><h1>Paystack checkout</h1>",
+    }),
+  );
+}
+
 export const ROUTES = [
   "/",
   "/about",
@@ -12,6 +23,7 @@ export const ROUTES = [
   "/exhibition",
   "/partners",
   "/register",
+  "/register/pay",
   "/contact",
   "/faq",
   "/talentnigeria20",

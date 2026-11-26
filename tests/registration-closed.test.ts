@@ -84,8 +84,11 @@ describe("registration window", () => {
 
   it("a stale open build swaps the form for the closed notice on the visitor's clock", () => {
     const form = read("src/components/forms/RegistrationForm.tsx");
-    expect(form).toContain("Date.now() >= closesAtMs");
+    expect(read("src/components/hooks/usePastRegistrationDeadline.ts")).toContain("Date.now() >= closesAtMs");
+    expect(form).toContain("usePastRegistrationDeadline()");
     expect(form).toContain('data-registration="closed"');
+    // The seat payment page stops offering payment the same way.
+    expect(read("src/components/forms/SeatPayment.tsx")).toContain("usePastRegistrationDeadline()");
   });
 
   it("production builds never carry the override and must match the deadline", () => {

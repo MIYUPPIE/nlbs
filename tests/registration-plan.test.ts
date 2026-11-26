@@ -24,10 +24,9 @@ describe("registration plan", () => {
     }
   });
 
-  it("timeline runs from 21 days out to the day before", () => {
+  it("timeline runs from payment to the day before", () => {
     expect(preEventTimeline.map((t) => t.when)).toEqual([
-      "21 days before",
-      "14 days before",
+      "When you pay",
       "7 days before",
       "2 days before",
       "1 day before",
@@ -41,7 +40,7 @@ describe("registration plan", () => {
   });
 
   it("sends nothing by WhatsApp (convener: email, and SMS the day before)", () => {
-    expect(preEventTimeline.map((t) => t.channel)).toEqual(["Email", "Email", "Email", "Email", "SMS"]);
+    expect(preEventTimeline.map((t) => t.channel)).toEqual(["Email", "Email", "Email", "SMS"]);
   });
 
   it("sends the QR code by email, not WhatsApp", () => {

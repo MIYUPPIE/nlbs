@@ -1,6 +1,6 @@
 import { enquirySchema } from "@/lib/enquiry";
 import type { SubmissionResponse } from "@/lib/forms";
-import { registrationSchema } from "@/lib/registration";
+import { guestsFrom, registrationSchema } from "@/lib/registration";
 import { parsePassHolders, passLimit, sponsorFormSchema } from "@/lib/sponsor-form";
 import {
   eligibility,
@@ -33,10 +33,19 @@ export const prepare: Record<CentralForm, (values: unknown) => Prepared> = {
     const r = registrationSchema.safeParse(values);
     if (!r.success) return invalid();
     // Explicit consent travels as a boolean, and only counts when there are needs to consent to.
-    const { accessNeedsConsent, ...fields } = r.data;
+    // Guest seats travel as `guests: [{fullName, email}]`; the backend counts seats and sets the price.
+    const data = r.data as Record<string, string>;
+    const fields: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (k !== "seats" && k !== "accessNeedsConsent" && !/^guest\d+(Name|Email)$/.test(k)) fields[k] = v;
+    }
     return {
       ok: true,
-      fields: { ...fields, accessNeedsConsent: fields.accessNeeds !== "" && accessNeedsConsent === "yes" },
+      fields: {
+        ...fields,
+        accessNeedsConsent: data.accessNeeds !== "" && data.accessNeedsConsent === "yes",
+        guests: guestsFrom(data),
+      },
     };
   },
 

@@ -164,9 +164,25 @@ describe("contract with the central backend", () => {
   });
 
   it.skipIf(!hasBackend)("registration sends exactly the fields the backend fixture has", () => {
+    // Paid seats (26 Nov 2026): the browser fixture is the group order, guests included.
     expect(
       sentKeys("registration", { ...validRegistration, whatsapp: "", nominatedBy: "", accessNeeds: "" }),
-    ).toEqual(fixtureKeys("nlbs-registration"));
+    ).toEqual(fixtureKeys("nlbs-registration-group"));
+  });
+
+  it.skipIf(!hasBackend)("a group order sends its guests the way the backend fixture does", () => {
+    const fixture = JSON.parse(readFileSync(join(FIXTURES, "nlbs-registration-group.json"), "utf8"));
+    const p = prepare.registration({
+      ...validRegistration,
+      email: fixture.email,
+      seats: "3",
+      guest1Name: " Ifeoma  Nwosu ",
+      guest1Email: "Ifeoma@Example.com",
+      guest2Name: "Bayo Lawal",
+      guest2Email: "bayo@example.com",
+    });
+    expect(p.ok && p.fields.guests).toEqual(fixture.guests);
+    expect(p.ok && Object.keys(p.fields).some((k) => /^guest\d|^seats$/.test(k))).toBe(false);
   });
 
   it.skipIf(!hasBackend)("enquiry sends exactly the fields the backend fixture has", () => {
