@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CreditCard, MailCheck, Send } from "lucide-react";
+import { ArrowRight, CalendarClock, MailCheck, Send, ShieldCheck } from "lucide-react";
 import { event } from "@/data/event";
-import { preEventTimeline, registrationModel, seatPayment } from "@/data/registration-plan";
+import { preEventTimeline, registrationModel } from "@/data/registration-plan";
 import { delegateTypes } from "@/lib/registration";
 import { registrationClosure as c, registrationOpen } from "@/lib/registration-window";
 import { RegistrationDaysLeft } from "@/components/sections/RegistrationDaysLeft";
@@ -18,13 +18,13 @@ const qrStep = preEventTimeline.find((t) => /QR code/.test(t.what));
 const steps = [
   {
     icon: Send,
-    title: "Register in two minutes",
-    detail: "Add colleagues to the same order if you are coming as a team.",
+    title: "Request your invitation",
+    detail: "Free. No payment on this site.",
   },
   {
-    icon: CreditCard,
-    title: `Pay ${seatPayment.priceDisplay} per seat`,
-    detail: `Securely with ${seatPayment.provider}. Your seat is confirmed the moment you pay.`,
+    icon: ShieldCheck,
+    title: "We vet every request",
+    detail: "Seats are confirmed only after vetting.",
   },
   {
     icon: MailCheck,
@@ -66,7 +66,7 @@ export function RegistrationSection() {
                 className="mt-6"
                 title={
                   <>
-                    Secure your <span className="text-gold">seat</span>
+                    Request your <span className="text-gold">invitation</span>
                   </>
                 }
                 lead={`${registrationModel.lead} ${event.date.display}, ${event.venue.display}.`}
@@ -88,10 +88,10 @@ export function RegistrationSection() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <GoldButton href="/register#request" size="lg">
-                  Register · {seatPayment.priceDisplay}
+                  Request your invitation
                 </GoldButton>
-                <GoldButton href={seatPayment.payPath} variant="outline-light" size="lg" arrow={false}>
-                  Already registered? Pay here
+                <GoldButton href="/register" variant="outline-light" size="lg" arrow={false}>
+                  How delegates get in
                 </GoldButton>
               </div>
             </div>

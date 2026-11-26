@@ -252,15 +252,13 @@ test.describe("speaker profiles without JavaScript", () => {
 });
 
 test.describe("register page", () => {
-  test("explains the price, the entry routes, the timeline and arrival", async ({ page }) => {
+  test("explains the invitation routes, the timeline and arrival", async ({ page }) => {
     await page.goto("/register");
-    await expect(page.getByRole("heading", { level: 1, name: "Secure your seat" })).toBeVisible();
-    await expect(page.getByText("800 seats · ₦15,000 per delegate")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Pay for your seat with your reference" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Request your invitation" })).toBeVisible();
     for (const c of ["Corporate C-Suite", "Investors, DFIs & Tech", "Media"]) {
       await expect(page.getByRole("heading", { name: c })).toBeVisible();
     }
-    await expect(page.getByText("When you pay", { exact: true })).toBeVisible();
+    await expect(page.getByText("21 days before")).toBeVisible();
     await expect(page.getByText(/no on-site registration/i)).toBeVisible();
     await expect(page.getByLabel(/WhatsApp Number/)).toBeVisible();
     await expect(page.getByLabel(/Who nominated you/)).toBeVisible();

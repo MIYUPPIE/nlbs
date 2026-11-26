@@ -10,40 +10,9 @@ import type { IconName } from "@/components/ui/Icon";
  */
 
 export const registrationModel = {
-  heading: "800 seats. Paid seats only.",
-  lead: "Seats are capped at 800 and a seat is confirmed only when it is paid, so the room is exactly who registered and the door stays calm.",
+  heading: "Invitation-only. Every seat is allocated.",
+  lead: "This is not open registration. Seats are capped at 800 and every request is vetted, so the room stays senior and the door stays calm.",
 };
-
-/**
- * Delegate seat price (convener, 26 Nov 2026): every delegate pays, including
- * people who registered free before that date. Paid online through Paystack;
- * the central backend (config central.nlbs_registration) charges the same
- * amount and refuses checkouts once `capacity` seats are paid.
- * tests/registration-paid.test.ts keeps both in step.
- */
-export const seatPayment = {
-  /** Naira per delegate. */
-  price: 15_000,
-  priceDisplay: "₦15,000",
-  currency: "NGN",
-  /** One order: you plus up to 19 guests. */
-  maxSeats: 20,
-  capacity: 800,
-  provider: "Paystack",
-  /** Where earlier registrants pay with their reference (/register/pay/?ref=N2-...). */
-  payPath: "/register/pay/",
-  promise: "Your seat is confirmed the moment you pay. Unpaid registrations do not hold a seat.",
-  secure: "Payment is taken securely by Paystack. We never see or store your card or bank details.",
-  /** Convener, 26 Nov 2026. The full wording is in the Terms of Sale and Use (/terms). */
-  refunds: "Seats are not refundable, but you can transfer yours to a colleague before the summit.",
-  earlierRegistrants:
-    "Registered before 26 November? Every delegate now pays to attend. Use the payment link we emailed you, or enter your reference on the payment page.",
-};
-
-/** The order total in naira, e.g. three seats cost three times the price. */
-export function seatTotalDisplay(seats: number): string {
-  return `₦${(seats * seatPayment.price).toLocaleString("en-NG")}`;
-}
 
 export type EntryRoute = {
   category: string;
@@ -70,14 +39,14 @@ export const entryRoutes: EntryRoute[] = [
   },
   {
     category: "Corporate C-Suite",
-    how: "Register with the form on this page. Tell us if a partner, chamber of commerce or bank nominated you.",
-    approval: "Confirmed when paid",
+    how: "Nominated by a partner, chamber of commerce or bank, then submit the form on this page.",
+    approval: "Vetted within 24 hours",
     icon: "briefcase",
   },
   {
     category: "Investors, DFIs & Tech",
-    how: "Register with the form on this page. Book seats for your team in the same order.",
-    approval: "Confirmed when paid",
+    how: "Apply with the form on this page and include your LinkedIn profile.",
+    approval: "Vetted within 48 hours",
     icon: "trending",
   },
   {
@@ -89,11 +58,16 @@ export const entryRoutes: EntryRoute[] = [
   },
 ];
 
-/** What confirmed delegates receive, counted back from the summit day. */
+/** What approved delegates receive, counted back from the summit day. */
 export const preEventTimeline: { when: string; what: string; channel: string }[] = [
   {
-    when: "When you pay",
-    what: "“You're in”: your seat code and the dress code, to you and to each guest",
+    when: "21 days before",
+    what: "“Save your seat” email with your form link",
+    channel: "Email",
+  },
+  {
+    when: "14 days before",
+    what: "“You're approved”: your e-badge and the dress code",
     channel: "Email",
   },
   { when: "7 days before", what: "Final details: parking, agenda and who you'll meet", channel: "Email" },
@@ -114,6 +88,5 @@ export const arrival = {
   bring: ["Your QR code (sent by email two days before)", "A valid photo ID"],
   parking: "Use the Eko Hotel gate and show your confirmation message.",
   exhibitors: "Exhibitor and booth set-up staff use a separate lane with their own badges.",
-  noOnSite:
-    "There is no on-site registration or payment. Only delegates with a paid, confirmed seat are admitted.",
+  noOnSite: "There is no on-site registration. Only pre-approved delegates are admitted.",
 };

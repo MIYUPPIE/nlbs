@@ -21,7 +21,7 @@ export function AudienceSection({ detailed = false }: { detailed?: boolean }) {
             tone="dark"
             eyebrow="Who Will Be in the Room"
             title="The room where Nigeria's next 12 months will be decided."
-            lead="800 delegates, every seat paid for. If you want to sell to, partner with or engage the people building Nigeria 2.0, this is the room."
+            lead="800+ invitation-only delegates. If you want to sell to, partner with or engage the people building Nigeria 2.0, this is the room."
           />
           <p className="max-w-xs text-sm text-mist lg:text-right" data-reveal>
             <span className="block font-display text-4xl text-gold">{formatStat(delegates)}</span>
@@ -41,7 +41,7 @@ export function AudienceSection({ detailed = false }: { detailed?: boolean }) {
             meta: `Est. ${a.estimate} seats`,
           }))}
         />
-        <p className="mt-4 text-xs text-mist">Seat estimates are targets for the delegate list.</p>
+        <p className="mt-4 text-xs text-mist">Seat estimates are targets for the invitation list.</p>
 
         {detailed && (
           <div className="mt-16 grid gap-12 border-t border-white/10 pt-14 lg:grid-cols-12 lg:gap-16">

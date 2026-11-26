@@ -24,6 +24,8 @@ AddType text/plain .txt
   # Friendly aliases for the Talent Fund portal printed in the FAQ and 2.md.
   RewriteRule ^talent/apply/?$ /talentnigeria20/ [R=301,L]
   RewriteRule ^apply/?$ /talentnigeria20/ [R=302,L]
+  # Seat payment page (26 Nov 2026), switched off the same day: old links and emails go to registration.
+  RewriteRule ^register/pay/?$ /register/ [R=302,L,QSD]
 </IfModule>
 
 <IfModule mod_headers.c>

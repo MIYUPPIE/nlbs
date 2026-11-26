@@ -7,30 +7,12 @@
 //     so parallel tests posting the same form never read each other's body
 //   POST /__reset       -> forget everything
 //   GET /__health       -> 200 (Playwright readiness)
-//   POST /__pay/<ref>   -> marks a registration paid (what Paystack's webhook does)
-// Paid seats (26 Nov 2026): a registration answers with a Paystack-shaped
-// checkout for ₦15,000 a seat, and /api/v1/submissions/<ref>/payment serves
-// the /register/pay page. N2-OLDR-EG01 is a seeded earlier (free) registrant.
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.FAKE_CENTRAL_PORT ?? 3299);
 const KEY = process.env.FAKE_CENTRAL_KEY ?? "pk_e2e_nlbs";
 const ORIGINS = (process.env.FAKE_CENTRAL_ORIGINS ?? "http://localhost:3200").split(",");
 const last = new Map();
-const SEAT_KOBO = 1_500_000;
-/** reference -> { seats, paid } */
-const seats = new Map();
-const seedSeats = () => {
-  seats.clear();
-  seats.set("N2-OLDR-EG01", { seats: 1, paid: false });
-  seats.set("N2-OLDR-EG02", { seats: 1, paid: false }); // paid by the "back from Paystack" test
-};
-seedSeats();
-const checkoutFor = (ref, n) => ({
-  url: `https://checkout.paystack.com/${ref.toLowerCase()}-p1`,
-  amount: n * SEAT_KOBO,
-  currency: "NGN",
-});
 // Mirrors src/data/universities.ts (tests/universities.test.ts pins the same list).
 const UNIVERSITY_SLUGS = [
   "unilag",
@@ -84,15 +66,8 @@ createServer((req, res) => {
     const body = last.get(email ? `${form}|${email.toLowerCase()}` : form);
     return body ? send(res, 200, body) : send(res, 404, { ok: false });
   }
-  if (req.method === "POST" && url.pathname.startsWith("/__pay/")) {
-    const s = seats.get(url.pathname.slice("/__pay/".length));
-    if (!s) return send(res, 404, { ok: false });
-    s.paid = true;
-    return send(res, 200, { ok: true });
-  }
   if (req.method === "POST" && url.pathname === "/__reset") {
     last.clear();
-    seedSeats();
     return send(res, 200, { ok: true });
   }
   // Talent Fund university numbers (GET, aggregates only). Fixed values the e2e
@@ -123,82 +98,6 @@ createServer((req, res) => {
           status: fixed[slug]?.[0] ?? "invited",
           applications: fixed[slug]?.[1] ?? 0,
         })),
-      },
-      origin,
-    );
-  }
-  if (url.pathname === "/api/v1/registrations/links") {
-    if (req.method === "OPTIONS") {
-      res.writeHead(204, {
-        "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : "",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Accept, X-Site-Key",
-      });
-      return res.end();
-    }
-    let raw = "";
-    req.on("data", (c) => (raw += c));
-    req.on("end", () => {
-      const email = (JSON.parse(raw || "{}").email ?? "").trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-        return send(
-          res,
-          422,
-          {
-            ok: false,
-            error: "Please correct the highlighted fields.",
-            fieldErrors: { email: "Enter a valid email address." },
-          },
-          origin,
-        );
-      last.set("registration-links", { email });
-      send(
-        res,
-        200,
-        {
-          ok: true,
-          message: "If that email address has a registration, we have sent its payment link there.",
-        },
-        origin,
-      );
-    });
-    return;
-  }
-  const payMatch = url.pathname.match(/^\/api\/v1\/submissions\/([A-Z0-9-]+)\/payment$/);
-  if (payMatch) {
-    if (req.method === "OPTIONS") {
-      res.writeHead(204, {
-        "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : "",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Accept, X-Site-Key",
-        "Access-Control-Max-Age": "600",
-      });
-      return res.end();
-    }
-    if (req.headers["x-site-key"] !== KEY)
-      return send(res, 401, { ok: false, error: "Missing or invalid site key." }, origin);
-    if (!ORIGINS.includes(origin))
-      return send(res, 403, { ok: false, error: "This origin is not allowed for this site." }, origin);
-    const ref = payMatch[1];
-    const s = seats.get(ref);
-    if (!s) return send(res, 404, { ok: false, error: "Order not found." }, origin);
-    if (req.method === "POST") {
-      if (s.paid) return send(res, 409, { ok: false, error: "This order is already paid." }, origin);
-      return send(res, 200, { ok: true, reference: ref, payment: checkoutFor(ref, s.seats) }, origin);
-    }
-    return send(
-      res,
-      200,
-      {
-        ok: true,
-        reference: ref,
-        status: s.paid ? "paid" : "pending",
-        paid: s.paid,
-        amount: s.seats * SEAT_KOBO,
-        currency: "NGN",
-        seats: s.seats,
-        seatPrice: SEAT_KOBO,
-        seatsLeft: 37,
       },
       origin,
     );
@@ -234,12 +133,6 @@ createServer((req, res) => {
     if (!["registration", "enquiry", "talent", "sponsor", "university", "privacy"].includes(body.form))
       return send(res, 404, { ok: false, error: "Unknown form." }, origin);
     remember(body);
-    const reference = `N2-${chunk()}-${chunk()}`;
-    if (body.form === "registration") {
-      const n = 1 + (Array.isArray(body.guests) ? body.guests.length : 0);
-      seats.set(reference, { seats: n, paid: false });
-      return send(res, 201, { ok: true, reference, payment: checkoutFor(reference, n) }, origin);
-    }
-    send(res, 201, { ok: true, reference }, origin);
+    send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);
   });
 }).listen(PORT, () => console.log(`fake central on :${PORT}`));

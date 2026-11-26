@@ -41,7 +41,7 @@ export const event = {
     previousShort: "23 Nov 2026",
     label: "New date",
     tagline: "Same vision. Bigger stage. Better experience.",
-    validity: "Your Talent Fund selection or paid seat remains valid. Save the new date.",
+    validity: "Your invitation or Talent Fund selection remains valid. Save the new date.",
   },
   venue: {
     name: "Eko Convention Centre",

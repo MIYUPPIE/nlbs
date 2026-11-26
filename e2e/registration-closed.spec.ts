@@ -25,7 +25,7 @@ test.describe("registration closed @closed", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Registration is closed" })).toBeVisible();
     await expect(page.locator('[data-registration="closed"]')).toBeVisible();
     await expect(page.locator("form")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: /Continue to payment/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Request Invitation" })).toHaveCount(0);
     await expect(page.getByText("7 December 2026").first()).toBeVisible();
     // Confirmed delegates still get the arrival details.
     await expect(page.getByText(/no on-site registration/i).first()).toBeVisible();
@@ -66,19 +66,6 @@ test.describe("registration closed @closed", () => {
     await expect(page.getByRole("heading", { name: "Applications for 2026 have closed" })).toBeVisible();
     await page.getByRole("main").getByRole("link", { name: "Check the shortlist" }).click();
     await expect(page).toHaveURL(/\/talentnigeria20\/shortlist\/?$/);
-  });
-});
-
-test.describe("seat payment page @closed", () => {
-  test("offers no payment and no registration once closed, but still checks a seat", async ({ page }) => {
-    await page.goto("/register/pay/");
-    await expect(page.getByRole("heading", { name: "Check your seat" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Register and pay in one step" })).toHaveCount(0);
-
-    await page.goto("/register/pay/?ref=N2-OLDR-EG01");
-    await expect(page.getByRole("heading", { name: "This seat was not paid for" })).toBeVisible();
-    await expect(page.getByText(/no payment at the door/)).toBeVisible();
-    await expect(page.getByRole("button", { name: /Pay .* with Paystack/ })).toHaveCount(0);
   });
 });
 

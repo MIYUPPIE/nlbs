@@ -45,7 +45,7 @@ test.describe("before hydration (regression: taps ignored on slow networks)", ()
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
     for (const [path, button] of [
-      ["/register", /Continue to payment/],
+      ["/register", "Request Invitation"],
       ["/contact", "Send enquiry"],
     ] as const) {
       await page.goto(path);
@@ -128,7 +128,7 @@ test.describe("new date announcement", () => {
     await expect(notice.getByRole("heading")).toHaveText("New date: Thursday, 10 December 2026");
     await expect(notice).toContainText("Moved from Monday, 23 November 2026.");
     await expect(notice).toContainText("Same vision. Bigger stage. Better experience.");
-    await expect(notice).toContainText("Your Talent Fund selection or paid seat remains valid.");
+    await expect(notice).toContainText("Your invitation or Talent Fund selection remains valid.");
     await expect(hero.getByText("Thursday, 10 December 2026 · 9:00 AM to 5:00 PM WAT")).toBeVisible();
   });
 

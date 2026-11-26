@@ -2,13 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, CircleCheck, Lock, MapPin } from "lucide-react";
 import { whatToExpect } from "@/data/content";
 import { contact, event } from "@/data/event";
-import {
-  arrival,
-  entryRoutes,
-  preEventTimeline,
-  registrationModel,
-  seatPayment,
-} from "@/data/registration-plan";
+import { arrival, entryRoutes, preEventTimeline, registrationModel } from "@/data/registration-plan";
 import { PageHero } from "@/components/layout/PageHero";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -23,8 +17,8 @@ import { eventJsonLd } from "@/lib/site";
 
 export const metadata = registrationOpen
   ? pageMetadata({
-      title: "Register",
-      description: `Register for Nigeria 2.0, the Nigerian Leadership Business Summit 2026: ${seatPayment.priceDisplay} per delegate, paid securely online. ${event.date.display.replace(",", "")}, ${event.venue.display}. Open until ${c.lastDay}.`,
+      title: "Request an Invitation",
+      description: `Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. ${event.date.display.replace(",", "")}, ${event.venue.display}. Open until ${c.lastDay}.`,
       path: "/register",
     })
   : pageMetadata({
@@ -47,7 +41,7 @@ function ClosedRegistration() {
   const shortlist = summitCta(false);
   return (
     <>
-      <PageHero eyebrow="800 seats" title={c.title} lead={c.body} />
+      <PageHero eyebrow="Invitation-only · 800 seats" title={c.title} lead={c.body} />
       <section
         id="request"
         aria-labelledby="closed-title"
@@ -61,14 +55,14 @@ function ClosedRegistration() {
                 <Lock aria-hidden="true" className="size-6" />
               </span>
               <h2 id="closed-title" className="mt-6 font-display text-4xl text-navy-950">
-                No new registrations
+                No new invitation requests
               </h2>
               <p className="mt-3 max-w-lg text-muted">
-                Registration closed on <time dateTime={c.closedIso}>{c.closed}</time>. Only delegates with a
-                paid seat are admitted, and there is no on-site registration.
+                Registration closed on <time dateTime={c.closedIso}>{c.closed}</time>. Seats are by confirmed
+                invitation only, and there is no on-site registration.
               </p>
               <p className="mt-3 max-w-lg text-muted">
-                Questions about your registration or payment:{" "}
+                Questions about an invitation you already requested:{" "}
                 {contact.email && (
                   <a href={`mailto:${contact.email}`} className="font-semibold text-navy-700 underline">
                     {contact.email}
@@ -99,13 +93,45 @@ function OpenRegistration() {
   return (
     <>
       <PageHero
-        eyebrow={`800 seats · ${seatPayment.priceDisplay} per delegate`}
-        title="Secure your seat"
+        eyebrow="Invitation-only · 800 seats"
+        title="Request your invitation"
         lead={registrationModel.lead}
       />
+      <Section tone="white" labelledBy="routes-title">
+        <Container>
+          <SectionHeading
+            id="routes-title"
+            eyebrow="How delegates get in"
+            title={registrationModel.heading}
+          />
+          <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-5">
+            {entryRoutes.map((r) => (
+              <li key={r.category} className="flex flex-col bg-white p-6" data-reveal>
+                <span className="flex size-10 items-center justify-center rounded-xl bg-navy-950 text-gold">
+                  <Icon name={r.icon} className="size-5" />
+                </span>
+                <h3 className="mt-5 font-semibold text-navy-950">{r.category}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{r.how}</p>
+                <p className="mt-5 text-xs font-semibold tracking-[0.14em] text-gold-ink uppercase">
+                  {r.approval}
+                </p>
+                {r.action && (
+                  <Link
+                    href={r.action.href}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-700 underline-offset-4 hover:underline"
+                  >
+                    {r.action.label}
+                    <ArrowRight aria-hidden="true" className="size-3.5" />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </Section>
       <section
         id="request"
-        aria-label="Registration form"
+        aria-label="Invitation request form"
         data-registration="open"
         className="surface-light bg-ivory py-16 sm:py-20 lg:py-24"
       >
@@ -116,14 +142,6 @@ function OpenRegistration() {
               Registration is open until <time dateTime={c.lastDayIso}>{c.lastDay}</time>, three days before
               the summit.
             </span>
-          </p>
-          <p className="mb-8 rounded-xl border border-line bg-white p-4 text-sm text-navy-950">
-            <span className="font-semibold">Registered before 26 November?</span> Every delegate now pays to
-            attend.{" "}
-            <Link href={seatPayment.payPath} className="font-semibold text-navy-700 underline">
-              Pay for your seat with your reference
-            </Link>
-            .
           </p>
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">
@@ -160,45 +178,14 @@ function OpenRegistration() {
                   ))}
                 </ul>
                 <p className="mt-8 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-relaxed text-mist">
-                  {seatPayment.priceDisplay} per delegate. {seatPayment.promise} {seatPayment.secure}
+                  Requests are free and involve no payment on this site. Seats are confirmed only after
+                  vetting.
                 </p>
               </div>
             </aside>
           </div>
         </Container>
       </section>
-      <Section tone="white" labelledBy="routes-title">
-        <Container>
-          <SectionHeading
-            id="routes-title"
-            eyebrow="How delegates get in"
-            title={registrationModel.heading}
-          />
-          <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-5">
-            {entryRoutes.map((r) => (
-              <li key={r.category} className="flex flex-col bg-white p-6" data-reveal>
-                <span className="flex size-10 items-center justify-center rounded-xl bg-navy-950 text-gold">
-                  <Icon name={r.icon} className="size-5" />
-                </span>
-                <h3 className="mt-5 font-semibold text-navy-950">{r.category}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{r.how}</p>
-                <p className="mt-5 text-xs font-semibold tracking-[0.14em] text-gold-ink uppercase">
-                  {r.approval}
-                </p>
-                {r.action && (
-                  <Link
-                    href={r.action.href}
-                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-700 underline-offset-4 hover:underline"
-                  >
-                    {r.action.label}
-                    <ArrowRight aria-hidden="true" className="size-3.5" />
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </Section>
     </>
   );
 }
