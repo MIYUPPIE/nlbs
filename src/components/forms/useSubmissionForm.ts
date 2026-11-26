@@ -62,10 +62,12 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
   };
 
   const focusFirstError = (errs: Record<string, string>) => {
-    const first = Object.keys(errs).find((k) => errs[k]);
-    if (!first) return;
-    const el = formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`);
-    el?.focus();
+    // First invalid field in page order (not schema order), skipping disabled
+    // controls such as a full class's radio.
+    const names = Object.keys(errs).filter((k) => errs[k]);
+    if (!names.length) return;
+    const selector = names.map((n) => `[name="${CSS.escape(n)}"]:not(:disabled)`).join(", ");
+    formRef.current?.querySelector<HTMLElement>(selector)?.focus();
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

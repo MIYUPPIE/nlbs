@@ -1,4 +1,4 @@
-import type { SubmissionResponse } from "@/lib/forms";
+import type { Checkout, SubmissionResponse } from "@/lib/forms";
 import { PRIVACY_VERSION } from "@/lib/privacy";
 
 /**
@@ -79,10 +79,25 @@ export async function submitToCentral(
     reference?: unknown;
     error?: unknown;
     fieldErrors?: unknown;
+    payment?: unknown;
+    paymentError?: unknown;
+    payUrl?: unknown;
   } | null;
 
   if (res.ok && data?.ok === true && typeof data.reference === "string") {
-    return { ok: true, reference: data.reference };
+    if (!("payment" in data)) return { ok: true, reference: data.reference };
+    const payment = asCheckout(data.payment);
+    const payUrl =
+      typeof data.payUrl === "string" && /^https:\/\//.test(data.payUrl) ? data.payUrl : undefined;
+    return {
+      ok: true,
+      reference: data.reference,
+      payment,
+      ...(payUrl ? { payUrl } : {}),
+      ...(payment
+        ? {}
+        : { paymentError: typeof data.paymentError === "string" ? data.paymentError : PAY_UNAVAILABLE }),
+    };
   }
   if (res.status === 422 && data && typeof data.fieldErrors === "object" && data.fieldErrors) {
     return {
@@ -131,6 +146,57 @@ export async function fetchUniversityStats(
         u.applications >= 0
       )
         out.set(u.slug, { slug: u.slug, status: u.status, applications: u.applications });
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}
+
+// ---- Delegate classes ------------------------------------------------------
+
+export const PAY_UNAVAILABLE =
+  "Your registration is saved, but the payment page could not open. Use the pay link below, or try again in a minute.";
+
+/** Only an https Paystack checkout is ever followed: the browser is sent there with the payer's money. */
+export function asCheckout(raw: unknown): Checkout | null {
+  const p = raw as { url?: unknown; amount?: unknown; currency?: unknown } | null;
+  if (!p || typeof p.url !== "string" || !Number.isInteger(p.amount) || typeof p.currency !== "string")
+    return null;
+  let url: URL;
+  try {
+    url = new URL(p.url);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" || !/(^|\.)paystack\.(com|co)$/.test(url.hostname)) return null;
+  return { url: p.url, amount: p.amount as number, currency: p.currency };
+}
+
+export type ClassAvailability = { key: string; left: number; open: boolean };
+
+/**
+ * Which classes can still be bought (GET /api/v1/nlbs/classes, counts only).
+ * Null when the backend cannot be reached: the form then shows every open
+ * class and the backend still refuses a full one.
+ */
+export async function fetchClassAvailability(
+  config: CentralConfig | null = centralConfig(),
+  fetchImpl: typeof fetch = fetch,
+): Promise<Map<string, ClassAvailability> | null> {
+  if (!config) return null;
+  try {
+    const res = await fetchImpl(`${config.apiUrl}/api/v1/nlbs/classes`, {
+      headers: { Accept: "application/json", "X-Site-Key": config.siteKey },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { ok?: unknown; classes?: unknown };
+    if (data.ok !== true || !Array.isArray(data.classes)) return null;
+    const out = new Map<string, ClassAvailability>();
+    for (const c of data.classes as ClassAvailability[]) {
+      if (typeof c?.key === "string" && Number.isInteger(c.left) && typeof c.open === "boolean") {
+        out.set(c.key, { key: c.key, left: c.left, open: c.open });
+      }
     }
     return out;
   } catch {

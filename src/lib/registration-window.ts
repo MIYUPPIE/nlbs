@@ -31,7 +31,7 @@ export const registrationClosure = {
   closedIso: "2026-12-07",
   closed: "7 December 2026",
   title: "Registration is closed",
-  body: "Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, closed on 7 December 2026. Thank you to everyone who requested an invitation.",
+  body: "Registration for Nigeria 2.0, the Nigerian Leadership Business Summit 2026, closed on 7 December 2026. Thank you to everyone who registered.",
 } as const;
 
 export const closesAtMs = Date.parse(registrationClosure.closesAt);

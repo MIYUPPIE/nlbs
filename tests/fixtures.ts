@@ -7,6 +7,7 @@ export const validRegistration = {
   sector: "Technology & Telecommunications",
   country: "Nigeria",
   delegateType: "Business",
+  tier: "business",
   website: "",
 };
 

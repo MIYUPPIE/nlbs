@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { openClassKeys } from "@/data/registration-plan";
 
 /**
  * Registration contract. Shared by the client form and the /api/register
@@ -65,6 +66,8 @@ export const registrationSchema = z
     sector: z.enum(sectors, { error: "Select your sector." }),
     country: requiredText("Country", 80),
     delegateType: z.enum(delegateTypes, { error: "Select a delegate type." }),
+    /** Delegate class: sets the price. The backend refuses a class that is full. */
+    tier: z.enum(openClassKeys, { error: "Choose your class." }),
     /** Optional extras from the registration plan. Blank WhatsApp means "same as phone". */
     whatsapp: z
       .string()

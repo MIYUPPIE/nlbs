@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, CalendarClock, MailCheck, Send, ShieldCheck } from "lucide-react";
+import { ArrowRight, CalendarClock, CreditCard, MailCheck, Send } from "lucide-react";
 import { event } from "@/data/event";
-import { preEventTimeline, registrationModel } from "@/data/registration-plan";
+import { registrationModel } from "@/data/registration-plan";
 import { delegateTypes } from "@/lib/registration";
 import { registrationClosure as c, registrationOpen } from "@/lib/registration-window";
 import { RegistrationDaysLeft } from "@/components/sections/RegistrationDaysLeft";
@@ -13,25 +13,21 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /** Delegate types offered as one-tap shortcuts; /register?type=... preselects the form. */
 const quickTypes = delegateTypes.filter((t) => t !== "Other" && t !== "Media");
 
-const qrStep = preEventTimeline.find((t) => /QR code/.test(t.what));
-
 const steps = [
   {
     icon: Send,
-    title: "Request your invitation",
-    detail: "Free. No payment on this site.",
+    title: "Choose your class",
+    detail: "VIP, Executive Class, Business Class or Standard. Seats are limited in each.",
   },
   {
-    icon: ShieldCheck,
-    title: "We vet every request",
-    detail: "Seats are confirmed only after vetting.",
+    icon: CreditCard,
+    title: "Pay securely",
+    detail: "With Paystack. Your seat is confirmed the moment you pay.",
   },
   {
     icon: MailCheck,
-    title: "Your QR code by email",
-    detail: qrStep
-      ? `${qrStep.when} the summit, with the venue map.`
-      : "Before the summit, with the venue map.",
+    title: "Your seat and QR code by email",
+    detail: "Straight away: your class, seat number and entry QR code.",
   },
 ];
 
@@ -66,7 +62,7 @@ export function RegistrationSection() {
                 className="mt-6"
                 title={
                   <>
-                    Request your <span className="text-gold">invitation</span>
+                    Secure your <span className="text-gold">seat</span>
                   </>
                 }
                 lead={`${registrationModel.lead} ${event.date.display}, ${event.venue.display}.`}
@@ -88,7 +84,7 @@ export function RegistrationSection() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <GoldButton href="/register#request" size="lg">
-                  Request your invitation
+                  Choose your class
                 </GoldButton>
                 <GoldButton href="/register" variant="outline-light" size="lg" arrow={false}>
                   How delegates get in

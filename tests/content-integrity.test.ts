@@ -195,7 +195,13 @@ describe("no fabricated content", () => {
   it("has no ticket pricing or payment flow", () => {
     // Naira amounts are only allowed as Talent Fund answer options (monthly revenue bands).
     // Talent Fund answer options (monthly revenue bands) and the summit book's price (src/data/book.ts).
-    const allowNaira = new Set([join(SRC, "lib", "talent-form.ts"), join(SRC, "data", "book.ts")]);
+    // Naira amounts: Talent Fund answer options, the summit book (src/data/book.ts) and the delegate
+    // class prices (convener, 26 Nov 2026), which live in src/data/registration-plan.ts only.
+    const allowNaira = new Set([
+      join(SRC, "lib", "talent-form.ts"),
+      join(SRC, "data", "book.ts"),
+      join(SRC, "data", "registration-plan.ts"),
+    ]);
     const priced = walk(SRC).filter(
       (p) => !allowNaira.has(p) && /[₦N]\s?\d{1,3}(,\d{3})+/.test(readFileSync(p, "utf8")),
     );
@@ -203,7 +209,16 @@ describe("no fabricated content", () => {
     const book = readFileSync(join(SRC, "data", "book.ts"), "utf8");
     expect([...book.matchAll(/₦\s?(\d{1,3}(?:,\d{3})+)/g)].map((m) => m[1])).toEqual(["10,000"]);
     // No payment on this site: seat payment was switched off (26 Nov 2026); payment links live on the backend.
-    expect(sourceText.toLowerCase()).not.toMatch(/checkout|paystack|flutterwave|stripe/);
+    const plan = readFileSync(join(SRC, "data", "registration-plan.ts"), "utf8");
+    expect([...plan.matchAll(/₦\s?(\d{1,3}(?:,\d{3})+)/g)].map((m) => m[1])).toEqual([
+      "250,000",
+      "200,000",
+      "150,000",
+      "100,000",
+      "20,000",
+    ]);
+    // One payment provider: Paystack (through the central backend).
+    expect(sourceText.toLowerCase()).not.toMatch(/flutterwave|stripe|paypal|interswitch|remita/);
   });
 });
 

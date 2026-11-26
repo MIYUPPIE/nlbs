@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
+import { CircleAlert, CircleCheck, CreditCard, LoaderCircle, Lock } from "lucide-react";
 import { event } from "@/data/event";
+import { classPayment, delegateClasses } from "@/data/registration-plan";
+import { fetchClassAvailability, type ClassAvailability } from "@/lib/central";
+import type { Checkout } from "@/lib/forms";
 import { delegateTypes, registrationSchema, sectors } from "@/lib/registration";
 import { buttonClasses } from "@/components/ui/GoldButton";
 import { Honeypot, SelectField, TextField } from "@/components/forms/Field";
@@ -44,15 +47,47 @@ const emptyValues = {
   nominatedBy: "",
   accessNeeds: "",
   accessNeedsConsent: "",
+  tier: "",
   website: "",
 };
+
+/** Sends the browser to Paystack (separate so the flow is easy to follow and test). */
+function goToCheckout(checkout: Checkout) {
+  window.location.assign(checkout.url);
+}
+
+const pickClass = (raw: string) => (delegateClasses.some((c) => c.key === raw && c.open) ? raw : null);
 
 const pickDelegateType = (raw: string) => ((delegateTypes as readonly string[]).includes(raw) ? raw : null);
 
 export function RegistrationForm() {
-  const { formRef, ...form } = useSubmissionForm(registrationSchema, emptyValues, (v) =>
-    sendForm("registration", v),
-  );
+  // After a successful registration: the Paystack checkout we are sending them to, or why it did not open.
+  const [pay, setPay] = useState<{
+    checkout: Checkout | null;
+    error: string | null;
+    payUrl: string | null;
+  } | null>(null);
+  const { formRef, ...form } = useSubmissionForm(registrationSchema, emptyValues, async (v) => {
+    const res = await sendForm("registration", v);
+    if (res.ok) {
+      setPay({ checkout: res.payment ?? null, error: res.paymentError ?? null, payUrl: res.payUrl ?? null });
+      if (res.payment) goToCheckout(res.payment);
+    }
+    return res;
+  });
+  // Live seats per class (null: unknown, every open class is offered and the backend still checks).
+  const [availability, setAvailability] = useState<Map<string, ClassAvailability> | null>(null);
+  useEffect(() => {
+    let live = true;
+    void fetchClassAvailability().then((a) => live && setAvailability(a));
+    return () => {
+      live = false;
+    };
+  }, []);
+  const isFull = (key: string) => availability?.get(key)?.open === false;
+  const chosen = delegateClasses.find((c) => c.key === form.values.tier);
+  // /register?class=vip preselects a class.
+  useQueryPrefill("class", pickClass, (v) => form.setField("tier", v));
   // /register?type=Investor preselects the delegate type.
   useQueryPrefill("type", pickDelegateType, (v) => form.setField("delegateType", v));
   const successRef = useRef<HTMLHeadingElement>(null);
@@ -84,42 +119,71 @@ export function RegistrationForm() {
   }
 
   if (form.status === "success") {
+    if (pay?.checkout) {
+      return (
+        <div role="status" className="rounded-3xl border border-gold/50 bg-white p-8 text-center sm:p-12">
+          <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-navy-950 text-gold">
+            <LoaderCircle aria-hidden="true" className="size-8 animate-spin" />
+          </span>
+          <h2
+            ref={successRef}
+            tabIndex={-1}
+            className="mt-6 font-display text-4xl text-navy-950 outline-none"
+          >
+            Taking you to payment
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-muted">
+            Your registration is saved (reference{" "}
+            <span className="font-mono font-semibold text-navy-950">{form.reference}</span>). Pay{" "}
+            {chosen?.priceDisplay} for your {chosen?.label} seat with {classPayment.provider}.
+          </p>
+          <a href={pay.checkout.url} className={buttonClasses("gold", "lg", "mt-8")}>
+            <CreditCard aria-hidden="true" className="size-4" />
+            Continue to payment
+          </a>
+        </div>
+      );
+    }
     return (
       <div role="status" className="rounded-3xl border border-gold/50 bg-white p-8 text-center sm:p-12">
         <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-navy-950 text-gold">
           <CircleCheck aria-hidden="true" className="size-8" />
         </span>
         <h2 ref={successRef} tabIndex={-1} className="mt-6 font-display text-4xl text-navy-950 outline-none">
-          Request received
+          Registration saved. One step left.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-muted">
-          Thank you, {form.values.fullName.split(" ")[0]}. Your invitation request for {event.shortName} has
-          been received. Once it is vetted, the summit team will confirm your seat at{" "}
-          <strong className="text-navy-950">{form.values.email}</strong>, where your QR entry code will also
-          be sent.
+          Thank you, {form.values.fullName.split(" ")[0]}. Your {chosen?.label} seat is confirmed when you pay{" "}
+          {chosen?.priceDisplay}.
         </p>
+        {pay?.error && (
+          <p className="mx-auto mt-4 flex max-w-md items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-left text-sm text-red-800">
+            <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            {pay.error}
+          </p>
+        )}
         <dl className="mx-auto mt-8 grid max-w-sm gap-3 rounded-2xl bg-ivory p-5 text-left text-sm">
           <div className="flex justify-between gap-4">
             <dt className="text-muted">Reference</dt>
             <dd className="font-mono font-semibold text-navy-950">{form.reference}</dd>
           </div>
           <div className="flex justify-between gap-4">
+            <dt className="text-muted">Class</dt>
+            <dd className="text-right text-navy-950">
+              {chosen?.label} · {chosen?.priceDisplay}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-4">
             <dt className="text-muted">Date</dt>
             <dd className="text-right text-navy-950">{event.date.display}</dd>
           </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-muted">Venue</dt>
-            <dd className="text-right text-navy-950">{event.venue.display}</dd>
-          </div>
         </dl>
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/programme" className={buttonClasses("gold")}>
-            Explore the programme
-          </Link>
-          <button type="button" onClick={form.reset} className={buttonClasses("outline-dark")}>
-            Request for another delegate
-          </button>
-        </div>
+        {pay?.payUrl && (
+          <a href={pay.payUrl} className={buttonClasses("gold", "lg", "mt-8")}>
+            <CreditCard aria-hidden="true" className="size-4" />
+            Pay {chosen?.priceDisplay} now
+          </a>
+        )}
         <BookOffer campaign="registration_received" />
       </div>
     );
@@ -150,7 +214,56 @@ export function RegistrationForm() {
         </div>
       )}
 
-      <fieldset>
+      <fieldset aria-describedby={form.errors.tier ? "f-tier-error" : "f-tier-hint"}>
+        <legend className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">Your class</legend>
+        <p id="f-tier-hint" className="mt-2 text-sm text-muted">
+          Seats are limited in each class. {classPayment.confirmed}
+        </p>
+        <div role="radiogroup" aria-label="Delegate class" className="mt-5 grid gap-3 sm:grid-cols-2">
+          {delegateClasses.map((c) => {
+            const full = !c.open || isFull(c.key);
+            const selected = form.values.tier === c.key;
+            return (
+              <label
+                key={c.key}
+                data-testid={`class-${c.key}`}
+                className={`relative flex cursor-pointer items-center justify-between gap-4 rounded-2xl border p-4 transition-colors ${
+                  full
+                    ? "cursor-not-allowed border-line bg-ivory opacity-60"
+                    : selected
+                      ? "border-gold bg-gold/10 ring-2 ring-gold"
+                      : "border-line bg-white hover:border-gold/60"
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="tier"
+                    value={c.key}
+                    checked={selected}
+                    disabled={full}
+                    onChange={() => form.setField("tier", c.key)}
+                    onBlur={() => form.blurField("tier")}
+                    className="size-5 accent-navy-950"
+                  />
+                  <span className="font-semibold text-navy-950">{c.label}</span>
+                </span>
+                <span className="text-right">
+                  <span className="block font-display text-2xl text-navy-950">{c.priceDisplay}</span>
+                  {full && <span className="block text-xs font-semibold text-red-700 uppercase">Full</span>}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        {form.errors.tier && (
+          <p id="f-tier-error" role="alert" className="mt-2 text-sm font-medium text-red-700">
+            {form.errors.tier}
+          </p>
+        )}
+      </fieldset>
+
+      <fieldset className="mt-10 border-t border-line pt-8">
         <legend className="text-xs font-semibold tracking-[0.2em] text-gold-ink uppercase">
           Your details
         </legend>
@@ -318,10 +431,32 @@ export function RegistrationForm() {
 
       <Honeypot value={form.values.website} onChange={(v) => form.setField("website", v)} />
 
-      <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+      {chosen && (
+        <div
+          data-testid="order-total"
+          className="mt-10 flex items-center justify-between gap-4 rounded-2xl bg-navy-950 p-5 text-white"
+        >
+          <div>
+            <p className="text-sm text-mist">{chosen.label} seat</p>
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-mist">
+              <Lock aria-hidden="true" className="size-3.5 text-gold" />
+              Secure payment by {classPayment.provider}
+            </p>
+            <p className="mt-1 text-xs text-mist" data-testid="refund-rule">
+              {classPayment.refunds}{" "}
+              <Link href="/terms#registration" className="underline">
+                Terms
+              </Link>
+            </p>
+          </div>
+          <p className="font-display text-3xl text-gold">{chosen.priceDisplay}</p>
+        </div>
+      )}
+
+      <div className="mt-8 flex flex-col gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
         <PrivacyNotice
           id="registration-note"
-          purpose="Fields marked * are required. Your details are used only to manage your participation in the summit."
+          purpose="Fields marked * are required. Your details are used only to take payment for your seat and manage your participation in the summit."
         />
         <button
           type="submit"
@@ -331,10 +466,15 @@ export function RegistrationForm() {
           {submitting ? (
             <>
               <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-              Submitting…
+              Saving your registration…
+            </>
+          ) : chosen ? (
+            <>
+              <CreditCard aria-hidden="true" className="size-4" />
+              Continue to payment · {chosen.priceDisplay}
             </>
           ) : (
-            "Request Invitation"
+            "Choose your class to continue"
           )}
         </button>
       </div>

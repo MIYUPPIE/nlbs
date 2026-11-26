@@ -30,11 +30,13 @@ test.describe("homepage registration", () => {
     expect(order).toEqual(["hero-title", "register", "shortlist"]);
 
     const section = page.locator("#register");
-    await expect(section.getByRole("heading", { level: 2, name: "Request your invitation" })).toBeVisible();
+    await expect(section.getByRole("heading", { level: 2, name: "Secure your seat" })).toBeVisible();
     await expect(section.getByText("Delegate registration is open")).toBeVisible();
     await expect(section.locator('time[datetime="2026-12-06"]')).toHaveText("6 December 2026");
     await expect(section.getByTestId("registration-days-left")).toHaveText("14 days left");
-    await expect(section.getByText("2 days before the summit, with the venue map.")).toBeVisible();
+    await expect(
+      section.getByText("Straight away: your class, seat number and entry QR code."),
+    ).toBeVisible();
 
     // The hero repeats the deadline under its buttons.
     const hero = page.getByTestId("hero-registration-deadline");
@@ -68,9 +70,9 @@ test.describe("homepage registration", () => {
 
   test("the main button opens the form", async ({ page }) => {
     await page.goto("/");
-    await page.locator("#register").getByRole("link", { name: "Request your invitation" }).click();
+    await page.locator("#register").getByRole("link", { name: "Choose your class" }).click();
     await expect(page).toHaveURL(/\/register\/?#request$/);
-    await expect(page.getByRole("button", { name: "Request Invitation" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Choose your class to continue" })).toBeVisible();
   });
 
   test("a 'Register as' shortcut preselects the delegate type", async ({ page }) => {

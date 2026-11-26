@@ -10,8 +10,66 @@ import type { IconName } from "@/components/ui/Icon";
  */
 
 export const registrationModel = {
-  heading: "Invitation-only. Every seat is allocated.",
-  lead: "This is not open registration. Seats are capped at 800 and every request is vetted, so the room stays senior and the door stays calm.",
+  heading: "Choose your class. Pay to confirm your seat.",
+  lead: "Delegate seats come in classes, each with a limited number of seats. A seat is confirmed only when it is paid, and your seat number and entry QR code arrive by email straight away.",
+};
+
+/**
+ * Delegate classes (convener, 26 Nov 2026, "Nigeria 2.0 Delegate Tier
+ * Distribution"). Price in naira; capacity = seats in the class. `open`: sold
+ * on this site. Basic Entry Level is subsidised for youths and full. VVIP
+ * guests are invited by the convener and are not sold here. The central
+ * backend charges the same prices and stops selling a class when it is full
+ * (config central.nlbs_registration.tiers; tests/registration-classes.test.ts
+ * compares them).
+ */
+export type DelegateClass = {
+  key: "vip" | "executive" | "business" | "standard" | "basic";
+  label: string;
+  price: number;
+  priceDisplay: string;
+  capacity: number;
+  open: boolean;
+};
+
+export const delegateClasses: DelegateClass[] = [
+  { key: "vip", label: "VIP", price: 250_000, priceDisplay: "₦250,000", capacity: 62, open: true },
+  {
+    key: "executive",
+    label: "Executive Class",
+    price: 200_000,
+    priceDisplay: "₦200,000",
+    capacity: 196,
+    open: true,
+  },
+  {
+    key: "business",
+    label: "Business Class",
+    price: 150_000,
+    priceDisplay: "₦150,000",
+    capacity: 351,
+    open: true,
+  },
+  { key: "standard", label: "Standard", price: 100_000, priceDisplay: "₦100,000", capacity: 108, open: true },
+  {
+    key: "basic",
+    label: "Basic Entry Level",
+    price: 20_000,
+    priceDisplay: "₦20,000",
+    capacity: 252,
+    open: false,
+  },
+];
+
+export const openClassKeys = ["vip", "executive", "business", "standard"] as const;
+
+export const classPayment = {
+  provider: "Paystack",
+  secure: "Payment is taken securely by Paystack. We never see or store your card or bank details.",
+  confirmed:
+    "Your seat is confirmed the moment you pay: your class, seat number and entry QR code arrive by email.",
+  refunds: "Seats are not refundable, but you can transfer yours to a colleague before the summit.",
+  basicFull: "Basic Entry Level (subsidised for youths) is full.",
 };
 
 export type EntryRoute = {
@@ -39,14 +97,14 @@ export const entryRoutes: EntryRoute[] = [
   },
   {
     category: "Corporate C-Suite",
-    how: "Nominated by a partner, chamber of commerce or bank, then submit the form on this page.",
-    approval: "Vetted within 24 hours",
+    how: "Register with the form on this page and choose your class. Tell us if a partner, chamber of commerce or bank nominated you.",
+    approval: "Confirmed when paid",
     icon: "briefcase",
   },
   {
     category: "Investors, DFIs & Tech",
-    how: "Apply with the form on this page and include your LinkedIn profile.",
-    approval: "Vetted within 48 hours",
+    how: "Register with the form on this page and choose your class.",
+    approval: "Confirmed when paid",
     icon: "trending",
   },
   {
@@ -58,20 +116,15 @@ export const entryRoutes: EntryRoute[] = [
   },
 ];
 
-/** What approved delegates receive, counted back from the summit day. */
+/** What confirmed delegates receive, counted back from the summit day. */
 export const preEventTimeline: { when: string; what: string; channel: string }[] = [
   {
-    when: "21 days before",
-    what: "“Save your seat” email with your form link",
-    channel: "Email",
-  },
-  {
-    when: "14 days before",
-    what: "“You're approved”: your e-badge and the dress code",
+    when: "When you pay",
+    what: "Your class, seat number and entry QR code",
     channel: "Email",
   },
   { when: "7 days before", what: "Final details: parking, agenda and who you'll meet", channel: "Email" },
-  { when: "2 days before", what: "Your QR code and the venue map", channel: "Email" },
+  { when: "2 days before", what: "The venue map and your QR code again", channel: "Email" },
   { when: "1 day before", what: "“See you tomorrow” reminder. ID required", channel: "SMS" },
 ];
 
@@ -85,8 +138,8 @@ export const arrival = {
     "Show your QR code on your phone, or give your name, at a check-in lane.",
     "Your badge prints in seconds and an usher directs you to the hall.",
   ],
-  bring: ["Your QR code (sent by email two days before)", "A valid photo ID"],
+  bring: ["Your QR code (in your payment confirmation email)", "A valid photo ID"],
   parking: "Use the Eko Hotel gate and show your confirmation message.",
   exhibitors: "Exhibitor and booth set-up staff use a separate lane with their own badges.",
-  noOnSite: "There is no on-site registration. Only pre-approved delegates are admitted.",
+  noOnSite: "There is no on-site registration or payment. Only delegates with a paid seat are admitted.",
 };

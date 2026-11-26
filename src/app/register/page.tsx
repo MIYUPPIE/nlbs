@@ -2,7 +2,14 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, CircleCheck, Lock, MapPin } from "lucide-react";
 import { whatToExpect } from "@/data/content";
 import { contact, event } from "@/data/event";
-import { arrival, entryRoutes, preEventTimeline, registrationModel } from "@/data/registration-plan";
+import {
+  arrival,
+  classPayment,
+  delegateClasses,
+  entryRoutes,
+  preEventTimeline,
+  registrationModel,
+} from "@/data/registration-plan";
 import { PageHero } from "@/components/layout/PageHero";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -17,8 +24,8 @@ import { eventJsonLd } from "@/lib/site";
 
 export const metadata = registrationOpen
   ? pageMetadata({
-      title: "Request an Invitation",
-      description: `Request an invitation to Nigeria 2.0, the invitation-only Nigerian Leadership Business Summit 2026. ${event.date.display.replace(",", "")}, ${event.venue.display}. Open until ${c.lastDay}.`,
+      title: "Register",
+      description: `Register for Nigeria 2.0, the Nigerian Leadership Business Summit 2026: choose your delegate class and pay securely online. ${event.date.display.replace(",", "")}, ${event.venue.display}. Open until ${c.lastDay}.`,
       path: "/register",
     })
   : pageMetadata({
@@ -41,7 +48,7 @@ function ClosedRegistration() {
   const shortlist = summitCta(false);
   return (
     <>
-      <PageHero eyebrow="Invitation-only · 800 seats" title={c.title} lead={c.body} />
+      <PageHero eyebrow="Delegate classes" title={c.title} lead={c.body} />
       <section
         id="request"
         aria-labelledby="closed-title"
@@ -55,14 +62,14 @@ function ClosedRegistration() {
                 <Lock aria-hidden="true" className="size-6" />
               </span>
               <h2 id="closed-title" className="mt-6 font-display text-4xl text-navy-950">
-                No new invitation requests
+                No new registrations
               </h2>
               <p className="mt-3 max-w-lg text-muted">
-                Registration closed on <time dateTime={c.closedIso}>{c.closed}</time>. Seats are by confirmed
-                invitation only, and there is no on-site registration.
+                Registration closed on <time dateTime={c.closedIso}>{c.closed}</time>. Only delegates with a
+                paid seat are admitted, and there is no on-site registration.
               </p>
               <p className="mt-3 max-w-lg text-muted">
-                Questions about an invitation you already requested:{" "}
+                Questions about your registration or seat:{" "}
                 {contact.email && (
                   <a href={`mailto:${contact.email}`} className="font-semibold text-navy-700 underline">
                     {contact.email}
@@ -93,8 +100,8 @@ function OpenRegistration() {
   return (
     <>
       <PageHero
-        eyebrow="Invitation-only · 800 seats"
-        title="Request your invitation"
+        eyebrow="Delegate classes · limited seats"
+        title="Secure your seat"
         lead={registrationModel.lead}
       />
       <Section tone="white" labelledBy="routes-title">
@@ -131,7 +138,7 @@ function OpenRegistration() {
       </Section>
       <section
         id="request"
-        aria-label="Invitation request form"
+        aria-label="Registration form"
         data-registration="open"
         className="surface-light bg-ivory py-16 sm:py-20 lg:py-24"
       >
@@ -178,8 +185,11 @@ function OpenRegistration() {
                   ))}
                 </ul>
                 <p className="mt-8 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-relaxed text-mist">
-                  Requests are free and involve no payment on this site. Seats are confirmed only after
-                  vetting.
+                  {delegateClasses
+                    .filter((k) => k.open)
+                    .map((k) => `${k.label} ${k.priceDisplay}`)
+                    .join(" · ")}
+                  . {classPayment.basicFull} {classPayment.confirmed} {classPayment.secure}
                 </p>
               </div>
             </aside>

@@ -13,6 +13,14 @@ const PORT = Number(process.env.FAKE_CENTRAL_PORT ?? 3299);
 const KEY = process.env.FAKE_CENTRAL_KEY ?? "pk_e2e_nlbs";
 const ORIGINS = (process.env.FAKE_CENTRAL_ORIGINS ?? "http://localhost:3200").split(",");
 const last = new Map();
+// Mirrors central-backend config central.nlbs_registration.tiers (price in kobo).
+const CLASS_KOBO = {
+  vip: 25_000_000,
+  executive: 20_000_000,
+  business: 15_000_000,
+  standard: 10_000_000,
+  basic: 2_000_000,
+};
 // Mirrors src/data/universities.ts (tests/universities.test.ts pins the same list).
 const UNIVERSITY_SLUGS = [
   "unilag",
@@ -102,6 +110,30 @@ createServer((req, res) => {
       origin,
     );
   }
+  // Delegate classes (GET, counts only): every open class has seats; Basic is never sold online.
+  if (url.pathname === "/api/v1/nlbs/classes") {
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : "",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Accept, X-Site-Key",
+      });
+      return res.end();
+    }
+    if (req.headers["x-site-key"] !== KEY)
+      return send(res, 401, { ok: false, error: "Missing or invalid site key." }, origin);
+    if (!ORIGINS.includes(origin))
+      return send(res, 403, { ok: false, error: "This origin is not allowed for this site." }, origin);
+    return send(
+      res,
+      200,
+      {
+        ok: true,
+        classes: Object.entries(CLASS_KOBO).map(([key]) => ({ key, left: 10, open: key !== "basic" })),
+      },
+      origin,
+    );
+  }
   if (url.pathname !== "/api/v1/submissions")
     return send(res, 404, { ok: false, error: "Not found." }, origin);
 
@@ -133,6 +165,24 @@ createServer((req, res) => {
     if (!["registration", "enquiry", "talent", "sponsor", "university", "privacy"].includes(body.form))
       return send(res, 404, { ok: false, error: "Unknown form." }, origin);
     remember(body);
-    send(res, 201, { ok: true, reference: `N2-${chunk()}-${chunk()}` }, origin);
+    const reference = `N2-${chunk()}-${chunk()}`;
+    if (body.form === "registration" && CLASS_KOBO[body.tier]) {
+      return send(
+        res,
+        201,
+        {
+          ok: true,
+          reference,
+          payment: {
+            url: `https://checkout.paystack.com/${reference.toLowerCase()}-p1`,
+            amount: CLASS_KOBO[body.tier],
+            currency: "NGN",
+          },
+          payUrl: `http://localhost:3299/pay/${"P".repeat(32)}`,
+        },
+        origin,
+      );
+    }
+    send(res, 201, { ok: true, reference }, origin);
   });
 }).listen(PORT, () => console.log(`fake central on :${PORT}`));

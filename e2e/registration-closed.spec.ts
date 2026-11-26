@@ -25,7 +25,7 @@ test.describe("registration closed @closed", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Registration is closed" })).toBeVisible();
     await expect(page.locator('[data-registration="closed"]')).toBeVisible();
     await expect(page.locator("form")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Request Invitation" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Choose your class|Continue to payment/ })).toHaveCount(0);
     await expect(page.getByText("7 December 2026").first()).toBeVisible();
     // Confirmed delegates still get the arrival details.
     await expect(page.getByText(/no on-site registration/i).first()).toBeVisible();
