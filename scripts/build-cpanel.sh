@@ -34,10 +34,11 @@ CLOSES_AT="$(sed -n 's/^ *closesAt: "\([^"]*\)".*/\1/p' src/lib/registration-win
 BUILD_STATE="$(node -e 'process.stdout.write(Date.now() < Date.parse(process.argv[1]) ? "open" : "closed")' "$CLOSES_AT")"
 if [ "$BUILD_STATE" = open ]; then
   grep -q 'data-registration="open"' out/register/index.html || fail "/register should be open until $CLOSES_AT"
-  grep -q 'Request Invitation' out/register/index.html || fail "/register is missing the registration form"
+  grep -q 'Continue to payment' out/register/index.html || fail "/register is missing the registration form"
+  [ -f out/register/pay/index.html ] || fail "/register/pay (seat payment page) is missing"
 else
   grep -q 'data-registration="closed"' out/register/index.html || fail "/register is not showing 'Registration is closed'"
-  ! grep -q 'Request Invitation' out/register/index.html || fail "/register still has the registration form"
+  ! grep -q 'Continue to payment' out/register/index.html || fail "/register still has the registration form"
 fi
 echo "registration: $BUILD_STATE (closes $CLOSES_AT)"
 
