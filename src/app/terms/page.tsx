@@ -2,9 +2,9 @@ import { LegalDocument } from "@/components/legal/LegalDocument";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
-  title: "Terms of Use",
+  title: "Terms of Sale and Use",
   description:
-    "Terms for using the Nigeria 2.0 website, registering for the summit and applying to the Talent Fund.",
+    "Terms for buying a Nigeria 2.0 seat (no refunds, transferable to a colleague), using the website and applying to the Talent Fund.",
   path: "/terms",
 });
 

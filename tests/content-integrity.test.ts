@@ -192,12 +192,13 @@ describe("no fabricated content", () => {
     expect(sourceText).not.toMatch(/\bdownload\b/);
   });
 
-  it("has exactly one ticket price, the convener's, and one payment provider", () => {
-    // Naira amounts: Talent Fund answer options (monthly revenue bands) and the delegate seat
-    // price (convener, 26 Nov 2026), which lives in src/data/registration-plan.ts only.
+  it("has only the convener's seat price, the book's price, and one payment provider", () => {
+    // Naira amounts: Talent Fund answer options (monthly revenue bands), the delegate seat price
+    // (convener, 26 Nov 2026, src/data/registration-plan.ts) and the summit book (src/data/book.ts).
     const allowNaira = new Set([
       join(SRC, "lib", "talent-form.ts"),
       join(SRC, "data", "registration-plan.ts"),
+      join(SRC, "data", "book.ts"),
     ]);
     const priced = walk(SRC).filter(
       (p) => !allowNaira.has(p) && /[₦N]\s?\d{1,3}(,\d{3})+/.test(readFileSync(p, "utf8")),
@@ -205,6 +206,9 @@ describe("no fabricated content", () => {
     expect(priced).toEqual([]);
     const plan = readFileSync(join(SRC, "data", "registration-plan.ts"), "utf8");
     expect([...plan.matchAll(/₦\s?(\d{1,3}(?:,\d{3})+)/g)].map((m) => m[1])).toEqual(["15,000"]);
+    // The summit book's price, checked against the book site in tests/book-offer.test.ts.
+    const book = readFileSync(join(SRC, "data", "book.ts"), "utf8");
+    expect([...book.matchAll(/₦\s?(\d{1,3}(?:,\d{3})+)/g)].map((m) => m[1])).toEqual(["10,000"]);
     expect(sourceText.toLowerCase()).not.toMatch(/flutterwave|stripe|paypal|interswitch|remita/);
   });
 });

@@ -49,7 +49,7 @@ export const footerSecondaryNav: NavLink[] = [
 export const legalNav: NavLink[] = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Cookie Policy", href: "/cookies" },
-  { label: "Terms of Use", href: "/terms" },
+  { label: "Terms of Sale", href: "/terms" },
   { label: "Privacy Request", href: "/privacy/request" },
   { label: "Photo Credits", href: "/credits" },
 ];

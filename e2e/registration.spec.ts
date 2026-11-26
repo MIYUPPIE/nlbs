@@ -28,6 +28,13 @@ test.describe("registration", () => {
     await page.getByLabel(/Sector/).selectOption("Technology & Telecommunications");
     await page.getByLabel(/Delegate Type/).selectOption("Investor");
     await expect(page.getByTestId("order-total")).toContainText("₦15,000");
+    await expect(page.getByTestId("refund-rule")).toContainText(
+      "Seats are not refundable, but you can transfer yours",
+    );
+    await expect(page.getByTestId("refund-rule").getByRole("link", { name: "Terms" })).toHaveAttribute(
+      "href",
+      /\/terms\/?#registration$/,
+    );
     await page.getByRole("button", { name: "Continue to payment · ₦15,000" }).click();
 
     await expect(page).toHaveURL(/^https:\/\/checkout\.paystack\.com\/n2-[a-z2-9]{4}-[a-z2-9]{4}-p1$/);
@@ -168,6 +175,18 @@ test.describe("paying for a seat later (/register/pay)", () => {
     const done = page.getByRole("heading", { name: "Your seat is confirmed" });
     await expect(done).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(/photo ID/i)).toBeVisible();
+    await expect(page.getByText(/transfer yours to a colleague/)).toBeVisible();
+
+    // The moment they are in, offer the summit book.
+    const offer = page.getByTestId("book-offer");
+    await expect(offer.getByRole("heading", { name: "Advising The Founder" })).toBeVisible();
+    await expect(offer).toContainText("₦10,000");
+    await expect(offer).toContainText("Ships 10 December 2026");
+    await expect(offer.getByRole("img", { name: /Front cover of Advising The Founder/ })).toBeVisible();
+    await expect(offer.getByRole("link", { name: "Pre-order the book" })).toHaveAttribute(
+      "href",
+      "https://advisingthefounder.com/preorder/?utm_source=nlbs&utm_medium=referral&utm_campaign=seat_confirmed_page",
+    );
   });
 
   test("an unknown reference says so and offers registration", async ({ page }) => {

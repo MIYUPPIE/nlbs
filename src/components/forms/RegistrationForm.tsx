@@ -473,6 +473,12 @@ export function RegistrationForm() {
             <Lock aria-hidden="true" className="size-3.5 text-gold" />
             Secure payment by {seatPayment.provider}
           </p>
+          <p className="mt-1 text-xs text-mist" data-testid="refund-rule">
+            {seatPayment.refunds}{" "}
+            <Link href="/terms#registration" className="underline">
+              Terms
+            </Link>
+          </p>
         </div>
         <p className="font-display text-3xl text-gold">{seatTotalDisplay(seats)}</p>
       </div>

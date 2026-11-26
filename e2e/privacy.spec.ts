@@ -10,7 +10,7 @@ test.describe("privacy (NDPA)", () => {
     for (const [name, href] of [
       ["Privacy Policy", "/privacy/"],
       ["Cookie Policy", "/cookies/"],
-      ["Terms of Use", "/terms/"],
+      ["Terms of Sale", "/terms/"],
       ["Privacy Request", "/privacy/request/"],
     ]) {
       await expect(legal.getByRole("link", { name })).toHaveAttribute(
@@ -43,8 +43,12 @@ test.describe("privacy (NDPA)", () => {
 
   test("terms load", async ({ page }) => {
     await page.goto("/terms");
-    await expect(page.getByRole("heading", { level: 1, name: "Terms of Use" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Terms of Sale and Use" })).toBeVisible();
     await expect(page.getByText("laws of the Federal Republic of Nigeria")).toBeVisible();
+    // Seats: no refunds, transferable to a colleague (convener, 26 Nov 2026).
+    await expect(page.getByText("Seats are not refundable, including if you cannot attend.")).toBeVisible();
+    await expect(page.getByText(/You can transfer your seat to a colleague/)).toBeVisible();
+    await expect(page.locator("#registration")).toBeAttached();
   });
 
   test("a privacy request reaches the backend with the policy version", async ({ page }) => {

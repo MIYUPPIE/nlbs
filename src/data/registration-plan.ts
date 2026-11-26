@@ -34,6 +34,8 @@ export const seatPayment = {
   payPath: "/register/pay/",
   promise: "Your seat is confirmed the moment you pay. Unpaid registrations do not hold a seat.",
   secure: "Payment is taken securely by Paystack. We never see or store your card or bank details.",
+  /** Convener, 26 Nov 2026. The full wording is in the Terms of Sale and Use (/terms). */
+  refunds: "Seats are not refundable, but you can transfer yours to a colleague before the summit.",
   earlierRegistrants:
     "Registered before 26 November? Every delegate now pays to attend. Use the payment link we emailed you, or enter your reference on the payment page.",
 };

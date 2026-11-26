@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CalendarDays, CircleAlert, CircleCheck, CreditCard, LoaderCircle, Lock, MapPin } from "lucide-react";
 import { event } from "@/data/event";
+import Image from "next/image";
+import { bookUrl, summitBook } from "@/data/book";
 import { arrival, seatPayment, seatTotalDisplay } from "@/data/registration-plan";
 import {
   fetchSeatStatus,
@@ -234,9 +236,11 @@ export function SeatPayment() {
           <li>Dress code: {arrival.dressCode.toLowerCase()}.</li>
           <li>{arrival.noOnSite}</li>
         </ul>
-        <Link href="/programme" className={buttonClasses("gold", "lg", "mt-8")}>
-          Explore the programme
-        </Link>
+        <p className="mt-6 text-sm text-muted">
+          Can&apos;t make it? {seatPayment.refunds} Reply to your confirmation email with your seat code and
+          your colleague&apos;s name and email.
+        </p>
+        <BookOffer />
       </div>
     );
   }
@@ -303,7 +307,53 @@ export function SeatPayment() {
         <Lock aria-hidden="true" className="size-3.5" />
         {seatPayment.secure}
       </p>
+      <p className="mt-2 text-xs text-muted">
+        {seatPayment.refunds}{" "}
+        <Link href="/terms#registration" className="underline">
+          Terms
+        </Link>
+      </p>
     </div>
+  );
+}
+
+/** The summit book, offered once the seat is paid: the moment a delegate is most likely to say yes. */
+function BookOffer() {
+  return (
+    <aside
+      aria-labelledby="book-offer-title"
+      data-testid="book-offer"
+      className="mt-10 grid gap-6 rounded-2xl bg-navy-950 p-6 text-white sm:grid-cols-[7rem_1fr] sm:items-center"
+    >
+      <Image
+        src={summitBook.cover.src}
+        width={summitBook.cover.width}
+        height={summitBook.cover.height}
+        alt={summitBook.coverAlt}
+        className="mx-auto h-auto w-28 rounded-md shadow-lg sm:mx-0"
+      />
+      <div>
+        <p className="text-xs font-semibold tracking-[0.2em] text-gold uppercase">Launches at the summit</p>
+        <h3 id="book-offer-title" className="mt-2 font-display text-2xl leading-tight">
+          {summitBook.title}
+        </h3>
+        <p className="mt-1 text-sm text-mist">
+          by {summitBook.author}. {summitBook.pitch}
+        </p>
+        <p className="mt-3 text-sm text-white">
+          Pre-order for <strong className="text-gold">{summitBook.priceDisplay}</strong>. Ships{" "}
+          {summitBook.shipDate}.
+        </p>
+        <a
+          href={bookUrl("seat_confirmed_page")}
+          className={buttonClasses("gold", "md", "mt-5")}
+          target="_blank"
+          rel="noopener"
+        >
+          Pre-order the book
+        </a>
+      </div>
+    </aside>
   );
 }
 
