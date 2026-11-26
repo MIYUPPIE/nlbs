@@ -12,6 +12,7 @@ import {
   fetchSeatStatus,
   normaliseReference,
   REFERENCE_PATTERN,
+  requestPaymentLink,
   startSeatPayment,
   type SeatStatus,
 } from "@/lib/central";
@@ -162,6 +163,7 @@ export function SeatPayment() {
             {view.error}
           </p>
         )}
+        <ForgotReference />
         {closed ? (
           <p className="mt-8 text-sm text-muted">
             Registration closed on{" "}
@@ -314,6 +316,93 @@ export function SeatPayment() {
         </Link>
       </p>
     </div>
+  );
+}
+
+/** Emails the payment link to the address they registered with; the page itself never says whether it exists. */
+function ForgotReference() {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<
+    { kind: "idle" | "sending" } | { kind: "sent"; message: string } | { kind: "error"; error: string }
+  >({
+    kind: "idle",
+  });
+  const hydrated = useHydrated();
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setState({ kind: "sending" });
+    const res = await requestPaymentLink(email);
+    setState(res.ok ? { kind: "sent", message: res.message } : { kind: "error", error: res.error });
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-4 text-sm font-semibold text-navy-700 underline underline-offset-4"
+      >
+        Forgot your reference? Email me my link
+      </button>
+    );
+  }
+  if (state.kind === "sent") {
+    return (
+      <p
+        role="status"
+        className="mt-6 max-w-md rounded-xl border border-gold/50 bg-ivory p-4 text-sm text-navy-950"
+      >
+        {state.message}
+      </p>
+    );
+  }
+  return (
+    <form
+      onSubmit={submit}
+      noValidate
+      className="mt-6 max-w-md rounded-2xl border border-line p-5"
+      aria-labelledby="forgot-title"
+    >
+      <p id="forgot-title" className="font-semibold text-navy-950">
+        Forgot your reference?
+      </p>
+      <p className="mt-1 text-sm text-muted">
+        Enter the email you registered with and we will email your payment link to it.
+      </p>
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <label htmlFor="forgot-email" className="sr-only">
+          Email you registered with
+        </label>
+        <input
+          id="forgot-email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={state.kind === "error" ? true : undefined}
+          aria-describedby={state.kind === "error" ? "forgot-error" : undefined}
+          className="min-h-12 flex-1 rounded-xl border border-line px-4 text-navy-950"
+        />
+        <button
+          type="submit"
+          disabled={!hydrated || state.kind === "sending"}
+          className={buttonClasses("outline-dark", "lg", "disabled:cursor-wait disabled:opacity-80")}
+        >
+          {state.kind === "sending" ? (
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+          ) : null}
+          Email me my link
+        </button>
+      </div>
+      {state.kind === "error" && (
+        <p id="forgot-error" role="alert" className="mt-2 text-sm font-medium text-red-700">
+          {state.error}
+        </p>
+      )}
+    </form>
   );
 }
 

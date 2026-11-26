@@ -266,3 +266,44 @@ export async function startSeatPayment(
     return { ok: false, error: "We could not reach the server. Check your connection and try again." };
   }
 }
+
+export type LinkRequestResult =
+  { ok: true; message: string } | { ok: false; error: string; fieldError?: string };
+
+/**
+ * "Forgot your reference?" (POST /registrations/links). The backend emails the
+ * payment link to that address if it has a registration, and answers the same
+ * either way, so the page never reveals who registered.
+ */
+export async function requestPaymentLink(
+  email: string,
+  config: CentralConfig | null = centralConfig(),
+  fetchImpl: typeof fetch = fetch,
+): Promise<LinkRequestResult> {
+  if (!config) return { ok: false, error: NOT_OPEN.registration };
+  try {
+    const res = await fetchImpl(`${config.apiUrl}/api/v1/registrations/links`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Site-Key": config.siteKey,
+      },
+      body: JSON.stringify({ email: email.trim() }),
+    });
+    const d = (await res.json().catch(() => null)) as {
+      message?: unknown;
+      error?: unknown;
+      fieldErrors?: { email?: unknown };
+    } | null;
+    if (res.ok && typeof d?.message === "string") return { ok: true, message: d.message };
+    if (res.status === 422) {
+      const fieldError =
+        typeof d?.fieldErrors?.email === "string" ? d.fieldErrors.email : "Enter a valid email address.";
+      return { ok: false, error: fieldError, fieldError };
+    }
+    return { ok: false, error: messageFor(res.status, "registration") };
+  } catch {
+    return { ok: false, error: "We could not reach the server. Check your connection and try again." };
+  }
+}

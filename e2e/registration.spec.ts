@@ -189,6 +189,19 @@ test.describe("paying for a seat later (/register/pay)", () => {
     );
   });
 
+  test("a forgotten reference: the link goes to their inbox, the page reveals nothing", async ({ page }) => {
+    await page.goto("/register/pay");
+    await page.getByRole("button", { name: "Forgot your reference? Email me my link" }).click();
+    await page.getByLabel("Email you registered with").fill("nope");
+    await page.getByRole("button", { name: "Email me my link" }).click();
+    await expect(page.locator("#forgot-error")).toHaveText("Enter a valid email address.");
+    await page.getByLabel("Email you registered with").fill("ada@example.com");
+    await page.getByRole("button", { name: "Email me my link" }).click();
+    await expect(page.getByRole("status")).toContainText("If that email address has a registration");
+    const sent = await (await page.request.get(`${CENTRAL}/__last/registration-links`)).json();
+    expect(sent).toEqual({ email: "ada@example.com" });
+  });
+
   test("an unknown reference says so and offers registration", async ({ page }) => {
     await page.goto("/register/pay/?ref=N2-ZZZZ-ZZZZ");
     await expect(page.locator("#pay-ref-error")).toContainText("could not find a registration");

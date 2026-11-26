@@ -127,6 +127,43 @@ createServer((req, res) => {
       origin,
     );
   }
+  if (url.pathname === "/api/v1/registrations/links") {
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : "",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, X-Site-Key",
+      });
+      return res.end();
+    }
+    let raw = "";
+    req.on("data", (c) => (raw += c));
+    req.on("end", () => {
+      const email = (JSON.parse(raw || "{}").email ?? "").trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+        return send(
+          res,
+          422,
+          {
+            ok: false,
+            error: "Please correct the highlighted fields.",
+            fieldErrors: { email: "Enter a valid email address." },
+          },
+          origin,
+        );
+      last.set("registration-links", { email });
+      send(
+        res,
+        200,
+        {
+          ok: true,
+          message: "If that email address has a registration, we have sent its payment link there.",
+        },
+        origin,
+      );
+    });
+    return;
+  }
   const payMatch = url.pathname.match(/^\/api\/v1\/submissions\/([A-Z0-9-]+)\/payment$/);
   if (payMatch) {
     if (req.method === "OPTIONS") {

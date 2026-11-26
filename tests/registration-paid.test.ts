@@ -7,6 +7,7 @@ import {
   asCheckout,
   fetchSeatStatus,
   normaliseReference,
+  requestPaymentLink,
   startSeatPayment,
   submitToCentral,
 } from "@/lib/central";
@@ -251,5 +252,29 @@ describe("payment with the central backend", () => {
       ),
     ).toMatchObject({ ok: false, paid: true });
     expect(await startSeatPayment("N2-AB12-CD34", null)).toMatchObject({ ok: false });
+  });
+
+  it("asks the backend to email a forgotten payment link, and shows its neutral answer", async () => {
+    const seen: { url?: string; init?: RequestInit } = {};
+    const neutral = "If that email address has a registration, we have sent its payment link there.";
+    expect(
+      await requestPaymentLink(
+        " ada@example.com ",
+        config,
+        fakeFetch(200, { ok: true, message: neutral }, seen),
+      ),
+    ).toEqual({
+      ok: true,
+      message: neutral,
+    });
+    expect(seen.url).toBe("https://api.example.test/api/v1/registrations/links");
+    expect(JSON.parse(String(seen.init?.body))).toEqual({ email: "ada@example.com" });
+    expect(
+      await requestPaymentLink(
+        "x",
+        config,
+        fakeFetch(422, { ok: false, fieldErrors: { email: "Enter a valid email address." } }),
+      ),
+    ).toMatchObject({ ok: false, fieldError: "Enter a valid email address." });
   });
 });
