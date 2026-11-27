@@ -125,3 +125,16 @@ describe("paying with the central backend", () => {
     expect(await fetchClassAvailability(null)).toBeNull();
   });
 });
+
+describe("class picker hides prices until a class is chosen", () => {
+  it("renders no price in the class cards or the register sidebar", () => {
+    const form = readFileSync(join(__dirname, "../src/components/forms/RegistrationForm.tsx"), "utf8");
+    const radioBlock = form.slice(
+      form.indexOf('aria-label="Delegate class"'),
+      form.indexOf('f-tier-error" role'),
+    );
+    expect(radioBlock).not.toContain("priceDisplay");
+    const page = readFileSync(join(__dirname, "../src/app/register/page.tsx"), "utf8");
+    expect(page).not.toContain("priceDisplay");
+  });
+});

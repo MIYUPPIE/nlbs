@@ -248,10 +248,7 @@ export function RegistrationForm() {
                   />
                   <span className="font-semibold text-navy-950">{c.label}</span>
                 </span>
-                <span className="text-right">
-                  <span className="block font-display text-2xl text-navy-950">{c.priceDisplay}</span>
-                  {full && <span className="block text-xs font-semibold text-red-700 uppercase">Full</span>}
-                </span>
+                {full && <span className="text-xs font-semibold text-red-700 uppercase">Full</span>}
               </label>
             );
           })}

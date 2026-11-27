@@ -27,16 +27,14 @@ test.describe("registration with delegate classes", () => {
     ).toBeVisible();
   });
 
-  test("shows the four classes with prices, Basic full, and the price on the button", async ({ page }) => {
+  test("shows the four classes without prices, Basic full, and the price after choosing", async ({
+    page,
+  }) => {
     await page.goto("/register");
-    for (const [cls, price] of [
-      ["vip", "₦250,000"],
-      ["executive", "₦200,000"],
-      ["business", "₦150,000"],
-      ["standard", "₦100,000"],
-    ]) {
-      await expect(page.getByTestId(`class-${cls}`)).toContainText(price);
+    for (const cls of ["vip", "executive", "business", "standard", "basic"]) {
+      await expect(page.getByTestId(`class-${cls}`)).not.toContainText("₦");
     }
+    await expect(page.getByTestId("order-total")).toHaveCount(0);
     await expect(page.getByTestId("class-basic")).toContainText("Full");
     await expect(page.getByRole("radio", { name: "Basic Entry Level" })).toBeDisabled();
 

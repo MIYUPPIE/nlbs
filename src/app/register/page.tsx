@@ -5,7 +5,6 @@ import { contact, event } from "@/data/event";
 import {
   arrival,
   classPayment,
-  delegateClasses,
   entryRoutes,
   preEventTimeline,
   registrationModel,
@@ -185,11 +184,7 @@ function OpenRegistration() {
                   ))}
                 </ul>
                 <p className="mt-8 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-relaxed text-mist">
-                  {delegateClasses
-                    .filter((k) => k.open)
-                    .map((k) => `${k.label} ${k.priceDisplay}`)
-                    .join(" · ")}
-                  . {classPayment.basicFull} {classPayment.confirmed} {classPayment.secure}
+                  {classPayment.basicFull} {classPayment.confirmed} {classPayment.secure}
                 </p>
               </div>
             </aside>
