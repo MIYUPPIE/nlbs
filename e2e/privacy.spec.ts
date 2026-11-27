@@ -85,10 +85,11 @@ test.describe("privacy (NDPA)", () => {
     await page.getByLabel(/Delegate Type/).selectOption("Investor");
     await expect(page.getByLabel(/I consent to the summit team/)).toHaveCount(0);
     await page.getByLabel(/Dietary or access needs/).fill("Halal meals");
-    await page.getByRole("button", { name: "Continue to payment · ₦150,000" }).click();
+    await page.getByRole("button", { name: "Next: payment" }).click();
     await expect(page.getByText(/Tick the box to let us use your dietary or access needs/)).toBeVisible();
 
     await page.getByLabel(/I consent to the summit team/).check();
+    await page.getByRole("button", { name: "Next: payment" }).click();
     await page.getByRole("button", { name: "Continue to payment · ₦150,000" }).click();
     await expect(page).toHaveURL(/^https:\/\/checkout\.paystack\.com\//);
     const sent = await (

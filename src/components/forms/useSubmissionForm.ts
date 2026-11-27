@@ -70,6 +70,25 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
     formRef.current?.querySelector<HTMLElement>(selector)?.focus();
   };
 
+  /**
+   * Validates every field without sending (for multi-step forms): marks all
+   * touched, shows errors, focuses the first invalid field. True when valid.
+   */
+  const validate = (): boolean => {
+    const errs = fieldErrorsFor(values);
+    setTouched(Object.fromEntries(Object.keys(values).map((k) => [k, true])));
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      setStatus("error");
+      setFormError("Please correct the highlighted fields.");
+      focusFirstError(errs);
+      return false;
+    }
+    setStatus("idle");
+    setFormError(null);
+    return true;
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "submitting") return;
@@ -120,6 +139,7 @@ export function useSubmissionForm<S extends z.ZodType<Record<string, unknown>>>(
     setField,
     setFields,
     blurField,
+    validate,
     onSubmit,
     reset,
   };

@@ -13,6 +13,12 @@ async function fillDetails(page: Page, email: string) {
   await page.getByLabel(/Delegate Type/).selectOption("Investor");
 }
 
+/** Step 1 -> step 2 (the payment page). */
+async function toPayment(page: Page) {
+  await page.getByRole("button", { name: "Next: payment" }).click();
+  await expect(page.getByTestId("step-payment")).toBeVisible();
+}
+
 test.describe("registration with delegate classes", () => {
   test("asks for a class first and shows inline validation", async ({ page }) => {
     await page.goto("/register");
@@ -35,15 +41,32 @@ test.describe("registration with delegate classes", () => {
       await expect(page.getByTestId(`class-${cls}`)).not.toContainText("₦");
     }
     await expect(page.getByTestId("order-total")).toHaveCount(0);
+    await expect(page.getByTestId("step-label")).toHaveText("Step 1 of 2");
     await expect(page.getByTestId("class-basic")).toContainText("Full");
     await expect(page.getByRole("radio", { name: "Basic Entry Level" })).toBeDisabled();
 
     await page.getByRole("radio", { name: "Executive Class" }).check();
+    // Still no price on step 1, even with a class chosen.
+    await expect(page.getByTestId("order-total")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Next: payment" })).toBeVisible();
+    await expect(page.locator("form")).not.toContainText("₦");
+
+    await fillDetails(page, "step@example.com");
+    await toPayment(page);
+    await expect(page.getByTestId("step-label")).toHaveText("Step 2 of 2");
+    await expect(page.getByTestId("order-total")).toContainText("Executive Class seat");
+    await expect(page.getByTestId("order-total")).toContainText("Secure payment by Paystack");
     await expect(page.getByTestId("order-total")).toContainText("₦200,000");
     await expect(page.getByTestId("refund-rule")).toContainText(
       "Seats are not refundable, but you can transfer yours",
     );
     await expect(page.getByRole("button", { name: "Continue to payment · ₦200,000" })).toBeVisible();
+
+    // Back keeps what was typed and the class.
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByTestId("step-payment")).toHaveCount(0);
+    await expect(page.getByRole("radio", { name: "Executive Class" })).toBeChecked();
+    await expect(page.getByLabel(/Email Address/)).toHaveValue("step@example.com");
   });
 
   test("a class the backend says is full cannot be picked", async ({ page }) => {
@@ -72,6 +95,7 @@ test.describe("registration with delegate classes", () => {
     await page.goto("/register?class=vip");
     await expect(page.getByRole("radio", { name: "VIP" })).toBeChecked();
     await fillDetails(page, "ada@example.com");
+    await toPayment(page);
     await page.getByRole("button", { name: "Continue to payment · ₦250,000" }).click();
     await expect(page).toHaveURL(/^https:\/\/checkout\.paystack\.com\/n2-[a-z2-9]{4}-[a-z2-9]{4}-p1$/);
 
@@ -107,6 +131,7 @@ test.describe("registration with delegate classes", () => {
     await page.goto("/register");
     await page.getByRole("radio", { name: "Standard" }).check();
     await fillDetails(page, "later@example.com");
+    await toPayment(page);
     await page.getByRole("button", { name: "Continue to payment · ₦100,000" }).click();
 
     const heading = page.getByRole("heading", { name: "Registration saved. One step left." });
@@ -146,6 +171,7 @@ test.describe("registration with delegate classes", () => {
     await page.goto("/register");
     await page.getByRole("radio", { name: "Business Class" }).check();
     await fillDetails(page, "ada@example.com");
+    await toPayment(page);
     await page.getByRole("button", { name: /Continue to payment/ }).click();
     await expect(page.locator("form").getByRole("alert")).toContainText("not open yet");
     await expect(page.getByRole("heading", { name: "Taking you to payment" })).toHaveCount(0);

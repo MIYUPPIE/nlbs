@@ -138,3 +138,12 @@ describe("class picker hides prices until a class is chosen", () => {
     expect(page).not.toContain("priceDisplay");
   });
 });
+
+describe("prices stay off the FAQ", () => {
+  it("FAQ answers name no delegate class price", () => {
+    const faq = readFileSync(join(__dirname, "../content/faq-overrides.json"), "utf8");
+    for (const c of delegateClasses) {
+      expect(faq).not.toContain(c.priceDisplay);
+    }
+  });
+});
